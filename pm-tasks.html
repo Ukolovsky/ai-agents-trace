@@ -86,7 +86,7 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
   </div>
   <details class="settings">
     <summary>GitHub token (один раз)</summary>
-    <p>Personal Access Token с <code>Contents: write</code> для репозитория <code>ai-agents-trace</code>. Хранится только в браузере.</p>
+    <p>Personal Access Token с <code>Contents: Read and write</code> для репозитория <code>ai-agents-trace</code> (не Read). Хранится только в браузере.</p>
     <input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off"/>
     <button type="button" class="btn" id="btn-save-token">Запомнить</button>
   </details>
@@ -129,7 +129,7 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
     var v = document.getElementById("gh-token").value.trim();
     if (!v) { showAlert("Введите token", "warn"); return; }
     localStorage.setItem(TOKEN_KEY, v);
-    showAlert("Токен сохранён", "ok");
+    verifyToken(true).catch(function (e) { showAlert(String(e.message || e), "err"); });
   };
   document.getElementById("gh-token").value = token();
 
@@ -218,13 +218,39 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
     render();
   }
 
+  async function ghError(r, label) {
+    var msg = label + ": " + r.status;
+    try {
+      var j = await r.json();
+      if (j.message) msg += " — " + j.message;
+    } catch (e) {}
+    return new Error(msg);
+  }
+
+  async function verifyToken(showOk) {
+    var tok = token();
+    if (!tok) throw new Error("Токен не задан");
+    var r = await fetch("https://api.github.com/repos/" + REPO, {
+      headers: { Authorization: "Bearer " + tok, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }
+    });
+    if (!r.ok) throw await ghError(r, "Токен не принят");
+    var repo = await r.json();
+    if (!repo.permissions || !repo.permissions.push) {
+      throw new Error(
+        "Нет права записи в " + REPO + ". В токене нужно: репозиторий ai-agents-trace → Contents → Read and write (не только Read)."
+      );
+    }
+    if (showOk) showAlert("Токен OK, запись разрешена", "ok");
+    return true;
+  }
+
   async function fetchSha() {
     var tok = token();
     if (!tok) return null;
     var r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
-      headers: { Authorization: "Bearer " + tok, Accept: "application/vnd.github+json" }
+      headers: { Authorization: "Bearer " + tok, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }
     });
-    if (!r.ok) throw new Error("GitHub GET: " + r.status);
+    if (!r.ok) throw await ghError(r, "GitHub GET");
     var data = await r.json();
     fileSha = data.sha;
     return data.sha;
@@ -239,6 +265,7 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
     }
     document.getElementById("btn-save").disabled = true;
     try {
+      await verifyToken(false);
       await fetchSha();
       var now = new Date().toISOString();
       state.tasks.forEach(function (t) {
@@ -254,10 +281,15 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
       if (fileSha) body.sha = fileSha;
       var r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
         method: "PUT",
-        headers: { Authorization: "Bearer " + tok, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
+        headers: {
+          Authorization: "Bearer " + tok,
+          Accept: "application/vnd.github+json",
+          "Content-Type": "application/json",
+          "X-GitHub-Api-Version": "2022-11-28"
+        },
         body: JSON.stringify(body)
       });
-      if (!r.ok) throw new Error("GitHub PUT: " + r.status);
+      if (!r.ok) throw await ghError(r, "GitHub PUT");
       dirty = false;
       showAlert("Сохранено", "ok");
       await loadJson();
