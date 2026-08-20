@@ -11,7 +11,7 @@
   --primary: #343A7E; --primary-light: #E7E7F0; --secondary: #FF5722;
   --text-primary: #050819; --text-secondary: #85868A;
   --grey-300: #D9DADF; --bg-default: #F5F5F5; --bg-paper: #FFFFFF;
-  --success: #599C16; --danger: #D32F2F;
+  --success: #599C16; --warning: #FCCA25;
   --maxw: 1280px; --radius: 12px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,45 +25,43 @@ body { font-family: "Fira Sans", sans-serif; background: var(--bg-default); colo
 .top-nav-link:hover { background: var(--primary-light); color: var(--primary); }
 .top-nav-link.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 24px 24px 64px; }
-.hero { background: linear-gradient(290deg, #F6F8FE 0%, #EBF2FF 100%); border: 1px solid var(--grey-300); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; }
-h1 { font-size: 26px; margin-bottom: 8px; }
-.lede { color: var(--text-secondary); max-width: 75ch; margin-bottom: 12px; font-size: 14px; }
+.hero { background: linear-gradient(290deg, #F6F8FE 0%, #EBF2FF 100%); border: 1px solid var(--grey-300); border-radius: var(--radius); padding: 28px 24px; margin-bottom: 20px; }
+h1 { font-size: 28px; margin-bottom: 8px; }
+.lede { color: var(--text-secondary); max-width: 72ch; margin-bottom: 12px; font-size: 14px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .chip { font-size: 13px; padding: 6px 12px; border-radius: 999px; background: var(--bg-paper); border: 1px solid var(--grey-300); }
 .chip b { color: var(--primary); }
-.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
-.btn { font-family: inherit; font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--grey-300); background: var(--bg-paper); cursor: pointer; color: var(--primary); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font-family: inherit; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--grey-300); background: var(--bg-paper); cursor: pointer; color: var(--primary); }
 .btn:hover { background: var(--primary-light); }
 .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
 .btn-primary:hover { filter: brightness(1.05); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-ghost { color: var(--text-secondary); }
-.filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; display: none; }
+.settings { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+.settings summary { cursor: pointer; color: var(--primary); font-weight: 600; }
+.settings input { width: 100%; max-width: 360px; margin: 6px 0; padding: 6px 8px; border: 1px solid var(--grey-300); border-radius: 6px; font-family: inherit; font-size: 12px; }
+.alert { padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; display: none; }
 .alert.show { display: block; }
-.alert-ok { background: #D4EDDA; color: #155724; border: 1px solid #C3E6CB; }
-.alert-warn { background: #FFF3CD; color: #856404; border: 1px solid #FFEEBA; }
-.alert-err { background: #F8D7DA; color: #721C24; border: 1px solid #F5C6CB; }
-.settings { background: var(--bg-paper); border: 1px solid var(--grey-300); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; font-size: 13px; }
-.settings summary { cursor: pointer; font-weight: 600; color: var(--primary); }
-.settings p { margin-top: 8px; color: var(--text-secondary); }
-.settings input { width: 100%; max-width: 480px; margin-top: 8px; padding: 8px 10px; border: 1px solid var(--grey-300); border-radius: 6px; font-family: inherit; }
-.cards { display: flex; flex-direction: column; gap: 12px; }
-.card { background: var(--bg-paper); border: 1px solid var(--grey-300); border-radius: var(--radius); padding: 16px; }
-.card.done { opacity: 0.72; }
-.card-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; margin-bottom: 8px; }
-.card-id { font-weight: 700; color: var(--primary); }
-.card-meta { font-size: 12px; color: var(--text-secondary); }
-.card-request { font-weight: 600; margin-bottom: 6px; }
-.card-summary { font-size: 14px; margin-bottom: 12px; }
-.card-row { display: grid; grid-template-columns: 140px 1fr; gap: 8px 12px; align-items: start; margin-bottom: 8px; }
-@media (max-width: 640px) { .card-row { grid-template-columns: 1fr; } }
-.card-row label { font-size: 12px; font-weight: 600; color: var(--text-secondary); padding-top: 8px; }
-select, textarea { width: 100%; font-family: inherit; font-size: 14px; border: 1px solid var(--grey-300); border-radius: 8px; padding: 8px 10px; }
-textarea { min-height: 72px; resize: vertical; }
-.card-src { font-size: 11px; color: var(--text-secondary); margin-top: 8px; word-break: break-word; }
-footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
+.alert-ok { background: #D4EDDA; color: #155724; }
+.alert-warn { background: #FFF3CD; color: #856404; }
+.alert-err { background: #F8D7DA; color: #721C24; }
+.table-wrap { overflow-x: auto; background: var(--bg-paper); border: 1px solid var(--grey-300); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { padding: 10px 12px; border-bottom: 1px solid var(--grey-300); vertical-align: top; text-align: left; }
+th { background: var(--primary-light); color: var(--primary); font-weight: 600; position: sticky; top: 0; z-index: 1; }
+tr:hover td { background: #fafbff; }
+tr.row-done td { opacity: 0.75; }
+.mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.summary { min-width: 240px; }
+.src { font-size: 12px; color: var(--text-secondary); max-width: 200px; word-break: break-word; }
+.st-select { font-family: inherit; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--grey-300); cursor: pointer; min-width: 100px; }
+.st-select.st-new { background: var(--primary-light); color: var(--primary); }
+.st-select.st-wip { background: #FFF3CD; color: #856404; }
+.st-select.st-done { background: #D4EDDA; color: var(--success); }
+.cm-input { width: 100%; min-width: 140px; font-family: inherit; font-size: 13px; border: 1px solid transparent; border-radius: 6px; padding: 4px 6px; resize: vertical; min-height: 32px; background: transparent; }
+.cm-input:hover, .cm-input:focus { border-color: var(--grey-300); background: #fff; outline: none; }
 .loading { text-align: center; padding: 48px; color: var(--text-secondary); }
+footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
 </style>
 </head>
 <body>
@@ -79,29 +77,29 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
 <div class="wrap">
   <div class="hero">
     <h1>Личные задачи PM</h1>
-    <p class="lede">Меняйте статус и пишите комментарий здесь. После «Сохранить на GitHub» агент подтянет правки в yaml и Excel. Новые поручения с встреч добавляет агент в таблицу.</p>
+    <p class="lede">Запросы со встреч. Меняйте статус и комментарий в таблице, затем «Сохранить». Новые строки добавляет агент из протоколов.</p>
     <div class="chips" id="chips"></div>
     <div class="toolbar">
-      <button type="button" class="btn btn-primary" id="btn-save">Сохранить на GitHub</button>
-      <button type="button" class="btn" id="btn-reload">Обновить с сайта</button>
-      <span style="flex:1"></span>
-      <button type="button" class="btn btn-ghost filter-btn active" data-filter="open">Открытые</button>
-      <button type="button" class="btn btn-ghost filter-btn" data-filter="all">Все</button>
+      <button type="button" class="btn btn-primary" id="btn-save">Сохранить</button>
+      <button type="button" class="btn" id="btn-reload">Обновить</button>
     </div>
   </div>
   <details class="settings">
-    <summary>Настройки сохранения (один раз)</summary>
-    <p>Нужен GitHub Personal Access Token с правом <code>Contents: Read and write</code> только для репозитория <code>ai-agents-trace</code>. Токен хранится только в браузере (localStorage), на сервер не отправляется никуда кроме GitHub API.</p>
-    <label for="gh-token">GitHub token</label>
+    <summary>GitHub token (один раз)</summary>
+    <p>Personal Access Token с <code>Contents: write</code> для репозитория <code>ai-agents-trace</code>. Хранится только в браузере.</p>
     <input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off"/>
-    <button type="button" class="btn" id="btn-save-token" style="margin-top:8px">Запомнить токен</button>
+    <button type="button" class="btn" id="btn-save-token">Запомнить</button>
   </details>
   <div id="alert" class="alert"></div>
-  <div id="app" class="loading">Загрузка задач…</div>
-  <footer>
-    Данные: <code>pm-tasks.json</code> в репозитории <a href="https://github.com/Ukolovsky/ai-agents-trace">ai-agents-trace</a>.
-    Агент: <code>python3 scripts/build_pm_tasks.py --sync --push</code>
-  </footer>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>ID</th><th>Дата</th><th>От кого</th><th>Запрос</th><th>Суть запроса</th><th>Статус</th><th>Комментарий</th><th>Источник</th>
+      </tr></thead>
+      <tbody id="tbody"><tr><td colspan="8" class="loading">Загрузка…</td></tr></tbody>
+    </table>
+  </div>
+  <footer>Данные: <code>pm-tasks.json</code> · агент: <code>build_pm_tasks.py --sync</code></footer>
 </div>
 <script>
 (function () {
@@ -114,29 +112,32 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
   let state = { tasks: [], as_of: "", owner: "" };
   let baseline = {};
   let fileSha = null;
-  let filter = "open";
   let dirty = false;
 
-  const app = document.getElementById("app");
-  const alertEl = document.getElementById("alert");
+  const tbody = document.getElementById("tbody");
   const chips = document.getElementById("chips");
+  const alertEl = document.getElementById("alert");
 
   function showAlert(msg, kind) {
     alertEl.textContent = msg;
     alertEl.className = "alert show alert-" + (kind || "ok");
   }
 
-  function token() {
-    return localStorage.getItem(TOKEN_KEY) || "";
-  }
+  function token() { return localStorage.getItem(TOKEN_KEY) || ""; }
 
   document.getElementById("btn-save-token").onclick = function () {
-    const v = document.getElementById("gh-token").value.trim();
+    var v = document.getElementById("gh-token").value.trim();
     if (!v) { showAlert("Введите token", "warn"); return; }
     localStorage.setItem(TOKEN_KEY, v);
-    showAlert("Токен сохранён в этом браузере", "ok");
+    showAlert("Токен сохранён", "ok");
   };
   document.getElementById("gh-token").value = token();
+
+  function stClass(s) {
+    if (s === "закрыто") return "st-done";
+    if (s === "в работе") return "st-wip";
+    return "st-new";
+  }
 
   function openCount() {
     return state.tasks.filter(function (t) { return t.status !== "закрыто"; }).length;
@@ -147,66 +148,63 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
       '<span class="chip">Срез <b>' + (state.as_of || "—") + '</b></span>' +
       '<span class="chip">Открыто <b>' + openCount() + '</b></span>' +
       '<span class="chip">Всего <b>' + state.tasks.length + '</b></span>' +
-      (dirty ? '<span class="chip" style="border-color:var(--secondary);color:var(--secondary)"><b>есть несохранённые правки</b></span>' : "");
-  }
-
-  function visibleTasks() {
-    if (filter === "all") return state.tasks;
-    return state.tasks.filter(function (t) { return t.status !== "закрыто"; });
-  }
-
-  function render() {
-    renderChips();
-    const list = visibleTasks();
-    if (!list.length) {
-      app.innerHTML = '<p class="loading">Нет задач в этом фильтре.</p>';
-      return;
-    }
-    const html = ['<div class="cards">'];
-    list.forEach(function (t, idx) {
-      const realIdx = state.tasks.indexOf(t);
-      const done = t.status === "закрыто";
-      html.push('<article class="card' + (done ? " done" : "") + '" data-idx="' + realIdx + '">');
-      html.push('<div class="card-head"><span class="card-id">' + esc(t.id) + '</span>');
-      html.push('<span class="card-meta">' + esc(t.date) + ' · ' + esc(t.from) + '</span></div>');
-      html.push('<div class="card-request">' + esc(t.request) + '</div>');
-      html.push('<div class="card-summary">' + esc(t.summary) + '</div>');
-      html.push('<div class="card-row"><label for="st-' + realIdx + '">Статус</label>');
-      html.push('<select id="st-' + realIdx + '" data-field="status">');
-      STATUS_OPTS.forEach(function (s) {
-        html.push('<option value="' + s + '"' + (t.status === s ? " selected" : "") + '>' + s + '</option>');
-      });
-      html.push('</select></div>');
-      html.push('<div class="card-row"><label for="cm-' + realIdx + '">Комментарий</label>');
-      html.push('<textarea id="cm-' + realIdx + '" data-field="comment" placeholder="Заметка PM…">' + esc(t.comment || "") + '</textarea></div>');
-      if (t.updated_at) html.push('<div class="card-meta">Обновлено: ' + esc(t.updated_at) + '</div>');
-      html.push('<div class="card-src">' + esc(t.source || "") + '</div></article>');
-    });
-    html.push('</div>');
-    app.innerHTML = html.join("");
-
-    app.querySelectorAll("select, textarea").forEach(function (el) {
-      el.addEventListener("change", onEdit);
-      el.addEventListener("input", onEdit);
-    });
-  }
-
-  function onEdit(e) {
-    const card = e.target.closest(".card");
-    if (!card) return;
-    const idx = parseInt(card.getAttribute("data-idx"), 10);
-    const field = e.target.getAttribute("data-field");
-    state.tasks[idx][field] = e.target.value;
-    dirty = true;
-    renderChips();
+      (dirty ? '<span class="chip" style="border-color:var(--secondary);color:var(--secondary)"><b>не сохранено</b></span>' : "");
   }
 
   function esc(s) {
     return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
   }
 
+  function render() {
+    renderChips();
+    if (!state.tasks.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="loading">Нет задач</td></tr>';
+      return;
+    }
+    var html = [];
+    state.tasks.forEach(function (t, idx) {
+      var done = t.status === "закрыто";
+      html.push('<tr class="' + (done ? "row-done" : "") + '" data-idx="' + idx + '">');
+      html.push('<td class="mono">' + esc(t.id) + '</td>');
+      html.push('<td class="mono">' + esc(t.date) + '</td>');
+      html.push('<td>' + esc(t.from) + '</td>');
+      html.push('<td>' + esc(t.request) + '</td>');
+      html.push('<td class="summary">' + esc(t.summary) + '</td>');
+      html.push('<td><select class="st-select ' + stClass(t.status) + '" data-field="status">');
+      STATUS_OPTS.forEach(function (s) {
+        html.push('<option value="' + s + '"' + (t.status === s ? " selected" : "") + '>' + s + '</option>');
+      });
+      html.push('</select></td>');
+      html.push('<td><textarea class="cm-input" data-field="comment" rows="2" placeholder="…">' + esc(t.comment || "") + '</textarea></td>');
+      html.push('<td class="src">' + esc(t.source || "") + '</td></tr>');
+    });
+    tbody.innerHTML = html.join("");
+
+    tbody.querySelectorAll("select").forEach(function (el) {
+      el.addEventListener("change", function (e) {
+        onEdit(e);
+        el.className = "st-select " + stClass(el.value);
+        var row = el.closest("tr");
+        if (row) row.classList.toggle("row-done", el.value === "закрыто");
+      });
+    });
+    tbody.querySelectorAll("textarea").forEach(function (el) {
+      el.addEventListener("input", onEdit);
+    });
+  }
+
+  function onEdit(e) {
+    var row = e.target.closest("tr");
+    if (!row) return;
+    var idx = parseInt(row.getAttribute("data-idx"), 10);
+    var field = e.target.getAttribute("data-field");
+    state.tasks[idx][field] = e.target.value;
+    dirty = true;
+    renderChips();
+  }
+
   async function loadJson() {
-    const r = await fetch(JSON_URL);
+    var r = await fetch(JSON_URL);
     if (!r.ok) throw new Error("Не удалось загрузить pm-tasks.json");
     state = await r.json();
     if (!state.tasks) state.tasks = [];
@@ -221,60 +219,47 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
   }
 
   async function fetchSha() {
-    const tok = token();
+    var tok = token();
     if (!tok) return null;
-    const r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
+    var r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
       headers: { Authorization: "Bearer " + tok, Accept: "application/vnd.github+json" }
     });
-    if (!r.ok) throw new Error("GitHub GET: " + r.status + " " + (await r.text()));
-    const data = await r.json();
+    if (!r.ok) throw new Error("GitHub GET: " + r.status);
+    var data = await r.json();
     fileSha = data.sha;
     return data.sha;
   }
 
   async function saveToGitHub() {
-    const tok = token();
+    var tok = token();
     if (!tok) {
-      showAlert("Укажите GitHub token в настройках (нужен Contents write для ai-agents-trace)", "warn");
+      showAlert("Укажите GitHub token в настройках", "warn");
       document.querySelector(".settings").open = true;
       return;
     }
     document.getElementById("btn-save").disabled = true;
     try {
       await fetchSha();
-      const now = new Date().toISOString();
+      var now = new Date().toISOString();
       state.tasks.forEach(function (t) {
-        const b = baseline[t.id];
+        var b = baseline[t.id];
         if (!b || b.status !== t.status || (b.comment || "") !== (t.comment || "")) {
           t.updated_at = now;
         }
       });
       state.as_of = now.slice(0, 10);
-      const payload = {
-        as_of: state.as_of,
-        owner: state.owner,
-        status_options: STATUS_OPTS,
-        tasks: state.tasks
-      };
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-      const body = {
-        message: "pm-tasks: update from web " + now.slice(0, 19),
-        content: content,
-        branch: "main"
-      };
+      var payload = { as_of: state.as_of, owner: state.owner, status_options: STATUS_OPTS, tasks: state.tasks };
+      var content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+      var body = { message: "pm-tasks: web " + now.slice(0, 19), content: content, branch: "main" };
       if (fileSha) body.sha = fileSha;
-      const r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
+      var r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
         method: "PUT",
-        headers: {
-          Authorization: "Bearer " + tok,
-          Accept: "application/vnd.github+json",
-          "Content-Type": "application/json"
-        },
+        headers: { Authorization: "Bearer " + tok, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
-      if (!r.ok) throw new Error("GitHub PUT: " + r.status + " " + (await r.text()));
+      if (!r.ok) throw new Error("GitHub PUT: " + r.status);
       dirty = false;
-      showAlert("Сохранено на GitHub. Агент подтянет при следующем sync.", "ok");
+      showAlert("Сохранено", "ok");
       await loadJson();
     } catch (err) {
       showAlert(String(err.message || err), "err");
@@ -287,17 +272,9 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
   document.getElementById("btn-reload").onclick = function () {
     loadJson().then(function () { showAlert("Обновлено", "ok"); }).catch(function (e) { showAlert(String(e), "err"); });
   };
-  document.querySelectorAll(".filter-btn").forEach(function (btn) {
-    btn.onclick = function () {
-      document.querySelectorAll(".filter-btn").forEach(function (b) { b.classList.remove("active"); });
-      btn.classList.add("active");
-      filter = btn.getAttribute("data-filter");
-      render();
-    };
-  });
 
   loadJson().catch(function (e) {
-    app.innerHTML = '<p class="loading">' + esc(String(e)) + '</p>';
+    tbody.innerHTML = '<tr><td colspan="8" class="loading">' + esc(String(e)) + '</td></tr>';
   });
 })();
 </script>
