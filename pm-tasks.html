@@ -11,7 +11,7 @@
   --primary: #343A7E; --primary-light: #E7E7F0; --secondary: #FF5722;
   --text-primary: #050819; --text-secondary: #85868A;
   --grey-300: #D9DADF; --bg-default: #F5F5F5; --bg-paper: #FFFFFF;
-  --success: #599C16; --warning: #FCCA25;
+  --success: #599C16; --danger: #D32F2F;
   --maxw: 1280px; --radius: 12px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,25 +25,45 @@ body { font-family: "Fira Sans", sans-serif; background: var(--bg-default); colo
 .top-nav-link:hover { background: var(--primary-light); color: var(--primary); }
 .top-nav-link.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 24px 24px 64px; }
-.hero { background: linear-gradient(290deg, #F6F8FE 0%, #EBF2FF 100%); border: 1px solid var(--grey-300); border-radius: var(--radius); padding: 28px 24px; margin-bottom: 20px; }
-h1 { font-size: 28px; margin-bottom: 8px; }
-.lede { color: var(--text-secondary); max-width: 72ch; margin-bottom: 12px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero { background: linear-gradient(290deg, #F6F8FE 0%, #EBF2FF 100%); border: 1px solid var(--grey-300); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; }
+h1 { font-size: 26px; margin-bottom: 8px; }
+.lede { color: var(--text-secondary); max-width: 75ch; margin-bottom: 12px; font-size: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .chip { font-size: 13px; padding: 6px 12px; border-radius: 999px; background: var(--bg-paper); border: 1px solid var(--grey-300); }
 .chip b { color: var(--primary); }
-.table-wrap { overflow-x: auto; background: var(--bg-paper); border: 1px solid var(--grey-300); border-radius: var(--radius); }
-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-th, td { padding: 10px 12px; border-bottom: 1px solid var(--grey-300); vertical-align: top; text-align: left; }
-th { background: var(--primary-light); color: var(--primary); font-weight: 600; position: sticky; top: 0; }
-tr:hover td { background: #fafbff; }
-.mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
-.summary { min-width: 280px; }
-.src { font-size: 12px; color: var(--text-secondary); max-width: 220px; }
-.badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
-.st-new { background: var(--primary-light); color: var(--primary); }
-.st-wip { background: #FFF3CD; color: #856404; }
-.st-done { background: #D4EDDA; color: var(--success); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+.btn { font-family: inherit; font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--grey-300); background: var(--bg-paper); cursor: pointer; color: var(--primary); }
+.btn:hover { background: var(--primary-light); }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-primary:hover { filter: brightness(1.05); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-ghost { color: var(--text-secondary); }
+.filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; display: none; }
+.alert.show { display: block; }
+.alert-ok { background: #D4EDDA; color: #155724; border: 1px solid #C3E6CB; }
+.alert-warn { background: #FFF3CD; color: #856404; border: 1px solid #FFEEBA; }
+.alert-err { background: #F8D7DA; color: #721C24; border: 1px solid #F5C6CB; }
+.settings { background: var(--bg-paper); border: 1px solid var(--grey-300); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; font-size: 13px; }
+.settings summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+.settings p { margin-top: 8px; color: var(--text-secondary); }
+.settings input { width: 100%; max-width: 480px; margin-top: 8px; padding: 8px 10px; border: 1px solid var(--grey-300); border-radius: 6px; font-family: inherit; }
+.cards { display: flex; flex-direction: column; gap: 12px; }
+.card { background: var(--bg-paper); border: 1px solid var(--grey-300); border-radius: var(--radius); padding: 16px; }
+.card.done { opacity: 0.72; }
+.card-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; margin-bottom: 8px; }
+.card-id { font-weight: 700; color: var(--primary); }
+.card-meta { font-size: 12px; color: var(--text-secondary); }
+.card-request { font-weight: 600; margin-bottom: 6px; }
+.card-summary { font-size: 14px; margin-bottom: 12px; }
+.card-row { display: grid; grid-template-columns: 140px 1fr; gap: 8px 12px; align-items: start; margin-bottom: 8px; }
+@media (max-width: 640px) { .card-row { grid-template-columns: 1fr; } }
+.card-row label { font-size: 12px; font-weight: 600; color: var(--text-secondary); padding-top: 8px; }
+select, textarea { width: 100%; font-family: inherit; font-size: 14px; border: 1px solid var(--grey-300); border-radius: 8px; padding: 8px 10px; }
+textarea { min-height: 72px; resize: vertical; }
+.card-src { font-size: 11px; color: var(--text-secondary); margin-top: 8px; word-break: break-word; }
 footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
+.loading { text-align: center; padding: 48px; color: var(--text-secondary); }
 </style>
 </head>
 <body>
@@ -51,179 +71,235 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
   <div class="app-header-in">
     <div class="brand"><span class="brand-mark">PM</span> BusinessPad · Задачи PM</div>
     <nav class="top-nav">
-    <a class="top-nav-link" href="index.html">Трассировка</a>
-    <a class="top-nav-link active" href="pm-tasks.html">Задачи PM</a>
+      <a class="top-nav-link" href="index.html">Трассировка</a>
+      <a class="top-nav-link active" href="pm-tasks.html">Задачи PM</a>
     </nav>
   </div>
 </header>
 <div class="wrap">
   <div class="hero">
     <h1>Личные задачи PM</h1>
-    <p class="lede">Запросы от стейкholders с встреч и переписки. Статус «получено» до явного закрытия по протоколам и документам. Источник правды для правок: Excel <code>AI_PM_tasks.xlsx</code>.</p>
-    <div class="chips">
-      <span class="chip">Срез <b>2026-08-20</b></span>
-      <span class="chip">Открыто <b>18</b></span>
-      <span class="chip">Всего <b>18</b></span>
+    <p class="lede">Меняйте статус и пишите комментарий здесь. После «Сохранить на GitHub» агент подтянет правки в yaml и Excel. Новые поручения с встреч добавляет агент в таблицу.</p>
+    <div class="chips" id="chips"></div>
+    <div class="toolbar">
+      <button type="button" class="btn btn-primary" id="btn-save">Сохранить на GitHub</button>
+      <button type="button" class="btn" id="btn-reload">Обновить с сайта</button>
+      <span style="flex:1"></span>
+      <button type="button" class="btn btn-ghost filter-btn active" data-filter="open">Открытые</button>
+      <button type="button" class="btn btn-ghost filter-btn" data-filter="all">Все</button>
     </div>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th>ID</th><th>Дата</th><th>От кого</th><th>Запрос</th><th>Суть запроса</th><th>Статус</th><th>Источник</th>
-      </tr></thead>
-      <tbody>
-        <tr>
-  <td class="mono">PM-001</td>
-  <td class="mono">2026-08-18</td>
-  <td>Кирилл Юрьевич Гончаров</td>
-  <td>Стартер-паки и капсулы</td>
-  <td class="summary">Чек-лист предпосылок до реализации стартер-паков; не запускать срочный vibe-code; дождаться теста капсул v2; узкая встреча с Беатрис по блокерам.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Дизайн стартер-паки и поиск_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-002</td>
-  <td class="mono">2026-08-18</td>
-  <td>Виктор Щербань</td>
-  <td>Импорт в демо-кейс</td>
-  <td class="summary">Дожать свой контур импорта (Саша/Эдуард); когда готов, маякнуть Виктору; по запросу помочь с vibe «документ → открытая форма → процесс» для демо Павла.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Продуктовый синк CPQ импорт капсулы_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-003</td>
-  <td class="mono">2026-08-18</td>
-  <td>Виктор Щербань</td>
-  <td>CPQ в BP3</td>
-  <td class="summary">Кик-офф с Сергеем Понариным: план переноса CPQ в BP3, инкремент «входящая заявка/письмо → потребность → сделка», без блокера конфигуратора Швецъ.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Продуктовый синк CPQ импорт капсулы_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-004</td>
-  <td class="mono">2026-08-19</td>
-  <td>Кирилл Юрьевич Гончаров</td>
-  <td>CPQ рефактор</td>
-  <td class="summary">Сначала презентация итогов CPQ (что получилось, как работает); не начинать «рефактор в общем виде» без демо и понятного объекта изменений.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-005</td>
-  <td class="mono">2026-08-19</td>
-  <td>Кирилл Юрьевич Гончаров</td>
-  <td>DataFlow / AI-09</td>
-  <td class="summary">Тезисы и вопросы к встрече 22.08 17:00 по MVP агентов на этапах; письмо КЮ заранее; после встречи зафиксировать консенсус для TDR Лёши.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-006</td>
-  <td class="mono">2026-08-17</td>
-  <td>Планирование спринта</td>
-  <td>ТЗ настройщика</td>
-  <td class="summary">Дописать аналитику/ТЗ настройщика (AI-02) для дизайна и фронта; волна 2, Александр Дорожинский ждёт материалы.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.17_ Планирование спринта_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-007</td>
-  <td class="mono">2026-08-17</td>
-  <td>Планирование / daily</td>
-  <td>Семантика опта</td>
-  <td class="summary">Положить обновлённую семантику оптовой торговли в целевой wiki; передать Сергею Понарину → новый прогон пресета у Дмитрия Кульбиды.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.17_ Планирование спринта_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-008</td>
-  <td class="mono">2026-08-19</td>
-  <td>AI Product status</td>
-  <td>Task tracker (AI-11)</td>
-  <td class="summary">Передать пакет контекста встреч / task tracker Софии на оценку и план; разработка со следующего спринта.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-009</td>
-  <td class="mono">2026-08-14</td>
-  <td>TDR / команда</td>
-  <td>Ревью хранилища</td>
-  <td class="summary">Напомнить Максиму Цветкову ревью MR файлового хранилища; блокирует milestone поиска и импорта по S3.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.14_ TDR настройщик и поиск_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-010</td>
-  <td class="mono">2026-08-19</td>
-  <td>AI Product status</td>
-  <td>TDR для Мирона</td>
-  <td class="summary">Отправить Мирону ссылки на три TDR на понедельник: интегратор, task tracker, договор.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-011</td>
-  <td class="mono">2026-08-18</td>
-  <td>Беатрис / Кирилл Юрьевич</td>
-  <td>Vibe-code стартер-паков</td>
-  <td class="summary">Провести узкую встречу по vibe-коду стартер-паков (21.08 в календаре); зафиксировать что реально собрать без обхода core BP3.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Дизайн стартер-паки и поиск_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-012</td>
-  <td class="mono">2026-08-18</td>
-  <td>Виктор Щербань</td>
-  <td>Саша на vibe импорт</td>
-  <td class="summary">По готовности своей линии импорта выделить Сашу Котовенко на vibe-помощь Виктору по импорту в демо-контур (не забирать MR сейчас).</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Продуктовый синк CPQ импорт капсулы_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-013</td>
-  <td class="mono">2026-08-17</td>
-  <td>CPQ daily</td>
-  <td>AI-11 аналитика</td>
-  <td class="summary">Подправить документацию контекста встреч (AI-11); согласовать оценку динамического статуса (AI-12) с Лёшей Шремзером.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.17_ CPQ daily_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-014</td>
-  <td class="mono">2026-08-18</td>
-  <td>Виктор Щербань</td>
-  <td>CPQ и sales</td>
-  <td class="summary">Написать Николаю (sales/AVK) для уточнения требований по CPQ-инкременту «входящие заявки → сделка», опереться на прошлый data-анализ категорий.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Продуктовый синк CPQ импорт капсулы_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-015</td>
-  <td class="mono">2026-08-07</td>
-  <td>Кирилл Юрьевич Гончаров</td>
-  <td>Стратегия AI</td>
-  <td class="summary">Зафиксировать отдельный продуктовый артефакт по образу «agentic interface» по итогам стратегической сессии 07.08.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.07_ Стратегия ИИ продуктов Кирилл Юрьевич_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-016</td>
-  <td class="mono">2026-08-19</td>
-  <td>Виктор Щербань / команда</td>
-  <td>Капсулы v2</td>
-  <td class="summary">Получить доступ к тесту капсул v2 после прогона Ильи; синхронизировать с Виктором по аналитике платформы (~20 строк бэклога).</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-017</td>
-  <td class="mono">2026-08-17</td>
-  <td>CPQ daily</td>
-  <td>1С vs интегратор</td>
-  <td class="summary">Согласовать наработки Лёши по «чёрному ящику» 1С с линией интегратора (AI-03); иначе дропнуть дублирующий контур.</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.17_ CPQ daily_протокол.md</td>
-</tr><tr>
-  <td class="mono">PM-018</td>
-  <td class="mono">2026-08-14</td>
-  <td>AI demo ML</td>
-  <td>Документация импорта</td>
-  <td class="summary">Помочь Сергею Адамову оформить документацию по импорту для фронта/BFF (если хвост не закрыт после 14.08).</td>
-  <td><span class="badge st-new">получено</span></td>
-  <td class="src">3. AVK/CPQ/2026-08/2026.08.14_ AI демо ML команды_протокол.md</td>
-</tr>
-      </tbody>
-    </table>
-  </div>
+  <details class="settings">
+    <summary>Настройки сохранения (один раз)</summary>
+    <p>Нужен GitHub Personal Access Token с правом <code>Contents: Read and write</code> только для репозитория <code>ai-agents-trace</code>. Токен хранится только в браузере (localStorage), на сервер не отправляется никуда кроме GitHub API.</p>
+    <label for="gh-token">GitHub token</label>
+    <input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off"/>
+    <button type="button" class="btn" id="btn-save-token" style="margin-top:8px">Запомнить токен</button>
+  </details>
+  <div id="alert" class="alert"></div>
+  <div id="app" class="loading">Загрузка задач…</div>
   <footer>
-    Сгенерировано 2026-08-20T15:11:18.
-    Excel: правки статусов → <code>python3 scripts/build_pm_tasks.py --from-xlsx --push</code>
+    Данные: <code>pm-tasks.json</code> в репозитории <a href="https://github.com/Ukolovsky/ai-agents-trace">ai-agents-trace</a>.
+    Агент: <code>python3 scripts/build_pm_tasks.py --sync --push</code>
   </footer>
 </div>
+<script>
+(function () {
+  const REPO = "Ukolovsky/ai-agents-trace";
+  const JSON_PATH = "pm-tasks.json";
+  const JSON_URL = "pm-tasks.json?t=" + Date.now();
+  const TOKEN_KEY = "pm_tasks_github_token";
+  const STATUS_OPTS = ["получено", "в работе", "закрыто"];
+
+  let state = { tasks: [], as_of: "", owner: "" };
+  let baseline = {};
+  let fileSha = null;
+  let filter = "open";
+  let dirty = false;
+
+  const app = document.getElementById("app");
+  const alertEl = document.getElementById("alert");
+  const chips = document.getElementById("chips");
+
+  function showAlert(msg, kind) {
+    alertEl.textContent = msg;
+    alertEl.className = "alert show alert-" + (kind || "ok");
+  }
+
+  function token() {
+    return localStorage.getItem(TOKEN_KEY) || "";
+  }
+
+  document.getElementById("btn-save-token").onclick = function () {
+    const v = document.getElementById("gh-token").value.trim();
+    if (!v) { showAlert("Введите token", "warn"); return; }
+    localStorage.setItem(TOKEN_KEY, v);
+    showAlert("Токен сохранён в этом браузере", "ok");
+  };
+  document.getElementById("gh-token").value = token();
+
+  function openCount() {
+    return state.tasks.filter(function (t) { return t.status !== "закрыто"; }).length;
+  }
+
+  function renderChips() {
+    chips.innerHTML =
+      '<span class="chip">Срез <b>' + (state.as_of || "—") + '</b></span>' +
+      '<span class="chip">Открыто <b>' + openCount() + '</b></span>' +
+      '<span class="chip">Всего <b>' + state.tasks.length + '</b></span>' +
+      (dirty ? '<span class="chip" style="border-color:var(--secondary);color:var(--secondary)"><b>есть несохранённые правки</b></span>' : "");
+  }
+
+  function visibleTasks() {
+    if (filter === "all") return state.tasks;
+    return state.tasks.filter(function (t) { return t.status !== "закрыто"; });
+  }
+
+  function render() {
+    renderChips();
+    const list = visibleTasks();
+    if (!list.length) {
+      app.innerHTML = '<p class="loading">Нет задач в этом фильтре.</p>';
+      return;
+    }
+    const html = ['<div class="cards">'];
+    list.forEach(function (t, idx) {
+      const realIdx = state.tasks.indexOf(t);
+      const done = t.status === "закрыто";
+      html.push('<article class="card' + (done ? " done" : "") + '" data-idx="' + realIdx + '">');
+      html.push('<div class="card-head"><span class="card-id">' + esc(t.id) + '</span>');
+      html.push('<span class="card-meta">' + esc(t.date) + ' · ' + esc(t.from) + '</span></div>');
+      html.push('<div class="card-request">' + esc(t.request) + '</div>');
+      html.push('<div class="card-summary">' + esc(t.summary) + '</div>');
+      html.push('<div class="card-row"><label for="st-' + realIdx + '">Статус</label>');
+      html.push('<select id="st-' + realIdx + '" data-field="status">');
+      STATUS_OPTS.forEach(function (s) {
+        html.push('<option value="' + s + '"' + (t.status === s ? " selected" : "") + '>' + s + '</option>');
+      });
+      html.push('</select></div>');
+      html.push('<div class="card-row"><label for="cm-' + realIdx + '">Комментарий</label>');
+      html.push('<textarea id="cm-' + realIdx + '" data-field="comment" placeholder="Заметка PM…">' + esc(t.comment || "") + '</textarea></div>');
+      if (t.updated_at) html.push('<div class="card-meta">Обновлено: ' + esc(t.updated_at) + '</div>');
+      html.push('<div class="card-src">' + esc(t.source || "") + '</div></article>');
+    });
+    html.push('</div>');
+    app.innerHTML = html.join("");
+
+    app.querySelectorAll("select, textarea").forEach(function (el) {
+      el.addEventListener("change", onEdit);
+      el.addEventListener("input", onEdit);
+    });
+  }
+
+  function onEdit(e) {
+    const card = e.target.closest(".card");
+    if (!card) return;
+    const idx = parseInt(card.getAttribute("data-idx"), 10);
+    const field = e.target.getAttribute("data-field");
+    state.tasks[idx][field] = e.target.value;
+    dirty = true;
+    renderChips();
+  }
+
+  function esc(s) {
+    return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+  }
+
+  async function loadJson() {
+    const r = await fetch(JSON_URL);
+    if (!r.ok) throw new Error("Не удалось загрузить pm-tasks.json");
+    state = await r.json();
+    if (!state.tasks) state.tasks = [];
+    baseline = {};
+    state.tasks.forEach(function (t) {
+      if (!t.status) t.status = "получено";
+      if (t.comment === undefined) t.comment = "";
+      baseline[t.id] = { status: t.status, comment: t.comment || "" };
+    });
+    dirty = false;
+    render();
+  }
+
+  async function fetchSha() {
+    const tok = token();
+    if (!tok) return null;
+    const r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
+      headers: { Authorization: "Bearer " + tok, Accept: "application/vnd.github+json" }
+    });
+    if (!r.ok) throw new Error("GitHub GET: " + r.status + " " + (await r.text()));
+    const data = await r.json();
+    fileSha = data.sha;
+    return data.sha;
+  }
+
+  async function saveToGitHub() {
+    const tok = token();
+    if (!tok) {
+      showAlert("Укажите GitHub token в настройках (нужен Contents write для ai-agents-trace)", "warn");
+      document.querySelector(".settings").open = true;
+      return;
+    }
+    document.getElementById("btn-save").disabled = true;
+    try {
+      await fetchSha();
+      const now = new Date().toISOString();
+      state.tasks.forEach(function (t) {
+        const b = baseline[t.id];
+        if (!b || b.status !== t.status || (b.comment || "") !== (t.comment || "")) {
+          t.updated_at = now;
+        }
+      });
+      state.as_of = now.slice(0, 10);
+      const payload = {
+        as_of: state.as_of,
+        owner: state.owner,
+        status_options: STATUS_OPTS,
+        tasks: state.tasks
+      };
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+      const body = {
+        message: "pm-tasks: update from web " + now.slice(0, 19),
+        content: content,
+        branch: "main"
+      };
+      if (fileSha) body.sha = fileSha;
+      const r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
+        method: "PUT",
+        headers: {
+          Authorization: "Bearer " + tok,
+          Accept: "application/vnd.github+json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) throw new Error("GitHub PUT: " + r.status + " " + (await r.text()));
+      dirty = false;
+      showAlert("Сохранено на GitHub. Агент подтянет при следующем sync.", "ok");
+      await loadJson();
+    } catch (err) {
+      showAlert(String(err.message || err), "err");
+    } finally {
+      document.getElementById("btn-save").disabled = false;
+    }
+  }
+
+  document.getElementById("btn-save").onclick = saveToGitHub;
+  document.getElementById("btn-reload").onclick = function () {
+    loadJson().then(function () { showAlert("Обновлено", "ok"); }).catch(function (e) { showAlert(String(e), "err"); });
+  };
+  document.querySelectorAll(".filter-btn").forEach(function (btn) {
+    btn.onclick = function () {
+      document.querySelectorAll(".filter-btn").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      filter = btn.getAttribute("data-filter");
+      render();
+    };
+  });
+
+  loadJson().catch(function (e) {
+    app.innerHTML = '<p class="loading">' + esc(String(e)) + '</p>';
+  });
+})();
+</script>
 </body>
 </html>
