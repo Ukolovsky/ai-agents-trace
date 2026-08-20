@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Задачи PM · BusinessPad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --primary: #343A7E; --primary-light: #E7E7F0; --secondary: #FF5722;
+  --text-primary: #050819; --text-secondary: #85868A;
+  --grey-300: #D9DADF; --bg-default: #F5F5F5; --bg-paper: #FFFFFF;
+  --success: #599C16; --warning: #FCCA25;
+  --maxw: 1280px; --radius: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Fira Sans", sans-serif; background: var(--bg-default); color: var(--text-primary); line-height: 1.45; }
+.app-header { position: sticky; top: 0; z-index: 100; background: var(--bg-paper); border-bottom: 1px solid var(--grey-300); }
+.app-header-in { max-width: var(--maxw); margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; color: var(--primary); }
+.brand-mark { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(290deg, #4D59FA 0%, #749EF2 100%); display: grid; place-items: center; color: #fff; font-size: 13px; font-weight: 700; }
+.top-nav { display: flex; gap: 8px; }
+.top-nav-link { font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--grey-300); color: var(--text-secondary); text-decoration: none; }
+.top-nav-link:hover { background: var(--primary-light); color: var(--primary); }
+.top-nav-link.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 24px 24px 64px; }
+.hero { background: linear-gradient(290deg, #F6F8FE 0%, #EBF2FF 100%); border: 1px solid var(--grey-300); border-radius: var(--radius); padding: 28px 24px; margin-bottom: 20px; }
+h1 { font-size: 28px; margin-bottom: 8px; }
+.lede { color: var(--text-secondary); max-width: 72ch; margin-bottom: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-size: 13px; padding: 6px 12px; border-radius: 999px; background: var(--bg-paper); border: 1px solid var(--grey-300); }
+.chip b { color: var(--primary); }
+.table-wrap { overflow-x: auto; background: var(--bg-paper); border: 1px solid var(--grey-300); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { padding: 10px 12px; border-bottom: 1px solid var(--grey-300); vertical-align: top; text-align: left; }
+th { background: var(--primary-light); color: var(--primary); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: #fafbff; }
+.mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.summary { min-width: 280px; }
+.src { font-size: 12px; color: var(--text-secondary); max-width: 220px; }
+.badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+.st-new { background: var(--primary-light); color: var(--primary); }
+.st-wip { background: #FFF3CD; color: #856404; }
+.st-done { background: #D4EDDA; color: var(--success); }
+footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="app-header-in">
+    <div class="brand"><span class="brand-mark">PM</span> BusinessPad · Задачи PM</div>
+    <nav class="top-nav">
+    <a class="top-nav-link" href="index.html">Трассировка</a>
+    <a class="top-nav-link active" href="pm-tasks.html">Задачи PM</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+  <div class="hero">
+    <h1>Личные задачи PM</h1>
+    <p class="lede">Запросы от стейкholders с встреч и переписки. Статус «получено» до явного закрытия по протоколам и документам. Источник правды для правок: Excel <code>AI_PM_tasks.xlsx</code>.</p>
+    <div class="chips">
+      <span class="chip">Срез <b>2026-08-20</b></span>
+      <span class="chip">Открыто <b>18</b></span>
+      <span class="chip">Всего <b>18</b></span>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>ID</th><th>Дата</th><th>От кого</th><th>Запрос</th><th>Суть запроса</th><th>Статус</th><th>Источник</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+  <td class="mono">PM-001</td>
+  <td class="mono">2026-08-18</td>
+  <td>Кирилл Юрьевич Гончаров</td>
+  <td>Стартер-паки и капсулы</td>
+  <td class="summary">Чек-лист предпосылок до реализации стартер-паков; не запускать срочный vibe-code; дождаться теста капсул v2; узкая встреча с Беатрис по блокерам.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Дизайн стартер-паки и поиск_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-002</td>
+  <td class="mono">2026-08-18</td>
+  <td>Виктор Щербань</td>
+  <td>Импорт в демо-кейс</td>
+  <td class="summary">Дожать свой контур импорта (Саша/Эдуард); когда готов, маякнуть Виктору; по запросу помочь с vibe «документ → открытая форма → процесс» для демо Павла.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Продуктовый синк CPQ импорт капсулы_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-003</td>
+  <td class="mono">2026-08-18</td>
+  <td>Виктор Щербань</td>
+  <td>CPQ в BP3</td>
+  <td class="summary">Кик-офф с Сергеем Понариным: план переноса CPQ в BP3, инкремент «входящая заявка/письмо → потребность → сделка», без блокера конфигуратора Швецъ.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Продуктовый синк CPQ импорт капсулы_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-004</td>
+  <td class="mono">2026-08-19</td>
+  <td>Кирилл Юрьевич Гончаров</td>
+  <td>CPQ рефактор</td>
+  <td class="summary">Сначала презентация итогов CPQ (что получилось, как работает); не начинать «рефактор в общем виде» без демо и понятного объекта изменений.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-005</td>
+  <td class="mono">2026-08-19</td>
+  <td>Кирилл Юрьевич Гончаров</td>
+  <td>DataFlow / AI-09</td>
+  <td class="summary">Тезисы и вопросы к встрече 22.08 17:00 по MVP агентов на этапах; письмо КЮ заранее; после встречи зафиксировать консенсус для TDR Лёши.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-006</td>
+  <td class="mono">2026-08-17</td>
+  <td>Планирование спринта</td>
+  <td>ТЗ настройщика</td>
+  <td class="summary">Дописать аналитику/ТЗ настройщика (AI-02) для дизайна и фронта; волна 2, Александр Дорожинский ждёт материалы.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.17_ Планирование спринта_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-007</td>
+  <td class="mono">2026-08-17</td>
+  <td>Планирование / daily</td>
+  <td>Семантика опта</td>
+  <td class="summary">Положить обновлённую семантику оптовой торговли в целевой wiki; передать Сергею Понарину → новый прогон пресета у Дмитрия Кульбиды.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.17_ Планирование спринта_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-008</td>
+  <td class="mono">2026-08-19</td>
+  <td>AI Product status</td>
+  <td>Task tracker (AI-11)</td>
+  <td class="summary">Передать пакет контекста встреч / task tracker Софии на оценку и план; разработка со следующего спринта.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-009</td>
+  <td class="mono">2026-08-14</td>
+  <td>TDR / команда</td>
+  <td>Ревью хранилища</td>
+  <td class="summary">Напомнить Максиму Цветкову ревью MR файлового хранилища; блокирует milestone поиска и импорта по S3.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.14_ TDR настройщик и поиск_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-010</td>
+  <td class="mono">2026-08-19</td>
+  <td>AI Product status</td>
+  <td>TDR для Мирона</td>
+  <td class="summary">Отправить Мирону ссылки на три TDR на понедельник: интегратор, task tracker, договор.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-011</td>
+  <td class="mono">2026-08-18</td>
+  <td>Беатрис / Кирилл Юрьевич</td>
+  <td>Vibe-code стартер-паков</td>
+  <td class="summary">Провести узкую встречу по vibe-коду стартер-паков (21.08 в календаре); зафиксировать что реально собрать без обхода core BP3.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Дизайн стартер-паки и поиск_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-012</td>
+  <td class="mono">2026-08-18</td>
+  <td>Виктор Щербань</td>
+  <td>Саша на vibe импорт</td>
+  <td class="summary">По готовности своей линии импорта выделить Сашу Котовенко на vibe-помощь Виктору по импорту в демо-контур (не забирать MR сейчас).</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Продуктовый синк CPQ импорт капсулы_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-013</td>
+  <td class="mono">2026-08-17</td>
+  <td>CPQ daily</td>
+  <td>AI-11 аналитика</td>
+  <td class="summary">Подправить документацию контекста встреч (AI-11); согласовать оценку динамического статуса (AI-12) с Лёшей Шремзером.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.17_ CPQ daily_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-014</td>
+  <td class="mono">2026-08-18</td>
+  <td>Виктор Щербань</td>
+  <td>CPQ и sales</td>
+  <td class="summary">Написать Николаю (sales/AVK) для уточнения требований по CPQ-инкременту «входящие заявки → сделка», опереться на прошлый data-анализ категорий.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.18_ Продуктовый синк CPQ импорт капсулы_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-015</td>
+  <td class="mono">2026-08-07</td>
+  <td>Кирилл Юрьевич Гончаров</td>
+  <td>Стратегия AI</td>
+  <td class="summary">Зафиксировать отдельный продуктовый артефакт по образу «agentic interface» по итогам стратегической сессии 07.08.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.07_ Стратегия ИИ продуктов Кирилл Юрьевич_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-016</td>
+  <td class="mono">2026-08-19</td>
+  <td>Виктор Щербань / команда</td>
+  <td>Капсулы v2</td>
+  <td class="summary">Получить доступ к тесту капсул v2 после прогона Ильи; синхронизировать с Виктором по аналитике платформы (~20 строк бэклога).</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.19_ AI Product status_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-017</td>
+  <td class="mono">2026-08-17</td>
+  <td>CPQ daily</td>
+  <td>1С vs интегратор</td>
+  <td class="summary">Согласовать наработки Лёши по «чёрному ящику» 1С с линией интегратора (AI-03); иначе дропнуть дублирующий контур.</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.17_ CPQ daily_протокол.md</td>
+</tr><tr>
+  <td class="mono">PM-018</td>
+  <td class="mono">2026-08-14</td>
+  <td>AI demo ML</td>
+  <td>Документация импорта</td>
+  <td class="summary">Помочь Сергею Адамову оформить документацию по импорту для фронта/BFF (если хвост не закрыт после 14.08).</td>
+  <td><span class="badge st-new">получено</span></td>
+  <td class="src">3. AVK/CPQ/2026-08/2026.08.14_ AI демо ML команды_протокол.md</td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+  <footer>
+    Сгенерировано 2026-08-20T15:11:18.
+    Excel: правки статусов → <code>python3 scripts/build_pm_tasks.py --from-xlsx --push</code>
+  </footer>
+</div>
+</body>
+</html>
