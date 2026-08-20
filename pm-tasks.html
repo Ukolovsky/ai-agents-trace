@@ -58,6 +58,7 @@ tr.row-done td { opacity: 0.75; }
 .st-select.st-new { background: var(--primary-light); color: var(--primary); }
 .st-select.st-wip { background: #FFF3CD; color: #856404; }
 .st-select.st-done { background: #D4EDDA; color: var(--success); }
+.st-select.st-dup { background: #FFCDD2; color: #B71C1C; }
 .cm-input { width: 100%; min-width: 140px; font-family: inherit; font-size: 13px; border: 1px solid transparent; border-radius: 6px; padding: 4px 6px; resize: vertical; min-height: 32px; background: transparent; }
 .cm-input:hover, .cm-input:focus { border-color: var(--grey-300); background: #fff; outline: none; }
 .loading { text-align: center; padding: 48px; color: var(--text-secondary); }
@@ -107,7 +108,8 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
   const JSON_PATH = "pm-tasks.json";
   const JSON_URL = "pm-tasks.json?t=" + Date.now();
   const TOKEN_KEY = "pm_tasks_github_token";
-  const STATUS_OPTS = ["получено", "в работе", "закрыто"];
+  const STATUS_OPTS = ["получено", "в работе", "закрыто", "Дубль/Ошибка"];
+  const INACTIVE = { "закрыто": true, "Дубль/Ошибка": true };
 
   let state = { tasks: [], as_of: "", owner: "" };
   let baseline = {};
@@ -135,12 +137,15 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
 
   function stClass(s) {
     if (s === "закрыто") return "st-done";
+    if (s === "Дубль/Ошибка") return "st-dup";
     if (s === "в работе") return "st-wip";
     return "st-new";
   }
 
+  function isInactive(s) { return !!INACTIVE[s]; }
+
   function openCount() {
-    return state.tasks.filter(function (t) { return t.status !== "закрыто"; }).length;
+    return state.tasks.filter(function (t) { return !isInactive(t.status); }).length;
   }
 
   function renderChips() {
@@ -163,7 +168,7 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
     }
     var html = [];
     state.tasks.forEach(function (t, idx) {
-      var done = t.status === "закрыто";
+      var done = isInactive(t.status);
       html.push('<tr class="' + (done ? "row-done" : "") + '" data-idx="' + idx + '">');
       html.push('<td class="mono">' + esc(t.id) + '</td>');
       html.push('<td class="mono">' + esc(t.date) + '</td>');
@@ -185,7 +190,7 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
         onEdit(e);
         el.className = "st-select " + stClass(el.value);
         var row = el.closest("tr");
-        if (row) row.classList.toggle("row-done", el.value === "закрыто");
+        if (row) row.classList.toggle("row-done", isInactive(el.value));
       });
     });
     tbody.querySelectorAll("textarea").forEach(function (el) {
