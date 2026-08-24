@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CPQ · Путь, техника, BP3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg: #F4F6FB;
+  --surface: #FFFFFF;
+  --text: #1A1D2E;
+  --muted: #5C6478;
+  --primary: #343A7E;
+  --primary-light: #E8EAF6;
+  --line: #D8DCE8;
+  --va: #1565C0;
+  --va-bg: #E3F2FD;
+  --vb: #2E7D32;
+  --vb-bg: #E8F5E9;
+  --vc: #C62828;
+  --vc-bg: #FFEBEE;
+  --shared: #5E35B1;
+  --shared-bg: #EDE7F6;
+  --warn: #E65100;
+  --warn-bg: #FFF3E0;
+  --bp3: #00695C;
+  --bp3-bg: #E0F2F1;
+  --mgmt: #00695C;
+  --mgmt-bg: #E0F2F1;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Fira Sans", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.45;
+}
+header {
+  background: linear-gradient(135deg, #2A2F6B 0%, #343A7E 55%, #4A5299 100%);
+  color: #fff;
+  padding: 28px 32px 20px;
+}
+header h1 { margin: 0 0 8px; font-size: 24px; font-weight: 700; }
+header p { margin: 0; max-width: 820px; opacity: 0.92; font-size: 14.5px; }
+header .meta { margin-top: 12px; font-size: 12.5px; opacity: 0.8; }
+.toc {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 14px 32px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 5;
+}
+.toc a {
+  text-decoration: none;
+  font-size: 13px; font-weight: 600;
+  padding: 6px 12px; border-radius: 999px;
+  background: var(--primary-light); color: var(--primary);
+}
+.toc a:hover { background: var(--primary); color: #fff; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 20px 24px 48px; }
+.block {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px 22px 26px;
+  margin-bottom: 20px;
+}
+.block h2 {
+  margin: 0 0 4px;
+  font-size: 20px; font-weight: 700;
+}
+.block-num {
+  display: inline-block;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--primary); background: var(--primary-light);
+  padding: 2px 8px; border-radius: 6px; margin-bottom: 8px;
+}
+.hint { color: var(--muted); font-size: 13.5px; margin: 0 0 16px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 999px;
+}
+.chip-shared { background: var(--shared-bg); color: var(--shared); }
+.chip-va { background: var(--va-bg); color: var(--va); }
+.chip-vb { background: var(--vb-bg); color: var(--vb); }
+.chip-vc { background: var(--vc-bg); color: var(--vc); }
+.chip-bp3 { background: var(--bp3-bg); color: var(--bp3); }
+.legend-tech { margin: 8px 0 0; }
+.chip-ai { background: #BBDEFB; color: #1565C0; }
+.chip-integ { background: #C8E6C9; color: #2E7D32; }
+.chip-hard { background: #FFCDD2; color: #C62828; }
+
+.layer1-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.diagram {
+  background: #FAFBFE;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  overflow-x: auto;
+  width: 100%;
+}
+.diagram .mermaid { display: flex; justify-content: flex-start; min-width: 1100px; }
+
+#user-card {
+  width: 100%;
+}
+.block-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 8px 0 18px;
+}
+.block-grid.five { grid-template-columns: repeat(3, 1fr); }
+.subhead {
+  margin: 4px 0 4px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--muted);
+}
+@media (max-width: 920px) { .block-grid { grid-template-columns: 1fr; } }
+.mini {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #FAFBFE;
+  font-size: 13px;
+}
+.mini h4 { margin: 0 0 6px; font-size: 13px; font-weight: 700; }
+.mini p { margin: 0; color: var(--muted); }
+.mini .tag-hard {
+  display: inline-block; margin-bottom: 6px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+  color: var(--warn); background: var(--warn-bg);
+  padding: 2px 7px; border-radius: 999px;
+}
+.src { font-size: 12px; color: var(--muted); }
+
+.split-panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.75fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 860px) { .split-panels { grid-template-columns: 1fr; } }
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px 12px;
+  background: #FAFBFE;
+}
+.panel-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 8px;
+}
+.flow { display: flex; flex-direction: column; gap: 4px; margin-top: 0; }
+.flow.mgmt .node { width: 100%; }
+.row { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; }
+.node {
+  appearance: none; border: 1.5px solid var(--line);
+  background: #fff; border-radius: 8px;
+  padding: 4px 8px; text-align: left; cursor: pointer;
+  min-width: 0; flex: 0 1 auto;
+}
+.node:hover { box-shadow: 0 1px 6px rgba(26,29,46,.08); }
+.node.active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+.node .id {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  color: var(--primary); background: var(--primary-light);
+  padding: 1px 5px; border-radius: 4px; margin-bottom: 2px;
+}
+.node .title { font-size: 12px; font-weight: 600; display: block; line-height: 1.25; }
+.node.shared { border-color: #B39DDB; }
+.node.va { border-color: #90CAF9; }
+.node.vb { border-color: #A5D6A7; }
+.node.vc { border-color: #EF9A9A; }
+.node.mgmt { border-color: #80CBC4; }
+.arrow { align-self: center; color: var(--muted); font-size: 13px; user-select: none; }
+.branch-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+  margin: 4px 0 0; text-transform: uppercase;
+}
+.branch-label.va { color: var(--va); }
+.branch-label.vb { color: var(--vb); }
+.branch-label.vc { color: var(--vc); }
+
+.card {
+  background: #FAFBFE;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+}
+.card h3 { margin: 0 0 8px; font-size: 17px; font-weight: 700; }
+.badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.badge {
+  font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+}
+.badge-id { background: var(--primary-light); color: var(--primary); }
+.field { margin-bottom: 11px; }
+.field dt {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--muted); margin-bottom: 3px;
+}
+.field dd { margin: 0; font-size: 14px; }
+.actions { margin: 0; padding-left: 18px; font-size: 14px; }
+.actions li { margin-bottom: 4px; }
+.warn-box {
+  margin-top: 12px; padding: 10px 12px; border-radius: 10px;
+  background: var(--warn-bg); color: var(--warn); font-size: 13px;
+  border: 1px solid #FFCC80;
+}
+.note-box {
+  margin-top: 12px; padding: 10px 12px; border-radius: 10px;
+  background: var(--bp3-bg); color: var(--bp3); font-size: 13px;
+  border: 1px dashed #80CBC4;
+}
+.stack {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.stack span {
+  font-size: 12px; padding: 4px 8px; border-radius: 8px;
+  background: #F6F8FE; border: 1px solid var(--line); color: var(--text);
+}
+
+table.bp3 {
+  width: 100%; border-collapse: collapse; font-size: 13.5px;
+}
+table.bp3 th, table.bp3 td {
+  border: 1px solid var(--line); padding: 8px 10px; vertical-align: top;
+}
+table.bp3 th {
+  background: #F6F8FE; text-align: left; font-size: 12px;
+}
+table.bp3 td[contenteditable="true"] {
+  min-height: 48px; background: #FFFEF8;
+}
+table.bp3 tr.hl td { background: var(--primary-light); }
+.empty { color: var(--muted); font-style: italic; }
+
+footer {
+  max-width: 1180px; margin: 0 auto; padding: 0 24px 36px;
+  font-size: 12.5px; color: var(--muted);
+}
+footer a { color: var(--primary); }
+</style>
+</head>
+<body>
+<header>
+  <h1>CPQ · три слоя: путь, техника пилота, BP3</h1>
+  <p>Слой 1: что может делать человек. Слева путь заказа, справа блоки управления (на диаграмме не рисуем). Слой 2: как это сейчас исполнено в пилоте Швецъ, хардкод контура и админки. Слой 3: как перенести в BP3, его заполняете вручную. Клик по шагу в слое 1 синхронизирует карточку и таблицу BP3.</p>
+  <div class="meta">Версия 0.3 · 24.08.2026 · шесть блоков контура; техника из протоколов CPQ</div>
+</header>
+
+<nav class="toc">
+  <a href="#block1">1. Действия пользователя</a>
+  <a href="#block2">2. Как исполнено в пилоте</a>
+  <a href="#block3">3. Как в BP3 (вручную)</a>
+</nav>
+
+<div class="wrap">
+
+<section class="block" id="block1">
+  <div class="block-num">СЛОЙ 1</div>
+  <h2>Действия, доступные пользователю</h2>
+  <p class="hint">Диаграмма слева направо. Описание выбранного этапа сверху. Снизу: слева путь заказа, справа блоки управления админки. На диаграмме блоки управления не рисуем.</p>
+  <div class="legend">
+    <span class="chip chip-shared">Общие</span>
+    <span class="chip chip-va">V-A без конфигурации</span>
+    <span class="chip chip-vb">V-B с конфигурацией</span>
+    <span class="chip chip-vc">V-C не релевантен</span>
+    <span class="chip chip-mgmt">Управление</span>
+  </div>
+
+  <div class="layer1-stack">
+    <div class="diagram">
+      <pre class="mermaid">
+flowchart LR
+  subgraph ch["1 Каналы"]
+    mail["Почта"]
+  end
+  subgraph ord["2 Обработка заказа"]
+    S0["S0 Принять заявку из письма"]
+    S1{"S1 Классифицировать"}
+    VC1["VC-1 Нерелевантно"]
+    pad["magicpad - быстрые действия"]
+  end
+  subgraph st["3 Уточнение остатков"]
+    VA1["VA-1 Остаток товара"]
+    VA2["VA-2 Закупка аналогов"]
+    VB2["VB-2 Остаток материалов"]
+    VB3["VB-3 Закупка сырья"]
+  end
+  subgraph cf["4 Конфигурация"]
+    VB1["VB-1 Конфигуратор"]
+  end
+  subgraph ev["5 Оценка предложения"]
+    VA3["VA-3 Цена от закупки"]
+    VB4["VB-4 Цена пошива"]
+  end
+  subgraph kp["6 Генерация КП"]
+    KPdoc["Генерация КП"]
+  end
+  mail --> S0
+  S0 --> S1
+  pad -.-> S1
+  S1 -->|"аналоги"| VA1
+  S1 -->|"шить"| VB1
+  S1 -->|"Нерелевантно"| VC1
+  VA1 --> VA2 --> VA3 --> KPdoc
+  VB1 --> VB2 --> VB3 --> VB4 --> KPdoc
+      </pre>
+    </div>
+
+    <div class="card" id="user-card"></div>
+
+    <div class="split-panels">
+      <div class="panel">
+        <p class="panel-title">Путь заказа</p>
+        <div class="flow">
+          <div class="row">
+            <button type="button" class="node shared" data-id="S0"><span class="id">S0</span><span class="title">Приём заявки</span></button>
+            <span class="arrow">→</span>
+            <button type="button" class="node shared" data-id="S1"><span class="id">S1</span><span class="title">Классификация</span></button>
+          </div>
+          <div class="branch-label va">V-A</div>
+          <div class="row">
+            <button type="button" class="node va" data-id="VA-1"><span class="id">VA-1</span><span class="title">Остатки товара</span></button>
+            <button type="button" class="node va" data-id="VA-2"><span class="id">VA-2</span><span class="title">Закупка аналогов</span></button>
+            <button type="button" class="node va" data-id="VA-3"><span class="id">VA-3</span><span class="title">Оценка и генерация КП</span></button>
+          </div>
+          <div class="branch-label vb">V-B</div>
+          <div class="row">
+            <button type="button" class="node vb" data-id="VB-1"><span class="id">VB-1</span><span class="title">Конфигуратор</span></button>
+            <button type="button" class="node vb" data-id="VB-2"><span class="id">VB-2</span><span class="title">Остатки материалов</span></button>
+            <button type="button" class="node vb" data-id="VB-3"><span class="id">VB-3</span><span class="title">Закупка сырья</span></button>
+            <button type="button" class="node vb" data-id="VB-4"><span class="id">VB-4</span><span class="title">Оценка и генерация КП</span></button>
+          </div>
+          <div class="branch-label vc">V-C</div>
+          <div class="row">
+            <button type="button" class="node vc" data-id="VC-1"><span class="id">VC-1</span><span class="title">Нерелевантно</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <p class="panel-title">Блоки управления</p>
+        <div class="flow mgmt">
+          <button type="button" class="node mgmt" data-id="M-CAT"><span class="id">M-CAT</span><span class="title">Каталог товаров</span></button>
+          <button type="button" class="node mgmt" data-id="M-MAT"><span class="id">M-MAT</span><span class="title">Материалы</span></button>
+          <button type="button" class="node mgmt" data-id="M-CFG"><span class="id">M-CFG</span><span class="title">Конфигурации</span></button>
+          <button type="button" class="node mgmt" data-id="M-USR"><span class="id">M-USR</span><span class="title">Пользователи</span></button>
+          <button type="button" class="node mgmt" data-id="M-ANL"><span class="id">M-ANL</span><span class="title">Аналитика по заказам</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="block2">
+  <div class="block-num">СЛОЙ 2</div>
+  <h2>Как это технически исполнено в пилоте</h2>
+  <p class="hint">As-is Швецъ на BP2. Весь контур и админка зашиты под пилот: ящик, агенты, 1С, наценки, шаблоны. Это не универсальная платформа BP3.</p>
+
+  <p class="subhead">Контур заказа · блоки 1–6</p>
+  <div class="block-grid">
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД</span>
+      <h4>1. Каналы</h4>
+      <p>Единственный вход: почта. Ящик Швецъ подключён хардкодом (IMAP), не как настройка интеграции платформы. Дедуп по IMAP UID: письмо не разбирается повторно и не остаётся «непрочитанным» у клиента. Ручного создания заказа нет. Telegram как канал CPQ в пилоте не закреплён.</p>
+    </div>
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД · ПАРОВОЗ АГЕНТОВ</span>
+      <h4>2. Обработка заказа</h4>
+      <p>Это в первую очередь цепочка агентов по письму. Сначала отделяют заказ от спама: не каждое письмо становится заявкой. Дальше агенты вытаскивают количество и статус по бизнес-логике пилота (шить / аналоги / комплементарное / Нерелевантно). Категорию товара берут работой с каталогом. Аналоги ищут по описанию: смотрят подключённые товары через RAG и, потенциально, API или файлы партнёров. Magic Pad здесь только быстрые действия к классификации.</p>
+    </div>
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД</span>
+      <h4>3. Уточнение остатков</h4>
+      <p>После разбора идёт запрос в интеграцию 1С: уточнить остатки по товарам и материалам. Отдельным запросом в ту же 1С забирают стоимость. Это не универсальный интегратор платформы, а зашитый контур пилота. Подготовлен принцип работы через «чёрный ящик» 1С: название, описание, внешний id, категория и цена.</p>
+    </div>
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД</span>
+      <h4>4. Конфигурация</h4>
+      <p>Дерево товара, техоперации и расход материалов зашиты под Швецъ. Костюм: два прохода, верх и низ, агрегированный BOM. Админка деревьев частично в Django. Операционный конфигуратор заказа опирается на это же мастер-дерево.</p>
+    </div>
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД</span>
+      <h4>5. Оценка предложения</h4>
+      <p>Наценка считается от заказа и от клиента. Вариации зашили хардкодом: разные коэффициенты и пороги под пилот, не конструктор правил BP3. Себестоимость опирается на стоимость из 1С и на формулы пошива, и сами развилки наценки вынесены в настройку клиента прямо в заказе.</p>
+    </div>
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД · ГЕН-ИИ</span>
+      <h4>6. Генерация КП</h4>
+      <p>Документ КП собирает генеративный ИИ. На вход: данные оценки и данные клиента (карточка из заявки). Это не платформенный конструктор шаблонов BP3: промпт и сборка зашиты под пилот. Реквизиты клиента подмешиваются в текст и поля КП.</p>
+    </div>
+  </div>
+
+  <div class="diagram" style="margin-bottom:8px">
+    <pre class="mermaid">
+%%{init: {"theme":"base"}}%%
+flowchart LR
+  subgraph ch["1 Каналы"]
+    imap["IMAP ящик Швецъ"]
+  end
+  subgraph ord["2 Паровоз агентов"]
+    spam["Заказ или спам"]
+    biz["Кол-во и статус"]
+    cat["Категория из каталога"]
+    analog["Аналоги: RAG / API / файлы"]
+  end
+  subgraph st["3 Интеграция 1С"]
+    stock["Остатки товаров и материалов"]
+    cost["Стоимость"]
+  end
+  subgraph cf["4 Конфигурация"]
+    tree["Дерево товара"]
+  end
+  subgraph ev["5 Наценка"]
+    markup["Вариации от заказа и клиента"]
+  end
+  subgraph kp["6 Генерация КП"]
+    gen["Ген-ИИ + данные клиента"]
+  end
+  imap --> spam --> biz --> cat --> analog
+  analog --> stock
+  analog --> cost
+  analog --> tree
+  stock --> markup
+  cost --> markup
+  tree --> markup
+  markup --> gen
+  classDef ai fill:#BBDEFB,stroke:#1565C0,color:#0D47A1
+  classDef integ fill:#C8E6C9,stroke:#2E7D32,color:#1B5E20
+  classDef hard fill:#FFCDD2,stroke:#C62828,color:#B71C1C
+  class spam,cat,analog,gen ai
+  class stock,cost integ
+  class imap,biz,tree,markup hard
+    </pre>
+  </div>
+  <div class="legend legend-tech">
+    <span class="chip chip-ai">ИИ-этап</span>
+    <span class="chip chip-integ">Интеграция 1С</span>
+    <span class="chip chip-hard">Хардкод</span>
+  </div>
+
+  <p class="subhead">Блоки управления · тоже хардкод пилота</p>
+  <div class="block-grid">
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД</span>
+      <h4>Каталог товаров</h4>
+      <p>Свой каталог и подключённые источники зашиты под Швецъ. Агенты категории и аналогов ходят именно сюда. Импорт файлов партнёров и стык с 1С по ключу живут в этом же контуре, не как универсальный модуль каталога платформы.</p>
+    </div>
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД</span>
+      <h4>Материалы</h4>
+      <p>Перечень материалов и цен заточен под пошив пилота. Остатки и стоимость, которые агенты и оценка запрашивают в 1С, сходятся к этой таблице. Загрузка прайса из файла или 1С, версия цены, поставщик: админка клиента, но схема полей пилотная.</p>
+    </div>
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД</span>
+      <h4>Конфигурации</h4>
+      <p>Мастер-деревья товаров, техоперации и сборки ведутся здесь. Это источник для блока 4 на заказе. Деревья и костюмный режим зашиты под номенклатуру Швецъ; часть ещё через Django Admin.</p>
+    </div>
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД</span>
+      <h4>Пользователи</h4>
+      <p>Учётки и шесть ролей живут в админке CPQ, не в платформенном Keycloak как в BP3. Одна роль на человека, синхронизация в Keycloak/BP пилотным контуром. Матрица этапов (кладовщик пишет остатки, закупщик снабжение) зашита под процесс Швецъ.</p>
+    </div>
+    <div class="mini">
+      <span class="tag-hard">ХАРДКОД</span>
+      <h4>Аналитика по заказам</h4>
+      <p>Страница сроков по этапам пилотного конвейера: ИИ-таски, уточнение, конфигурация, склад, снабжение, оценка, КП. Фильтры периода и ролей смотрят на эти же зашитые этапы, не на произвольный процесс BP3.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="block3">
+  <div class="block-num">СЛОЙ 3</div>
+  <h2>Как реализовать в BP3</h2>
+  <p class="hint">Таблица пустая намеренно: заполняете вручную. Жёлтые ячейки редактируются прямо в браузере. Сохранение в файл: скопируйте страницу или правьте HTML. Клик по шагу в слое 1 подсвечивает строку.</p>
+  <div class="note-box">Не заполнять автоматически. Сюда: этап/капсула BP3, что переносим из пилота, что пишем заново, HITL.</div>
+  <div style="overflow-x:auto; margin-top:14px">
+    <table class="bp3" id="bp3-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Шаг</th>
+          <th>Этап / капсула / объект BP3</th>
+          <th>Что берём из пилота</th>
+          <th>Что делаем заново</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  Источник:
+  <a href="CPQ_Happy_Path.md">CPQ_Happy_Path.md</a> ·
+  <a href="CPQ_Tech_by_Step.md">CPQ_Tech_by_Step.md</a> ·
+  <a href="README.md">README.md</a>
+</footer>
+
+<script>
+const STEPS = {
+  "S0": {
+    title: "Приём заявки",
+    branch: "Общая",
+    badgeClass: "chip-shared",
+    actions: [
+      "Система принимает письмо с ящика",
+      "Система создаёт заказ из письма (единственный канал)",
+      "Система не даёт создать заказ вручную"
+    ],
+    user: "Это действие системы, не менеджера. Заказ появляется из почты. Карточка уже создана; править её менеджер начинает на S1.",
+    impl: "Единственный канал создания: хардкод IMAP ящика Швецъ. Письмо → заказ. Дедуп по IMAP UID (daily 10.07): повторно не разбирать, у клиента не оставлять «непрочитанным». Ручного create нет. Telegram как вход CPQ не закреплён.",
+    stack: ["хардкод ящика", "IMAP + UID", "письмо → заказ"],
+    unique: "Создание заказа только из почты, без участия менеджера.",
+    reuse: "Паттерн «письмо → сущность». В BP3 ящик и слушатель: настройка интеграции, не код клиента.",
+    src: "Уточнение PM 24.08; слайды (заявка из почты); daily 10.07 IMAP UID.",
+    warn: "Уточнить: точный ящик/стенд; есть ли ещё файловая папка как вход."
+  },
+  "S1": {
+    title: "Классификация позиции",
+    branch: "Общая → развилка",
+    badgeClass: "chip-shared",
+    actions: [
+      "Изменить заказ: состав, количества, поля позиций",
+      "Провести сверку разночтений (письмо / ИИ-разбор vs карточка)",
+      "Проверить подобранные аналоги и при необходимости заменить",
+      "Проверить описание позиции и выявленную категорию",
+      "Подтвердить или исправить статус: Шить / Аналоги / Комплементарное",
+      "Сменить статус в UI или через magicpad (быстрые действия)",
+      "Пометить как Нерелевантно"
+    ],
+    user: "Менеджер верифицирует то, что система собрала на S0: правит заказ, сверяет разночтения, проверяет и меняет подобранные аналоги, описание и категорию, ставит статус. Magic Pad: быстрые действия со стрелкой только к классификации.",
+    impl: "Этап «Уточнение» (US-CPQ-02) + классификация. ИИ-тег и RAG-подбор аналогов уже лежат в карточке; человек подтверждает или меняет SKU аналога, описание, категорию, статус. mp2: покажи/найди аналоги, измени статус, массовые смены, удали нерелевантные. Карточка клиента (ТЗ 05.2026). Не отдельный вход на склад или в конфигуратор.",
+    stack: ["агенты + промпты", "S3 вложения", "RAG аналоги", "ИИ-тег", "верификация человеком"],
+    unique: "HITL: подбор аналогов и правка карточки до развилки экономики.",
+    reuse: "Классификация, RAG-подбор и сверка человеком. Оркестрацию в BP3 не копировать как монолит пилота.",
+    src: "US-CPQ-02 этап Уточнение; ТЗ_Оценка_v2; ТЗ_CPQ_Карточка_клиента_в_заявке; mp2-supported-requests; слайды 05.2026.",
+    warn: "Дозаписать: какие агенты по шагам, какой промпт, как RAG кладёт SKU в позицию и как человек его меняет."
+  },
+  "VA-1": {
+    title: "Остатки товара",
+    branch: "V-A",
+    badgeClass: "chip-va",
+    actions: [
+      "Открыть этап «Склад / аналоги»",
+      "Увидеть потребность need_qty по позиции",
+      "Ввести или подтвердить доступный остаток stock_available",
+      "Зафиксировать покрытие складом или дефицит"
+    ],
+    user: "Кладовщик видит потребность и доступный остаток по готовой позиции / аналогу.",
+    impl: "Этап склада (US-CPQ-02; роли Wave2). Поля need_qty, stock_available. Роль Кладовщик, флаг записи остатка. Источник: ручной ввод или 1С. На 18.08 «чёрный ящик» 1С: название, описание, внешний id, категория есть; цена на прогоне не находилась. Сверка по готовому SKU / аналогу, не по BOM.",
+    stack: ["этап склада", "need_qty / stock_available", "1С чёрный ящик", "роль Кладовщик"],
+    unique: "Остаток готового товара, не материалов пошива.",
+    reuse: "Формула дефицита. Источник остатков в BP3 через интегратор, не второй 1С-зоопарк.",
+    src: "US-CPQ-02; ТЗ_Снабжение_Аналоги (вход со склада); ТЗ_CPQ_Wave2_07_Ролевая_модель; daily 18.08 1С.",
+    warn: "Уточнить, ходит ли склад аналогов уже в 1С на проде или только мок."
+  },
+  "VA-2": {
+    title: "Закупка аналогов",
+    branch: "V-A",
+    badgeClass: "chip-va",
+    actions: [
+      "Увидеть кол-во к закупке required_purchase_qty",
+      "При дефиците указать дату поставки",
+      "При дефиците указать цену закупки за единицу (> 0)",
+      "При нулевом дефиците опереться на последнюю закупочную цену (или информер)"
+    ],
+    user: "Снабжение закрывает дыру по готовому аналогу. Исходное qty заказа на экране не акцентируется.",
+    impl: "ТЗ_Снабжение_Аналоги_Комплементарное: required_purchase_qty = max(need_qty − stock_available, 0). При дефиците обязательны дата и цена > 0. При нуле дату можно пустой; цену подтянуть из последней закупки. UI прячет исходное qty заказа.",
+    stack: ["этап снабжения", "required_purchase_qty", "валидация backend", "история закупочной цены"],
+    unique: "Валидация этапа зависит от рассчитанного дефицита.",
+    reuse: "Правило расчёта. UI этапа в BP3 как капсула / этап процесса.",
+    src: "ТЗ_Снабжение_Аналоги_Комплементарное.md",
+    warn: null
+  },
+  "VA-3": {
+    title: "Оценка и генерация КП (аналоги)",
+    branch: "V-A",
+    badgeClass: "chip-va",
+    actions: [
+      "Увидеть себестоимость cost_price (от analog_purchase_price)",
+      "Увидеть / подтвердить рекомендованную цену (не ниже себестоимости / закупки)",
+      "Перейти к генерации КП по допущенным позициям"
+    ],
+    user: "Экономика позиции без пошива: цена опирается на закупку аналога.",
+    impl: "ТЗ_Оценка_v2: для Аналоги/Комплементарное база analog_purchase_price; recommended_price не ниже ограничений. US-CPQ-06: генерация КП при входе на этап КП; без архивных позиций; приоритет цены (пользовательская / конфигурация / аналог).",
+    stack: ["движок оценки v2", "analog_purchase_price", "генерация КП"],
+    unique: "Нет materials_cost и labor_cost пошива.",
+    reuse: "Формулы. Экран генерации КП пересобирать в BP3.",
+    src: "ТЗ_Оценка_Рекомендованная_стоимость_v2; US-CPQ-06; Wave1_05 / Wave1_06.",
+    warn: "Уточнить, генерится ли файл КП в пилоте или только экран/Excel."
+  },
+  "VB-1": {
+    title: "Конфигуратор",
+    branch: "V-B",
+    badgeClass: "chip-vb",
+    actions: [
+      "Открыть конфигуратор позиции со статусом Шить",
+      "Выбрать дерево по категории (для Костюмы: куртка, затем низ)",
+      "Заполнить параметры изделия (элементы, материалы, цвет, размеры)",
+      "Получить сводку материалов BOM",
+      "Сохранить сборку / продолжить заказ"
+    ],
+    user: "Дерево слева, параметры и материалы в центре, оценка справа. Костюм: два поддерева.",
+    impl: "US-CPQ-04 / ТЗ костюма: категория обязательна для Шить; иначе конфигурация блокируется. Костюм: suit_bottom_type, два прохода, агрегированный BOM. Админка деревьев частично Django.",
+    stack: ["конфигуратор UI", "дерево / пресеты", "BOM костюма"],
+    unique: "Двухпредметный режим узко под Швецъ.",
+    reuse: "Зафиксировать пилот. В BP3 отдельный инкремент.",
+    src: "US-CPQ-02 / US-CPQ-04; ТЗ_CPQ_Конфигуратор_Костюм; Wave1_03.",
+    warn: null
+  },
+  "VB-2": {
+    title: "Остатки материалов",
+    branch: "V-B",
+    badgeClass: "chip-vb",
+    actions: [
+      "Открыть сводку BOM после конфигурации",
+      "Увидеть наличие и дефицит по строкам материалов"
+    ],
+    user: "Сверка потребности сырья, не готового SKU.",
+    impl: "Потребность из BOM конфигуратора. Каталог материалов + 1С (чёрный ящик схем: номенклатура, остаток; цена на 18.08 ещё дыра). Роль кладовщика. Контракт «какие поля нужны CPQ» с 14.05: не вшивать всю логику 1С.",
+    stack: ["BOM", "каталог материалов", "1С чёрный ящик", "этап склада"],
+    unique: "Сверка по сырью, не по SKU аналога.",
+    reuse: "BOM ↔ остатки. Один интегратор, без второго коннектора.",
+    src: "ТЗ костюма §5; Wave1_02; daily 18.08; интеграция 1С 14.05.",
+    warn: "Уточнить у PM: UI этапа vs автосверка после конфигуратора."
+  },
+  "VB-3": {
+    title: "Закупка сырья",
+    branch: "V-B",
+    badgeClass: "chip-vb",
+    actions: [
+      "Закрыть дефицит строк BOM закупкой",
+      "Проставить даты и цены по материалам",
+      "Массово задать дату поставки"
+    ],
+    user: "Снабжение работает со строками сырья под пошив.",
+    impl: "Снабжение по дефициту строк BOM. Тот же паттерн, что у аналогов, на материалах. Отдельного толстого ТЗ «снабжение сырья для Шить» рядом с аналогами мало.",
+    stack: ["снабжение BOM", "даты поставки", "роль Закупщик"],
+    unique: "Закупка сырья под пошив.",
+    reuse: "Паттерн дефицит → обязательные поля.",
+    src: "ТЗ снабжения (логика дефицита); роли Закупщик.",
+    warn: "Уточнить у PM полный набор полей снабжения для Шить."
+  },
+  "VB-4": {
+    title: "Оценка и генерация КП (Шить)",
+    branch: "V-B",
+    badgeClass: "chip-vb",
+    actions: [
+      "Увидеть себестоимость пошива (материалы + труд × накладные)",
+      "Увидеть / подтвердить рекомендованную цену (не ниже себестоимости)",
+      "Перейти к генерации КП"
+    ],
+    user: "Экономика пошива: материалы плюс труд и накладные.",
+    impl: "ТЗ_Оценка_v2: cost_price = labor_cost × overhead_index + materials_cost; overhead от qty. Костюм: сумма двух изделий. Backend пересчитывает. US-CPQ-06: генерация КП на этапе КП.",
+    stack: ["движок оценки v2", "materials / labor / overhead", "генерация КП"],
+    unique: "Накладные от порога qty; агрегат костюма.",
+    reuse: "Формулы и «считает backend».",
+    src: "ТЗ_Оценка_v2; Wave1_06; ТЗ костюма §6; US-CPQ-06.",
+    warn: null
+  },
+  "VC-1": {
+    title: "Нерелевантно",
+    branch: "V-C",
+    badgeClass: "chip-vc",
+    actions: [
+      "Пометить позицию как Нерелевантно",
+      "Команда Pad: удали все не релевантные товары из заказа"
+    ],
+    user: "Позиции уходят из рабочего состава заказа как Нерелевантно.",
+    impl: "ИИ-тег «Нерелевантно» на заявке/позициях (слайды 05.2026) плюс команда Pad «удали все не релевантные товары». Отдельного enum в ТЗ оценки рядом с Шить/Аналоги нет. Дальше по позициям нет склада и снабжения.",
+    stack: ["ИИ-тег", "Magic Pad whitelist", "удаление позиций"],
+    unique: "Отрицательный путь: отсечение до экономики.",
+    reuse: "Раннее отсечение. В BP3 квалификация / HITL.",
+    src: "Слайды CPQ (тег через ИИ); mp2-supported-requests; уточнение PM: лейбл «Нерелевантно».",
+    warn: "Сверка с PM: удаление позиций, архив заказа или другой процесс."
+  },
+  "M-CAT": {
+    title: "Каталог товаров",
+    branch: "Управление",
+    badgeClass: "chip-mgmt",
+    actions: [
+      "Открыть вкладку «Каталоги» в клиентской админке",
+      "Переключить вид: свой каталог / подключённые / общий",
+      "Отфильтровать позиции деревом категорий",
+      "Открыть карточку товара (фото, реквизиты, источник)",
+      "Запустить импорт или экспорт по шаблону",
+      "Обновить данные и посмотреть ошибки загрузки / актуальность",
+      "Сопоставить позицию с 1С по общему ключу"
+    ],
+    user: "Администратор каталога или менеджер закупок ведёт номенклатуру вне заказа: свои позиции и каталоги поставщиков, актуальность и источник каждой строки.",
+    impl: "Клиентская админка, вкладка «Каталоги». Свой / подключённые / опционально общий. Таблица: миниатюра, ID, название, категория, цена, источник, даты. Импорт xlsx/csv, журнал ошибок. Сопоставление с 1С только по общему ключу, без эвристик по имени.",
+    stack: ["клиентская админка", "свой / подключённые", "импорт-экспорт", "ключ 1С"],
+    unique: "Каталог как контур управления, не этап заказа.",
+    reuse: "Листинг + карточка + импорт. Коннектор 1С в BP3 через интегратор.",
+    src: "ТЗ_Каталоги_товара_дизайн; ТЗ_CPQ_Wave1_01_Каталоги_источники_1С.",
+    warn: null
+  },
+  "M-MAT": {
+    title: "Материалы",
+    branch: "Управление",
+    badgeClass: "chip-mgmt",
+    actions: [
+      "Открыть перечень материалов с ценами",
+      "Отфильтровать по категории, поставщику, источнику загрузки",
+      "Увидеть актуальную цену, остаток, кем и когда загружено",
+      "Загрузить прайс из файла или из 1С",
+      "Открыть историю изменения цены по материалу",
+      "Выгрузить прайс"
+    ],
+    user: "Технолог или закупщик ведёт каталог цен на материалы: видит актуальную стоимость, источник и историю, не заходя в конкретный заказ.",
+    impl: "Волна 1: CRUD цен, пакетная загрузка из файла и 1С, версионирование, дата действия. Таблица: наименование, категория, ед. изм., остаток, стоимость, источник, время и инициатор загрузки, поставщик. Файловый контур не блокируется, если обмен с 1С ещё не стабилен.",
+    stack: ["каталог цен материалов", "версионирование", "файл / 1С", "история цены"],
+    unique: "Цена материала с периодом действия, отдельно от оценки заказа.",
+    reuse: "Таблица + импорт + история. В BP3 тот же справочник для BOM.",
+    src: "ТЗ_CPQ_Wave1_02_Материалы_цены_1С.",
+    warn: null
+  },
+  "M-CFG": {
+    title: "Конфигурации",
+    branch: "Управление",
+    badgeClass: "chip-mgmt",
+    actions: [
+      "Открыть редактор дерева товара в админке (не конфигуратор заказа)",
+      "Добавить или править узел в категории",
+      "Привязать техоперации (секунды, разряд) и расход материалов",
+      "Сохранить сборку / версию дерева с уникальным именем",
+      "Опубликовать дерево после проверки целостности"
+    ],
+    user: "Технолог готовит мастер-дерево товара: новые элементы, операции и материалы. Это настройка шаблона, по которому потом конфигурируют позицию в заказе (VB-1).",
+    impl: "Волна 1: дерево, узлы, связи, ресурсы, расход материалов, сборки и шаблоны, версионирование, валидация перед публикацией. ТЗ управления деревом: «+» в категории, вложенность, обязательные поля, версия с уникальным именем. Часть админки деревьев ещё в Django.",
+    stack: ["мастер-дерево", "техоперации", "расход материалов", "версия / публикация"],
+    unique: "Управление конфигурациями отдельно от операционного конфигуратора заказа.",
+    reuse: "Сквозной сценарий «новый товар → опубликованная сборка» без Django Admin.",
+    src: "ТЗ_CPQ_Wave1_03_Конфигуратор_дерева_ресурсы; ТЗ_CPQ_Конфигуратор_управление_деревом_товара.",
+    warn: "Клиентский редактор волны 1 не закрыл весь контур: часть ещё Django."
+  },
+  "M-USR": {
+    title: "Пользователи",
+    branch: "Управление",
+    badgeClass: "chip-mgmt",
+    actions: [
+      "Открыть список пользователей (фильтр по роли, статусу, синхронизации)",
+      "Добавить пользователя: ФИО, логин, email, одна роль из шести",
+      "Заблокировать или разблокировать без удаления истории",
+      "Посмотреть статус push в Keycloak / BP",
+      "Открыть справочник ролей и матрицу «этап → ответственная роль»"
+    ],
+    user: "Администратор или директор ведёт учётки в клиентской админке CPQ. У человека ровно одна роль. Источник истины учётки: CPQ, дальше синхронизация в Keycloak и BP.",
+    impl: "6 ролей без «Снабженец» (права снабжения у Закупщика). Кладовщик отдельно, флаг записи остатков. Одна роль на пользователя. CRUD, блокировка, аудит смены роли. CPQ master → async Keycloak/BP, статус в карточке.",
+    stack: ["клиентская админка", "одна роль", "Keycloak / BP", "матрица этапов"],
+    unique: "Учётка живёт в CPQ, не в Django Admin и не только в BP.",
+    reuse: "Список + карточка + одна роль. В BP3 стыковать с Keycloak платформы.",
+    src: "ТЗ_CPQ_Wave2_07_Ролевая_модель; ТЗ_CPQ_Ролевая_модель_дизайн.",
+    warn: null
+  },
+  "M-ANL": {
+    title: "Аналитика по заказам",
+    branch: "Управление",
+    badgeClass: "chip-mgmt",
+    actions: [
+      "Открыть раздел «Аналитика заказов»",
+      "Выбрать период: день / неделя / месяц",
+      "Отфильтровать по ролям или по конкретному заказу",
+      "Увидеть, уложилась ли заявка в общий срок",
+      "Посмотреть длительность каждого этапа, включая ИИ-таски",
+      "Увидеть ответственную роль на этапе"
+    ],
+    user: "Директор или админ смотрит, как заявки укладываются в сроки: в целом и по этапам с ответственными, отдельно этапы ИИ и этапы с человеком.",
+    impl: "Страница вне пути заказа. Цепочка: ИИ-таски → Уточнение → Конфигурация → Склад → Снабжение → Оценка → КП → Финиш. Фильтры: период, роли, заказ. Индикация «в срок / с нарушением».",
+    stack: ["сроки по этапам", "роли", "ИИ vs человек", "фильтр периода"],
+    unique: "Просмотр, не изменение заказа.",
+    reuse: "Дашборд сроков. В BP3 опираться на факты этапов процесса.",
+    src: "ТЗ_Аналитика_Заказов_дизайн; US-CPQ-12.",
+    warn: null
+  }
+};
+
+const ORDER = ["S0","S1","VA-1","VA-2","VA-3","VB-1","VB-2","VB-3","VB-4","VC-1","M-CAT","M-MAT","M-CFG","M-USR","M-ANL"];
+
+function renderUser(id) {
+  const t = STEPS[id];
+  document.getElementById("user-card").innerHTML = `
+    <div class="badge-row">
+      <span class="badge badge-id">${id}</span>
+      <span class="chip ${t.badgeClass}">${t.branch}</span>
+    </div>
+    <h3>${t.title}</h3>
+    <dl>
+      <div class="field"><dt>Что происходит для человека</dt><dd>${t.user}</dd></div>
+      <div class="field"><dt>Доступные действия</dt><dd>
+        <ul class="actions">${t.actions.map(a => `<li>${a}</li>`).join("")}</ul>
+      </dd></div>
+    </dl>
+  `;
+}
+
+function renderBp3Table() {
+  const tb = document.querySelector("#bp3-table tbody");
+  tb.innerHTML = ORDER.map(id => {
+    const t = STEPS[id];
+    return `<tr data-id="${id}">
+      <td><strong>${id}</strong></td>
+      <td>${t.title}</td>
+      <td contenteditable="true" class="empty">заполнить вручную</td>
+      <td contenteditable="true" class="empty">заполнить вручную</td>
+      <td contenteditable="true" class="empty">заполнить вручную</td>
+    </tr>`;
+  }).join("");
+  tb.querySelectorAll("[contenteditable]").forEach(cell => {
+    cell.addEventListener("focus", () => {
+      if (cell.textContent.trim() === "заполнить вручную") {
+        cell.textContent = "";
+        cell.classList.remove("empty");
+      }
+    });
+  });
+}
+
+function selectStep(id) {
+  if (!STEPS[id]) return;
+  document.querySelectorAll(".node").forEach(n => n.classList.toggle("active", n.dataset.id === id));
+  document.querySelectorAll("#bp3-table tbody tr").forEach(r => r.classList.toggle("hl", r.dataset.id === id));
+  renderUser(id);
+  history.replaceState(null, "", "#" + id);
+}
+
+document.querySelectorAll(".node").forEach(n => n.addEventListener("click", () => selectStep(n.dataset.id)));
+
+mermaid.initialize({
+  startOnLoad: true,
+  theme: "neutral",
+  flowchart: { curve: "basis", htmlLabels: true },
+  securityLevel: "loose"
+});
+
+renderBp3Table();
+const hash = location.hash.replace(/^#/, "");
+selectStep(STEPS[hash] ? hash : "S0");
+</script>
+</body>
+</html>
