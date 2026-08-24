@@ -246,6 +246,30 @@ table.bp3 td[contenteditable="true"] {
 table.bp3 tr.hl td { background: var(--primary-light); }
 .empty { color: var(--muted); font-style: italic; }
 
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 8px; }
+.btn {
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  padding: 8px 14px; border-radius: 8px;
+  border: 1px solid var(--line); background: #fff;
+  cursor: pointer; color: var(--primary);
+}
+.btn:hover { background: var(--primary-light); }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.settings { font-size: 12.5px; color: var(--muted); margin: 8px 0 10px; }
+.settings summary { cursor: pointer; color: var(--primary); font-weight: 600; }
+.settings input {
+  width: 100%; max-width: 360px; margin: 6px 0;
+  padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px;
+  font-family: inherit; font-size: 12px;
+}
+.alert { padding: 10px 12px; border-radius: 8px; margin: 8px 0; font-size: 13px; display: none; }
+.alert.show { display: block; }
+.alert-ok { background: #D4EDDA; color: #155724; }
+.alert-warn { background: var(--warn-bg); color: var(--warn); }
+.alert-err { background: #FFEBEE; color: #C62828; }
+.chip-dirty { background: #FFF3E0; color: var(--warn); }
+
 footer {
   max-width: 1180px; margin: 0 auto; padding: 0 24px 36px;
   font-size: 12.5px; color: var(--muted);
@@ -484,9 +508,22 @@ flowchart LR
 <section class="block" id="block3">
   <div class="block-num">СЛОЙ 3</div>
   <h2>Как реализовать в BP3</h2>
-  <p class="hint">Таблица пустая намеренно: заполняете вручную. Жёлтые ячейки редактируются прямо в браузере. Сохранение в файл: скопируйте страницу или правьте HTML. Клик по шагу в слое 1 подсвечивает строку.</p>
-  <div class="note-box">Не заполнять автоматически. Сюда: этап/капсула BP3, что переносим из пилота, что пишем заново, HITL.</div>
-  <div style="overflow-x:auto; margin-top:14px">
+  <p class="hint">Жёлтые ячейки редактируются в браузере. «Сохранить» пишет таблицу в git (public-репо страницы), коллеги увидят её после обновления. Клик по шагу в слое 1 подсвечивает строку.</p>
+  <div class="note-box">Сюда: этап/капсула BP3, что переносим из пилота, что пишем заново, HITL. Не заполнять автоматически.</div>
+  <div class="toolbar">
+    <button type="button" class="btn btn-primary" id="btn-save">Сохранить</button>
+    <button type="button" class="btn" id="btn-reload">Обновить</button>
+    <span class="chip" id="save-meta"></span>
+    <span class="chip chip-dirty" id="dirty-chip" hidden>не сохранено</span>
+  </div>
+  <details class="settings" id="gh-settings">
+    <summary>GitHub token (один раз)</summary>
+    <p>Тот же токен, что для задач PM: Personal Access Token с Contents: Read and write для репозитория <code>ai-agents-trace</code>. Хранится только в браузере.</p>
+    <input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off"/>
+    <button type="button" class="btn" id="btn-save-token">Запомнить</button>
+  </details>
+  <div id="alert" class="alert"></div>
+  <div style="overflow-x:auto; margin-top:8px">
     <table class="bp3" id="bp3-table">
       <thead>
         <tr>
@@ -792,6 +829,74 @@ const STEPS = {
 
 const ORDER = ["S0","S1","VA-1","VA-2","VA-3","VB-1","VB-2","VB-3","VB-4","VC-1","M-CAT","M-MAT","M-CFG","M-USR","M-ANL"];
 
+const PLACEHOLDER = "заполнить вручную";
+const REPO = "Ukolovsky/ai-agents-trace";
+const JSON_PATH = "cpq-bp3.json";
+const TOKEN_KEY = "pm_tasks_github_token";
+const GH_HEADERS = {
+  Accept: "application/vnd.github+json",
+  "X-GitHub-Api-Version": "2022-11-28"
+};
+
+let savedRows = {};
+let fileSha = null;
+let dirty = false;
+
+function showAlert(msg, kind) {
+  const el = document.getElementById("alert");
+  el.textContent = msg;
+  el.className = "alert show alert-" + (kind || "ok");
+}
+
+function token() { return localStorage.getItem(TOKEN_KEY) || ""; }
+
+function setDirty(v) {
+  dirty = v;
+  document.getElementById("dirty-chip").hidden = !v;
+}
+
+function cellValue(text) {
+  const t = (text || "").trim();
+  return t === PLACEHOLDER ? "" : t;
+}
+
+function cellHtml(val) {
+  const t = (val || "").trim();
+  if (!t) return `<td contenteditable="true" class="empty">${PLACEHOLDER}</td>`;
+  return `<td contenteditable="true">${t.replace(/&/g,"&amp;").replace(/</g,"&lt;")}</td>`;
+}
+
+function collectRows() {
+  const rows = {};
+  document.querySelectorAll("#bp3-table tbody tr").forEach(tr => {
+    const cells = tr.querySelectorAll("td[contenteditable]");
+    rows[tr.dataset.id] = {
+      bp3: cellValue(cells[0].textContent),
+      from_pilot: cellValue(cells[1].textContent),
+      anew: cellValue(cells[2].textContent)
+    };
+  });
+  return rows;
+}
+
+function bindEditable() {
+  document.querySelectorAll("#bp3-table td[contenteditable]").forEach(cell => {
+    cell.addEventListener("focus", () => {
+      if (cell.textContent.trim() === PLACEHOLDER) {
+        cell.textContent = "";
+        cell.classList.remove("empty");
+      }
+    });
+    cell.addEventListener("input", () => setDirty(true));
+    cell.addEventListener("blur", () => {
+      if (!cell.textContent.trim()) {
+        cell.textContent = PLACEHOLDER;
+        cell.classList.add("empty");
+      }
+    });
+  });
+}
+
 function renderUser(id) {
   const t = STEPS[id];
   document.getElementById("user-card").innerHTML = `
@@ -813,22 +918,101 @@ function renderBp3Table() {
   const tb = document.querySelector("#bp3-table tbody");
   tb.innerHTML = ORDER.map(id => {
     const t = STEPS[id];
+    const row = savedRows[id] || {};
     return `<tr data-id="${id}">
       <td><strong>${id}</strong></td>
       <td>${t.title}</td>
-      <td contenteditable="true" class="empty">заполнить вручную</td>
-      <td contenteditable="true" class="empty">заполнить вручную</td>
-      <td contenteditable="true" class="empty">заполнить вручную</td>
+      ${cellHtml(row.bp3)}
+      ${cellHtml(row.from_pilot)}
+      ${cellHtml(row.anew)}
     </tr>`;
   }).join("");
-  tb.querySelectorAll("[contenteditable]").forEach(cell => {
-    cell.addEventListener("focus", () => {
-      if (cell.textContent.trim() === "заполнить вручную") {
-        cell.textContent = "";
-        cell.classList.remove("empty");
-      }
-    });
+  bindEditable();
+}
+
+async function ghError(r, label) {
+  let msg = label + ": " + r.status;
+  try {
+    const j = await r.json();
+    if (j.message) msg += " · " + j.message;
+  } catch (e) {}
+  return new Error(msg);
+}
+
+function decodeB64(content) {
+  return decodeURIComponent(escape(atob(String(content || "").replace(/\s/g, ""))));
+}
+
+async function loadBp3() {
+  const r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH + "?ref=main", {
+    headers: GH_HEADERS
   });
+  if (r.status === 404) {
+    savedRows = {};
+    fileSha = null;
+    document.getElementById("save-meta").textContent = "таблица ещё пустая";
+    return;
+  }
+  if (!r.ok) throw await ghError(r, "Загрузка");
+  const data = await r.json();
+  fileSha = data.sha;
+  const payload = JSON.parse(decodeB64(data.content));
+  savedRows = payload.rows || {};
+  const when = payload.updated_at ? payload.updated_at.slice(0, 16).replace("T", " ") : "";
+  document.getElementById("save-meta").textContent = when ? ("сохранено " + when) : "";
+  setDirty(false);
+}
+
+async function verifyToken() {
+  const tok = token();
+  if (!tok) throw new Error("Токен не задан");
+  const r = await fetch("https://api.github.com/repos/" + REPO, {
+    headers: { ...GH_HEADERS, Authorization: "Bearer " + tok }
+  });
+  if (!r.ok) throw await ghError(r, "Токен не принят");
+  const repo = await r.json();
+  if (!repo.permissions || !repo.permissions.push) {
+    throw new Error("Нет права записи в " + REPO + ". В токене: Contents → Read and write.");
+  }
+}
+
+async function saveToGitHub() {
+  const tok = token();
+  if (!tok) {
+    showAlert("Укажите GitHub token в настройках ниже", "warn");
+    document.getElementById("gh-settings").open = true;
+    return;
+  }
+  const btn = document.getElementById("btn-save");
+  btn.disabled = true;
+  try {
+    await verifyToken();
+    savedRows = collectRows();
+    const now = new Date().toISOString();
+    const payload = { updated_at: now, rows: savedRows };
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+    const body = { message: "cpq-bp3: web " + now.slice(0, 19), content, branch: "main" };
+    if (fileSha) body.sha = fileSha;
+    const r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
+      method: "PUT",
+      headers: {
+        ...GH_HEADERS,
+        Authorization: "Bearer " + tok,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) throw await ghError(r, "GitHub PUT");
+    const saved = await r.json();
+    fileSha = saved.content && saved.content.sha;
+    setDirty(false);
+    document.getElementById("save-meta").textContent = "сохранено " + now.slice(0, 16).replace("T", " ");
+    showAlert("Сохранено. Коллеги увидят таблицу после обновления страницы.", "ok");
+  } catch (err) {
+    showAlert(String(err.message || err), "err");
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 function selectStep(id) {
@@ -841,6 +1025,20 @@ function selectStep(id) {
 
 document.querySelectorAll(".node").forEach(n => n.addEventListener("click", () => selectStep(n.dataset.id)));
 
+document.getElementById("gh-token").value = token();
+document.getElementById("btn-save-token").onclick = function () {
+  const v = document.getElementById("gh-token").value.trim();
+  if (!v) { showAlert("Введите token", "warn"); return; }
+  localStorage.setItem(TOKEN_KEY, v);
+  verifyToken().then(() => showAlert("Токен OK, запись разрешена", "ok"))
+    .catch(e => showAlert(String(e.message || e), "err"));
+};
+document.getElementById("btn-save").onclick = saveToGitHub;
+document.getElementById("btn-reload").onclick = function () {
+  loadBp3().then(() => { renderBp3Table(); showAlert("Обновлено", "ok"); })
+    .catch(e => showAlert(String(e.message || e), "err"));
+};
+
 mermaid.initialize({
   startOnLoad: true,
   theme: "neutral",
@@ -848,9 +1046,13 @@ mermaid.initialize({
   securityLevel: "loose"
 });
 
-renderBp3Table();
-const hash = location.hash.replace(/^#/, "");
-selectStep(STEPS[hash] ? hash : "S0");
+loadBp3()
+  .catch(e => { savedRows = {}; showAlert(String(e.message || e), "warn"); })
+  .finally(() => {
+    renderBp3Table();
+    const hash = location.hash.replace(/^#/, "");
+    selectStep(STEPS[hash] ? hash : "S0");
+  });
 </script>
 </body>
 </html>
