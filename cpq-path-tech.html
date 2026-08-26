@@ -301,7 +301,7 @@ footer a { color: var(--primary); }
 <header>
   <h1>CPQ · три слоя: путь, техника пилота, BP3</h1>
   <p>Слой 1: что видит и делает человек. Слева путь заказа, справа блоки управления. Слой 2: как исполнено в пилоте (теги: хардкод, агент, RAI, RAG, BP2, интеграция, Magic Pad). Слой 3: целевой вид в BP3, предзаполнен идеями из review 25.08, все поля можно править; под любой ID можно добавить шаг экрана и комментарий к ревью.</p>
-  <div class="meta">Версия 0.6 · 26.08.2026 · слой 3: предзаполнение, шаги экранов, комментарии</div>
+  <div class="meta">Версия 0.6 · 26.08.2026 · диаграмма: паровоз агентов + BP2 / Magic Pad рядом</div>
 </header>
 
 <nav class="toc">
@@ -454,9 +454,11 @@ flowchart LR
   subgraph ch["1 Каналы"]
     imap["IMAP ящик Швецъ"]
   end
-  subgraph ord["2 Обработка заказа"]
-    spam["Разбор письма агентами"]
-    analog["RAG аналоги"]
+  subgraph ord["2 Паровоз агентов"]
+    spam["Заказ или спам"]
+    biz["Кол-во и статус"]
+    cat["Категория из каталога"]
+    analog["Аналоги: RAG / API / файлы"]
     bp2ord["BP2: этапы, переменные, 2 ФО"]
     pad["Magic Pad"]
   end
@@ -471,29 +473,29 @@ flowchart LR
     markup["Вариации от заказа и клиента"]
   end
   subgraph kp["6 Генерация КП"]
-    fields["Поля BP2"]
-    docs["Хранилище BP"]
-    gen["GenAI"]
+    gen["Ген-ИИ + данные клиента"]
+    kpbp2["BP2: поля и хранилище"]
   end
-  imap --> spam --> analog --> bp2ord
-  pad -.-> analog
+  imap --> spam --> biz --> cat --> analog
   analog --> stock
   analog --> cost
   analog --> tree
   stock --> markup
   cost --> markup
   tree --> markup
-  markup --> fields --> gen
-  docs --> gen
+  markup --> gen
+  bp2ord ~~~ analog
+  pad ~~~ analog
+  kpbp2 ~~~ gen
   classDef ai fill:#BBDEFB,stroke:#1565C0,color:#0D47A1
   classDef integ fill:#C8E6C9,stroke:#2E7D32,color:#1B5E20
   classDef hard fill:#FFCDD2,stroke:#C62828,color:#B71C1C
   classDef bp2 fill:#EDE7F6,stroke:#5E35B1,color:#311B92
   classDef mpad fill:#FFF8E1,stroke:#F9A825,color:#F57F17
-  class spam,analog,gen ai
+  class spam,cat,analog,gen ai
   class imap,stock,cost integ
-  class tree,markup hard
-  class bp2ord,fields,docs bp2
+  class biz,tree,markup hard
+  class bp2ord,kpbp2 bp2
   class pad mpad
     </pre>
   </div>
