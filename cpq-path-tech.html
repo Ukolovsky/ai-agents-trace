@@ -252,6 +252,18 @@ table.bp3 td[contenteditable="true"] {
   min-height: 48px; background: #FFFEF8;
 }
 table.bp3 tr.hl td { background: var(--primary-light); }
+table.bp3 tr.extra td:first-child { padding-left: 22px; color: var(--muted); font-size: 12px; }
+table.bp3 tr.extra td { background: #FBFCFE; }
+table.bp3 .col-act { width: 88px; white-space: nowrap; }
+table.bp3 .col-id { width: 72px; }
+.btn-row {
+  font-family: inherit; font-size: 11px; font-weight: 600;
+  padding: 4px 8px; border-radius: 6px; margin: 0 2px 2px 0;
+  border: 1px solid var(--line); background: #fff;
+  cursor: pointer; color: var(--primary);
+}
+.btn-row:hover { background: var(--primary-light); }
+.btn-row.danger { color: #C62828; }
 .empty { color: var(--muted); font-style: italic; }
 
 .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 8px; }
@@ -288,8 +300,8 @@ footer a { color: var(--primary); }
 <body>
 <header>
   <h1>CPQ · три слоя: путь, техника пилота, BP3</h1>
-  <p>Слой 1: что видит и делает человек. Слева путь заказа, справа блоки управления. Слой 2: как исполнено в пилоте (теги: хардкод, агент, RAI, RAG, BP2, интеграция, Magic Pad). Слой 3: перенос в BP3, заполняется вручную; намётки из review 25.08 уже в карточках. Клик по шагу в слое 1 синхронизирует карточку и таблицу BP3.</p>
-  <div class="meta">Версия 0.5 · 26.08.2026 · слой 2: интеграция каналов, BP2 / Magic Pad на диаграмме</div>
+  <p>Слой 1: что видит и делает человек. Слева путь заказа, справа блоки управления. Слой 2: как исполнено в пилоте (теги: хардкод, агент, RAI, RAG, BP2, интеграция, Magic Pad). Слой 3: целевой вид в BP3, предзаполнен идеями из review 25.08, все поля можно править; под любой ID можно добавить шаг экрана и комментарий к ревью.</p>
+  <div class="meta">Версия 0.6 · 26.08.2026 · слой 3: предзаполнение, шаги экранов, комментарии</div>
 </header>
 
 <nav class="toc">
@@ -526,8 +538,8 @@ flowchart LR
 <section class="block" id="block3">
   <div class="block-num">СЛОЙ 3</div>
   <h2>Как реализовать в BP3</h2>
-  <p class="hint">Жёлтые ячейки редактируются в браузере. «Сохранить» пишет таблицу в git (public-репо страницы), коллеги увидят её после обновления. Клик по шагу в слое 1 подсвечивает строку.</p>
-  <div class="note-box">Намётки из review 25.08 уже в поле «reuse» карточек слоя 1/2. Здесь: этап/капсула BP3, что берём, что заново. Жёлтые ячейки вручную; параллель с ~8 типами системных БП.</div>
+  <p class="hint">Предзаполнено идеями из review 25.08. Жёлтые ячейки можно править. «+ шаг» добавляет экран или пункт ревью под этот ID. «Сохранить» пишет таблицу в git.</p>
+  <div class="note-box">Разбирайте каждый экран: допишите шаг, целевой объект BP3 и комментарий. Параллель с ~8 типами системных БП уточняем со Сергеем.</div>
   <div class="toolbar">
     <button type="button" class="btn btn-primary" id="btn-save">Сохранить</button>
     <button type="button" class="btn" id="btn-reload">Обновить</button>
@@ -545,11 +557,13 @@ flowchart LR
     <table class="bp3" id="bp3-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Шаг</th>
+          <th class="col-id">ID</th>
+          <th>Шаг / экран</th>
           <th>Этап / капсула / объект BP3</th>
           <th>Что берём из пилота</th>
           <th>Что делаем заново</th>
+          <th>Комментарий к ревью</th>
+          <th class="col-act"></th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -856,9 +870,121 @@ const GH_HEADERS = {
   "X-GitHub-Api-Version": "2022-11-28"
 };
 
+const BP3_SEED = {
+  "S0": {
+    bp3: "Контур управления каналами через интеграции",
+    from_pilot: "Идея «письмо → заказ», исходящая почта из карточки",
+    anew: "Не копировать IMAP ящика Швецъ как хардкод",
+    comment: "Параллель с типами системных БП BP3 (~8) уточнять на разборе экранов"
+  },
+  "S1": {
+    bp3: "Агент импорта + бизнес-промпт / семантика пресета",
+    from_pilot: "Разбор письма, RAG по каталогу, статусы ветки, этап уточнения BP2",
+    anew: "Не тащить пайплайн Швецъ монолитом",
+    comment: "Magic Pad: не must-have первого моста, позже tools под действия процесса"
+  },
+  "VA-1": {
+    bp3: "Динамические таблицы или хранилище + агент-интегратор",
+    from_pilot: "Сверка потребность vs остаток готового, формула дефицита",
+    anew: "Каталог не сущность BP2, переделывать",
+    comment: ""
+  },
+  "VA-2": {
+    bp3: "Тот же контур, что каталог / остатки (таблицы или интегратор)",
+    from_pilot: "Правило закупки при дефиците аналога (даты, цены)",
+    anew: "Переделывать вместе с каталогом",
+    comment: ""
+  },
+  "VA-3": {
+    bp3: "Оценка: решение из BP3. КП: документ + хранилище + улучшенный GenAI",
+    from_pilot: "Себестоимость / рекомендованная цена; генерация КП из полей",
+    anew: "Формулы наценки не копировать слепо; конструктор не единый",
+    comment: "Экономика и КП можно разнести на отдельные экраны при разборе"
+  },
+  "VB-1": {
+    bp3: "Не в первую версию. Отдельный инкремент позже",
+    from_pilot: "Дерево товара, BOM, идея конфигуратора (близко к целевому)",
+    anew: "Ревью методики, лучше подтвердить на другом клиенте",
+    comment: ""
+  },
+  "VB-2": {
+    bp3: "Тот же контур, что у товаров: таблицы или интегратор",
+    from_pilot: "Сверка BOM с остатками материалов",
+    anew: "Не сущность BP2, переделывать",
+    comment: ""
+  },
+  "VB-3": {
+    bp3: "Тот же контур материалов / интегратора",
+    from_pilot: "Закупка сырья при дефиците",
+    anew: "Переделывать вместе с материалами",
+    comment: ""
+  },
+  "VB-4": {
+    bp3: "Оценка: решение из BP3. КП: документ + хранилище + улучшенный GenAI",
+    from_pilot: "Себестоимость пошива; генерация КП из полей BP2",
+    anew: "Нужно платформенное решение оценки",
+    comment: ""
+  },
+  "VC-1": {
+    bp3: "Квалификация / HITL «не тот документ»",
+    from_pilot: "Раннее отсечение Нерелевантно",
+    anew: "Не команда Pad в CPQ как целевой механизм",
+    comment: ""
+  },
+  "M-CAT": {
+    bp3: "Динамические таблицы или хранилище + агент-интегратор",
+    from_pilot: "Админка каталога, обновление RAG",
+    anew: "Переделывать, не сущность BP2",
+    comment: ""
+  },
+  "M-MAT": {
+    bp3: "Тот же контур, что у товаров",
+    from_pilot: "Админка материалов, BOM-остатки",
+    anew: "Переделывать",
+    comment: ""
+  },
+  "M-CFG": {
+    bp3: "Не в первую версию",
+    from_pilot: "Мастер-дерево как источник конфигуратора",
+    anew: "Отдельный инкремент после ревью",
+    comment: ""
+  },
+  "M-USR": {
+    bp3: "Контрагенты и роли платформы BP3",
+    from_pilot: "Клиент ↔ контрагенты BP, доступы на этапах",
+    anew: "Не плодить отдельный зоопарк учёток CPQ",
+    comment: ""
+  },
+  "M-ANL": {
+    bp3: "Не в v1 по бэклогу enablement",
+    from_pilot: "Идея сроков по этапам",
+    anew: "Длительности этапов не целимся в первую версию",
+    comment: ""
+  }
+};
+
 let savedRows = {};
 let fileSha = null;
 let dirty = false;
+
+function emptyFields() {
+  return { bp3: "", from_pilot: "", anew: "", comment: "", steps: [] };
+}
+
+function mergedRow(id) {
+  const seed = BP3_SEED[id] || emptyFields();
+  const saved = savedRows[id];
+  if (!saved) {
+    return { bp3: seed.bp3 || "", from_pilot: seed.from_pilot || "", anew: seed.anew || "", comment: seed.comment || "", steps: [] };
+  }
+  return {
+    bp3: saved.bp3 != null ? saved.bp3 : (seed.bp3 || ""),
+    from_pilot: saved.from_pilot != null ? saved.from_pilot : (seed.from_pilot || ""),
+    anew: saved.anew != null ? saved.anew : (seed.anew || ""),
+    comment: saved.comment != null ? saved.comment : (seed.comment || ""),
+    steps: Array.isArray(saved.steps) ? saved.steps : []
+  };
+}
 
 function showAlert(msg, kind) {
   const el = document.getElementById("alert");
@@ -878,21 +1004,50 @@ function cellValue(text) {
   return t === PLACEHOLDER ? "" : t;
 }
 
+function esc(val) {
+  return String(val || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+}
+
 function cellHtml(val) {
   const t = (val || "").trim();
   if (!t) return `<td contenteditable="true" class="empty">${PLACEHOLDER}</td>`;
-  return `<td contenteditable="true">${t.replace(/&/g,"&amp;").replace(/</g,"&lt;")}</td>`;
+  return `<td contenteditable="true">${esc(t)}</td>`;
+}
+
+function nextStepId(parentId, steps) {
+  let max = 0;
+  (steps || []).forEach(s => {
+    const m = String(s.id || "").match(new RegExp("^" + parentId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\.(\\d+)$"));
+    if (m) max = Math.max(max, Number(m[1]));
+  });
+  return parentId + "." + (max + 1);
 }
 
 function collectRows() {
   const rows = {};
-  document.querySelectorAll("#bp3-table tbody tr").forEach(tr => {
+  document.querySelectorAll("#bp3-table tbody tr[data-kind='main']").forEach(tr => {
+    const id = tr.dataset.id;
     const cells = tr.querySelectorAll("td[contenteditable]");
-    rows[tr.dataset.id] = {
+    rows[id] = {
       bp3: cellValue(cells[0].textContent),
       from_pilot: cellValue(cells[1].textContent),
-      anew: cellValue(cells[2].textContent)
+      anew: cellValue(cells[2].textContent),
+      comment: cellValue(cells[3].textContent),
+      steps: []
     };
+  });
+  document.querySelectorAll("#bp3-table tbody tr[data-kind='extra']").forEach(tr => {
+    const parent = tr.dataset.parent;
+    if (!rows[parent]) rows[parent] = emptyFields();
+    const cells = tr.querySelectorAll("td[contenteditable]");
+    rows[parent].steps.push({
+      id: tr.dataset.id,
+      title: cellValue(cells[0].textContent) || "Новый шаг",
+      bp3: cellValue(cells[1].textContent),
+      from_pilot: cellValue(cells[2].textContent),
+      anew: cellValue(cells[3].textContent),
+      comment: cellValue(cells[4].textContent)
+    });
   });
   return rows;
 }
@@ -913,10 +1068,63 @@ function bindEditable() {
       }
     });
   });
+  document.querySelectorAll("#bp3-table .btn-add").forEach(btn => {
+    btn.onclick = () => addStep(btn.dataset.parent);
+  });
+  document.querySelectorAll("#bp3-table .btn-del").forEach(btn => {
+    btn.onclick = () => removeStep(btn.dataset.id);
+  });
+}
+
+function addStep(parentId) {
+  savedRows = collectRows();
+  const row = mergedRow(parentId);
+  const id = nextStepId(parentId, row.steps);
+  row.steps = (row.steps || []).concat([{
+    id,
+    title: "Экран / шаг ревью",
+    bp3: "",
+    from_pilot: "",
+    anew: "",
+    comment: ""
+  }]);
+  savedRows[parentId] = row;
+  setDirty(true);
+  renderBp3Table();
+  const tr = document.querySelector("#bp3-table tr[data-id='" + CSS.escape(id) + "']");
+  if (tr) {
+    tr.classList.add("hl");
+    tr.scrollIntoView({ block: "nearest" });
+    const titleCell = tr.querySelector("td[contenteditable]");
+    if (titleCell) titleCell.focus();
+  }
+}
+
+function removeStep(stepId) {
+  savedRows = collectRows();
+  Object.keys(savedRows).forEach(pid => {
+    const steps = savedRows[pid].steps || [];
+    savedRows[pid].steps = steps.filter(s => s.id !== stepId);
+  });
+  setDirty(true);
+  renderBp3Table();
+}
+
+function extraRowHtml(parentId, step) {
+  return `<tr class="extra" data-kind="extra" data-id="${esc(step.id)}" data-parent="${esc(parentId)}">
+      <td>${esc(step.id)}</td>
+      ${cellHtml(step.title)}
+      ${cellHtml(step.bp3)}
+      ${cellHtml(step.from_pilot)}
+      ${cellHtml(step.anew)}
+      ${cellHtml(step.comment)}
+      <td class="col-act"><button type="button" class="btn-row danger btn-del" data-id="${esc(step.id)}">удалить</button></td>
+    </tr>`;
 }
 
 function renderUser(id) {
   const t = STEPS[id];
+  if (!t) return;
   document.getElementById("user-card").innerHTML = `
     <div class="badge-row">
       <span class="badge badge-id">${id}</span>
@@ -936,14 +1144,17 @@ function renderBp3Table() {
   const tb = document.querySelector("#bp3-table tbody");
   tb.innerHTML = ORDER.map(id => {
     const t = STEPS[id];
-    const row = savedRows[id] || {};
-    return `<tr data-id="${id}">
-      <td><strong>${id}</strong></td>
+    const row = mergedRow(id);
+    const extras = (row.steps || []).map(s => extraRowHtml(id, s)).join("");
+    return `<tr data-kind="main" data-id="${id}">
+      <td class="col-id"><strong>${id}</strong></td>
       <td>${t.title}</td>
       ${cellHtml(row.bp3)}
       ${cellHtml(row.from_pilot)}
       ${cellHtml(row.anew)}
-    </tr>`;
+      ${cellHtml(row.comment)}
+      <td class="col-act"><button type="button" class="btn-row btn-add" data-parent="${id}">+ шаг</button></td>
+    </tr>${extras}`;
   }).join("");
   bindEditable();
 }
@@ -1034,11 +1245,15 @@ async function saveToGitHub() {
 }
 
 function selectStep(id) {
-  if (!STEPS[id]) return;
-  document.querySelectorAll(".node").forEach(n => n.classList.toggle("active", n.dataset.id === id));
-  document.querySelectorAll("#bp3-table tbody tr").forEach(r => r.classList.toggle("hl", r.dataset.id === id));
-  renderUser(id);
-  history.replaceState(null, "", "#" + id);
+  const mainId = STEPS[id] ? id : (document.querySelector("#bp3-table tr[data-id='" + id + "']") || {}).dataset?.parent;
+  const focusId = STEPS[id] ? id : mainId;
+  if (focusId && STEPS[focusId]) renderUser(focusId);
+  document.querySelectorAll(".node").forEach(n => n.classList.toggle("active", n.dataset.id === focusId));
+  document.querySelectorAll("#bp3-table tbody tr").forEach(r => {
+    const hit = r.dataset.id === id || r.dataset.id === focusId || r.dataset.parent === focusId;
+    r.classList.toggle("hl", Boolean(hit && (r.dataset.id === id || r.dataset.kind === "main" && r.dataset.id === focusId)));
+  });
+  if (STEPS[id]) history.replaceState(null, "", "#" + id);
 }
 
 document.querySelectorAll(".node").forEach(n => n.addEventListener("click", () => selectStep(n.dataset.id)));
