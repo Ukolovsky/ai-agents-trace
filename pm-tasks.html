@@ -53,13 +53,14 @@ tr:hover td { background: #fafbff; }
 tr.row-done td { opacity: 0.75; }
 .mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .summary { min-width: 240px; }
-.src { font-size: 12px; color: var(--text-secondary); max-width: 200px; word-break: break-word; }
+.src { font-size: 12px; color: var(--text-secondary); min-width: 200px; max-width: 240px; word-break: break-word; }
+.cm-cell { min-width: 240px; width: 24%; }
 .st-select { font-family: inherit; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--grey-300); cursor: pointer; min-width: 100px; }
 .st-select.st-new { background: var(--primary-light); color: var(--primary); }
 .st-select.st-wip { background: #FFF3CD; color: #856404; }
 .st-select.st-done { background: #D4EDDA; color: var(--success); }
 .st-select.st-dup { background: #FFCDD2; color: #B71C1C; }
-.cm-input { width: 100%; min-width: 140px; font-family: inherit; font-size: 13px; border: 1px solid transparent; border-radius: 6px; padding: 4px 6px; resize: vertical; min-height: 32px; background: transparent; }
+.cm-input { width: 100%; min-width: 220px; min-height: 96px; font-family: inherit; font-size: 13px; line-height: 1.4; border: 1px solid var(--grey-300); border-radius: 6px; padding: 8px; resize: vertical; background: #fff; }
 .cm-input:hover, .cm-input:focus { border-color: var(--grey-300); background: #fff; outline: none; }
 .loading { text-align: center; padding: 48px; color: var(--text-secondary); }
 footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
@@ -180,7 +181,7 @@ footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); }
         html.push('<option value="' + s + '"' + (t.status === s ? " selected" : "") + '>' + s + '</option>');
       });
       html.push('</select></td>');
-      html.push('<td><textarea class="cm-input" data-field="comment" rows="2" placeholder="…">' + esc(t.comment || "") + '</textarea></td>');
+      html.push('<td class="cm-cell"><textarea class="cm-input" data-field="comment" rows="5" placeholder="…">' + esc(t.comment || "") + '</textarea></td>');
       html.push('<td class="src">' + esc(t.source || "") + '</td></tr>');
     });
     tbody.innerHTML = html.join("");
