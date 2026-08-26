@@ -95,6 +95,8 @@ header .meta { margin-top: 12px; font-size: 12.5px; opacity: 0.8; }
 .chip-ai { background: #BBDEFB; color: #1565C0; }
 .chip-integ { background: #C8E6C9; color: #2E7D32; }
 .chip-hard { background: #FFCDD2; color: #C62828; }
+.chip-bp2 { background: #EDE7F6; color: #5E35B1; }
+.chip-pad { background: #FFF8E1; color: #F9A825; }
 
 .layer1-stack {
   display: flex;
@@ -137,12 +139,18 @@ header .meta { margin-top: 12px; font-size: 12.5px; opacity: 0.8; }
 }
 .mini h4 { margin: 0 0 6px; font-size: 13px; font-weight: 700; }
 .mini p { margin: 0; color: var(--muted); }
-.mini .tag-hard {
+.mini .tag-hard,
+.mini .tag-integ,
+.mini .tag-bp2,
+.mini .tag-ai {
   display: inline-block; margin-bottom: 6px;
   font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
-  color: var(--warn); background: var(--warn-bg);
   padding: 2px 7px; border-radius: 999px;
 }
+.mini .tag-hard { color: var(--warn); background: var(--warn-bg); }
+.mini .tag-integ { color: #2E7D32; background: #E8F5E9; }
+.mini .tag-bp2 { color: #5E35B1; background: #EDE7F6; }
+.mini .tag-ai { color: #1565C0; background: #E3F2FD; }
 .src { font-size: 12px; color: var(--muted); }
 
 .split-panels {
@@ -281,7 +289,7 @@ footer a { color: var(--primary); }
 <header>
   <h1>CPQ · три слоя: путь, техника пилота, BP3</h1>
   <p>Слой 1: что видит и делает человек. Слева путь заказа, справа блоки управления. Слой 2: как исполнено в пилоте (теги: хардкод, агент, RAI, RAG, BP2, интеграция, Magic Pad). Слой 3: перенос в BP3, заполняется вручную; намётки из review 25.08 уже в карточках. Клик по шагу в слое 1 синхронизирует карточку и таблицу BP3.</p>
-  <div class="meta">Версия 0.4 · 26.08.2026 · сверка слоёв 0–1 с Сергеем и Лёшей 25.08 · протокол CPQ review Path</div>
+  <div class="meta">Версия 0.5 · 26.08.2026 · слой 2: интеграция каналов, BP2 / Magic Pad на диаграмме</div>
 </header>
 
 <nav class="toc">
@@ -396,14 +404,14 @@ flowchart LR
   <p class="subhead">Контур заказа · блоки 1–6</p>
   <div class="block-grid">
     <div class="mini">
-      <span class="tag-hard">ХАРДКОД</span>
+      <span class="tag-integ">ИНТЕГРАЦИЯ</span>
       <h4>1. Каналы</h4>
-      <p>Менеджер видит создаваемые заказы; из карточки можно отвечать по почте. Система принимает письмо и создаёт заказ. Отдельный бэкенд CPQ, IMAP / исходящая почта: хардкод, в BP3 как есть не переиспользуем. Нужен контур управления каналами через интеграции.</p>
+      <p>Система принимает письмо и создаёт заказ. Отдельный бэкенд CPQ, IMAP / исходящая почта. В BP3 как есть не переиспользуем. Нужен контур управления каналами через интеграции.</p>
     </div>
     <div class="mini">
-      <span class="tag-hard">АГЕНТ · RAG · BP2</span>
+      <span class="tag-ai">АГЕНТ · RAG · BP2</span>
       <h4>2. Обработка заказа</h4>
-      <p>Пайплайн агентов разбирает письмо; RAI маршрутизирует к нейросети; RAG ищет аналоги по каталогу; человек на этапе уточнения правит заказ, разночтения, аналоги, описание, количество, категорию и ветку (Шить / Аналоги / Комплементарное / Нерелевантно). BP2: этапы, переменные, два ФО. Цель: агент импорта + бизнес-промпт / семантика пресета. Magic Pad: быстрые команды (хардкод под пилот).</p>
+      <p>Пайплайн агентов разбирает письмо; RAI маршрутизирует к нейросети; RAG ищет аналоги по каталогу. BP2 держит этапы, переменные и два ФО. Цель: агент импорта + бизнес-промпт / семантика пресета. Magic Pad: быстрые команды (хардкод под пилот).</p>
     </div>
     <div class="mini">
       <span class="tag-hard">ХАРДКОД</span>
@@ -421,7 +429,7 @@ flowchart LR
       <p>Себестоимость / рекомендованная цена и бизнес-логика ценового предложения. Формулы и коэффициенты снаружи BP2 (в т.ч. подстановка суммы после этапа): хардкод, конструктор не единый, нужен ревью. В BP3 нужно платформенное решение.</p>
     </div>
     <div class="mini">
-      <span class="tag-hard">BP2 · ХРАНИЛИЩЕ · GenAI</span>
+      <span class="tag-bp2">BP2 · ХРАНИЛИЩЕ · GenAI</span>
       <h4>6. Генерация КП</h4>
       <p>Генерация КП из полей BP2 + хранилище документов BP + GenAI. Вложения и сгенерированные документы в карточке. В BP3: документ + хранилище + улучшенный GenAI.</p>
     </div>
@@ -434,11 +442,11 @@ flowchart LR
   subgraph ch["1 Каналы"]
     imap["IMAP ящик Швецъ"]
   end
-  subgraph ord["2 Паровоз агентов"]
-    spam["Заказ или спам"]
-    biz["Кол-во и статус"]
-    cat["Категория из каталога"]
-    analog["Аналоги: RAG / API / файлы"]
+  subgraph ord["2 Обработка заказа"]
+    spam["Разбор письма агентами"]
+    analog["RAG аналоги"]
+    bp2ord["BP2: этапы, переменные, 2 ФО"]
+    pad["Magic Pad"]
   end
   subgraph st["3 Интеграция 1С"]
     stock["Остатки товаров и материалов"]
@@ -451,31 +459,41 @@ flowchart LR
     markup["Вариации от заказа и клиента"]
   end
   subgraph kp["6 Генерация КП"]
-    gen["Ген-ИИ + данные клиента"]
+    fields["Поля BP2"]
+    docs["Хранилище BP"]
+    gen["GenAI"]
   end
-  imap --> spam --> biz --> cat --> analog
+  imap --> spam --> analog --> bp2ord
+  pad -.-> analog
   analog --> stock
   analog --> cost
   analog --> tree
   stock --> markup
   cost --> markup
   tree --> markup
-  markup --> gen
+  markup --> fields --> gen
+  docs --> gen
   classDef ai fill:#BBDEFB,stroke:#1565C0,color:#0D47A1
   classDef integ fill:#C8E6C9,stroke:#2E7D32,color:#1B5E20
   classDef hard fill:#FFCDD2,stroke:#C62828,color:#B71C1C
-  class spam,cat,analog,gen ai
-  class stock,cost integ
-  class imap,biz,tree,markup hard
+  classDef bp2 fill:#EDE7F6,stroke:#5E35B1,color:#311B92
+  classDef mpad fill:#FFF8E1,stroke:#F9A825,color:#F57F17
+  class spam,analog,gen ai
+  class imap,stock,cost integ
+  class tree,markup hard
+  class bp2ord,fields,docs bp2
+  class pad mpad
     </pre>
   </div>
   <div class="legend legend-tech">
-    <span class="chip chip-ai">ИИ-этап</span>
-    <span class="chip chip-integ">Интеграция 1С</span>
+    <span class="chip chip-ai">ИИ / агент / RAG</span>
+    <span class="chip chip-integ">Интеграция</span>
     <span class="chip chip-hard">Хардкод</span>
+    <span class="chip chip-bp2">BP2</span>
+    <span class="chip chip-pad">Magic Pad</span>
   </div>
 
-  <p class="subhead">Блоки управления · тоже хардкод пилота</p>
+  <p class="subhead">Блоки управления</p>
   <div class="block-grid">
     <div class="mini">
       <span class="tag-hard">ХАРДКОД</span>
@@ -493,9 +511,9 @@ flowchart LR
       <p>Мастер-дерево для операционного конфигуратора. Хардкод вне BP3, близко к целевому, на ревью. В первую версию переноса не входит.</p>
     </div>
     <div class="mini">
-      <span class="tag-hard">ХАРДКОД</span>
+      <span class="tag-bp2">BP2</span>
       <h4>Пользователи</h4>
-      <p>Клиент и контрагенты BP; доступы и роли пользователей уже есть в BP (тег BP2). В BP3 переиспользовать контрагентов и роли платформы.</p>
+      <p>Клиент и контрагенты BP; доступы и роли пользователей уже есть в BP. В BP3 переиспользовать контрагентов и роли платформы.</p>
     </div>
     <div class="mini">
       <span class="tag-hard">ХАРДКОД</span>
