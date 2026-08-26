@@ -550,7 +550,7 @@ flowchart LR
   </div>
   <details class="settings" id="gh-settings">
     <summary>GitHub token (один раз)</summary>
-    <p>Тот же токен, что для задач PM. «Запомнить» проверяет именно запись файлов, не факт что вы владелец репозитория. Хранится только в браузере.</p>
+    <p>Classic PAT аккаунта Ukolovsky, галка <code>public_repo</code>. «Запомнить» только проверяет логин. Запись файлов проверяет кнопка «Сохранить».</p>
     <input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off"/>
     <button type="button" class="btn" id="btn-save-token">Запомнить</button>
   </details>
@@ -995,7 +995,7 @@ function showAlert(msg, kind) {
   el.className = "alert show alert-" + (kind || "ok");
 }
 
-function token() { return localStorage.getItem(TOKEN_KEY) || ""; }
+function token() { return normalizeToken(localStorage.getItem(TOKEN_KEY) || ""); }
 
 function persistDraft(rows) {
   try {
@@ -1010,6 +1010,16 @@ function setDirty(v, rows) {
   dirty = v;
   document.getElementById("dirty-chip").hidden = !v;
   if (v) persistDraft(rows);
+}
+
+function normalizeToken(raw) {
+  return String(raw || "").trim().replace(/^(Bearer|token)\s+/i, "");
+}
+
+function tokenKind(tok) {
+  if (tok.indexOf("github_pat_") === 0) return "fine-grained (github_pat_)";
+  if (tok.indexOf("ghp_") === 0) return "classic (ghp_)";
+  return "неизвестный тип";
 }
 
 function authHeaders(tok, extra) {
@@ -1190,9 +1200,9 @@ function decodeB64(content) {
 }
 
 function writeDeniedMessage(detail) {
-  return "GitHub вас узнаёт, но этому токену нельзя писать файлы в ai-agents-trace. Раньше зелёное «Токен OK» врало: проверяли владельца репо, не право Contents. "
+  return "Этому токену нельзя писать файлы в Ukolovsky/ai-agents-trace. "
     + (detail ? detail + " " : "")
-    + "Classic PAT: галка public_repo. Fine-grained: только репозиторий ai-agents-trace и Contents → Read and write.";
+    + "Нужен classic PAT (ghp_) с галкой public_repo. Fine-grained часто не подходит: в нём должен быть именно репозиторий ai-agents-trace, не vstrechi, и Contents → Read and write.";
 }
 
 async function loadBp3() {
@@ -1240,22 +1250,14 @@ async function verifyToken() {
   const me = await fetch("https://api.github.com/user", {
     headers: authHeaders(tok)
   });
-  if (me.status === 401) throw new Error("GitHub не принял токен. Вставьте его целиком, ghp_ или github_pat_.");
+  if (me.status === 401) throw new Error("GitHub не принял токен. Вставьте его целиком, начинается с ghp_.");
   if (!me.ok) throw await ghError(me, "Токен");
-  const scopes = (me.headers.get("X-OAuth-Scopes") || "").split(",").map(s => s.trim()).filter(Boolean);
-  if (scopes.length) {
-    if (!scopes.includes("repo") && !scopes.includes("public_repo")) {
-      throw new Error(writeDeniedMessage("У classic PAT сейчас scope: " + scopes.join(", ") + "."));
-    }
-    return;
+  const user = await me.json();
+  const login = user.login || "?";
+  if (login.toLowerCase() !== "ukolovsky") {
+    throw new Error("Токен от аккаунта " + login + ", а репозиторий принадлежит Ukolovsky. Создайте PAT будучи залогиненым как Ukolovsky.");
   }
-  const blob = await fetch("https://api.github.com/repos/" + REPO + "/git/blobs", {
-    method: "POST",
-    headers: { ...authHeaders(tok), "Content-Type": "application/json" },
-    body: JSON.stringify({ content: "cpq-path-tech token probe", encoding: "utf-8" })
-  });
-  if (blob.status === 403) throw new Error(writeDeniedMessage(""));
-  if (!blob.ok) throw await ghError(blob, "Проверка записи");
+  return login;
 }
 
 async function putContents(tok, payload, sha) {
@@ -1304,7 +1306,8 @@ async function saveToGitHub() {
     }
     const r = await putContents(tok, payload, fileSha);
     if (r.status === 403) {
-      throw new Error(writeDeniedMessage(""));
+      const login = (await fetch("https://api.github.com/user", { headers: authHeaders(tok) }).then(x => x.json()).catch(() => ({}))).login || "?";
+      throw new Error(writeDeniedMessage("Аккаунт: " + login + ". Тип: " + tokenKind(tok) + "."));
     }
     if (!r.ok) throw await ghError(r, "GitHub PUT");
     const saved = await r.json();
@@ -1336,10 +1339,11 @@ document.querySelectorAll(".node").forEach(n => n.addEventListener("click", () =
 
 document.getElementById("gh-token").value = token();
 document.getElementById("btn-save-token").onclick = function () {
-  const v = document.getElementById("gh-token").value.trim();
+  const v = normalizeToken(document.getElementById("gh-token").value);
   if (!v) { showAlert("Введите token", "warn"); return; }
   localStorage.setItem(TOKEN_KEY, v);
-  verifyToken().then(() => showAlert("Токен пишет в git, можно сохранять таблицу", "ok"))
+  document.getElementById("gh-token").value = v;
+  verifyToken().then((login) => showAlert("Токен принят как " + login + ". Теперь нажмите Сохранить.", "ok"))
     .catch(e => showAlert(String(e.message || e), "err"));
 };
 document.getElementById("btn-save").onclick = saveToGitHub;
