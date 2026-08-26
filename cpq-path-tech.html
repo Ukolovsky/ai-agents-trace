@@ -550,7 +550,7 @@ flowchart LR
   </div>
   <details class="settings" id="gh-settings">
     <summary>GitHub token (один раз)</summary>
-    <p>Classic PAT аккаунта Ukolovsky, галка <code>public_repo</code>. «Запомнить» только проверяет логин. Запись файлов проверяет кнопка «Сохранить».</p>
+    <p>Токен только для этой страницы, задачи PM его не используют. Хранится в браузере.</p>
     <input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off"/>
     <button type="button" class="btn" id="btn-save-token">Запомнить</button>
   </details>
@@ -866,7 +866,7 @@ const ORDER = ["S0","S1","VA-1","VA-2","VA-3","VB-1","VB-2","VB-3","VB-4","VC-1"
 const PLACEHOLDER = "заполнить вручную";
 const REPO = "Ukolovsky/ai-agents-trace";
 const JSON_PATH = "cpq-bp3.json";
-const TOKEN_KEY = "pm_tasks_github_token";
+const TOKEN_KEY = "cpq_bp3_github_token";
 const DRAFT_KEY = "cpq_bp3_draft_v1";
 const GH_HEADERS = {
   Accept: "application/vnd.github+json",
@@ -1202,7 +1202,7 @@ function decodeB64(content) {
 function writeDeniedMessage(detail) {
   return "Этому токену нельзя писать файлы в Ukolovsky/ai-agents-trace. "
     + (detail ? detail + " " : "")
-    + "Нужен classic PAT (ghp_) с галкой public_repo. Fine-grained часто не подходит: в нём должен быть именно репозиторий ai-agents-trace, не vstrechi, и Contents → Read and write.";
+    + "Нужен classic PAT (ghp_) с галкой public_repo для репозитория ai-agents-trace.";
 }
 
 async function loadBp3() {
