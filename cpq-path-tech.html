@@ -545,7 +545,6 @@ flowchart LR
   <div class="toolbar">
     <button type="button" class="btn btn-primary" id="btn-save">Сохранить</button>
     <button type="button" class="btn" id="btn-reload">Обновить</button>
-    <button type="button" class="btn" id="btn-download">Скачать JSON</button>
     <span class="chip" id="save-meta"></span>
     <span class="chip chip-dirty" id="dirty-chip" hidden>не сохранено</span>
   </div>
@@ -1013,19 +1012,6 @@ function setDirty(v, rows) {
   if (v) persistDraft(rows);
 }
 
-function currentPayload() {
-  return { updated_at: new Date().toISOString(), rows: collectRows() };
-}
-
-function downloadJson(obj) {
-  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "cpq-bp3.json";
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
 function authHeaders(tok, extra) {
   return { ...GH_HEADERS, Authorization: "Bearer " + tok, ...(extra || {}) };
 }
@@ -1206,7 +1192,7 @@ function decodeB64(content) {
 function writeDeniedMessage(detail) {
   return "GitHub вас узнаёт, но этому токену нельзя писать файлы в ai-agents-trace. Раньше зелёное «Токен OK» врало: проверяли владельца репо, не право Contents. "
     + (detail ? detail + " " : "")
-    + "Classic PAT: галка public_repo. Fine-grained: только репозиторий ai-agents-trace и Contents → Read and write. Таблицу можно скачать кнопкой «Скачать JSON».";
+    + "Classic PAT: галка public_repo. Fine-grained: только репозиторий ai-agents-trace и Contents → Read and write.";
 }
 
 async function loadBp3() {
@@ -1318,8 +1304,7 @@ async function saveToGitHub() {
     }
     const r = await putContents(tok, payload, fileSha);
     if (r.status === 403) {
-      downloadJson(payload);
-      throw new Error(writeDeniedMessage("JSON скачан на компьютер, могу закоммитить его сам."));
+      throw new Error(writeDeniedMessage(""));
     }
     if (!r.ok) throw await ghError(r, "GitHub PUT");
     const saved = await r.json();
@@ -1358,9 +1343,6 @@ document.getElementById("btn-save-token").onclick = function () {
     .catch(e => showAlert(String(e.message || e), "err"));
 };
 document.getElementById("btn-save").onclick = saveToGitHub;
-document.getElementById("btn-download").onclick = function () {
-  downloadJson(currentPayload());
-};
 document.getElementById("btn-reload").onclick = function () {
   loadBp3().then(() => { renderBp3Table(); showAlert("Обновлено", "ok"); })
     .catch(e => showAlert(String(e.message || e), "err"));
