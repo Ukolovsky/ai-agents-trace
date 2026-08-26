@@ -545,12 +545,13 @@ flowchart LR
   <div class="toolbar">
     <button type="button" class="btn btn-primary" id="btn-save">Сохранить</button>
     <button type="button" class="btn" id="btn-reload">Обновить</button>
+    <button type="button" class="btn" id="btn-download">Скачать JSON</button>
     <span class="chip" id="save-meta"></span>
     <span class="chip chip-dirty" id="dirty-chip" hidden>не сохранено</span>
   </div>
   <details class="settings" id="gh-settings">
     <summary>GitHub token (один раз)</summary>
-    <p>Тот же токен, что для задач PM: Personal Access Token с Contents: Read and write для репозитория <code>ai-agents-trace</code>. Хранится только в браузере.</p>
+    <p>Тот же токен, что для задач PM. «Запомнить» проверяет именно запись файлов, не факт что вы владелец репозитория. Хранится только в браузере.</p>
     <input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off"/>
     <button type="button" class="btn" id="btn-save-token">Запомнить</button>
   </details>
@@ -867,6 +868,7 @@ const PLACEHOLDER = "заполнить вручную";
 const REPO = "Ukolovsky/ai-agents-trace";
 const JSON_PATH = "cpq-bp3.json";
 const TOKEN_KEY = "pm_tasks_github_token";
+const DRAFT_KEY = "cpq_bp3_draft_v1";
 const GH_HEADERS = {
   Accept: "application/vnd.github+json",
   "X-GitHub-Api-Version": "2022-11-28"
@@ -996,9 +998,36 @@ function showAlert(msg, kind) {
 
 function token() { return localStorage.getItem(TOKEN_KEY) || ""; }
 
-function setDirty(v) {
+function persistDraft(rows) {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      updated_at: new Date().toISOString(),
+      rows: rows || collectRows()
+    }));
+  } catch (e) {}
+}
+
+function setDirty(v, rows) {
   dirty = v;
   document.getElementById("dirty-chip").hidden = !v;
+  if (v) persistDraft(rows);
+}
+
+function currentPayload() {
+  return { updated_at: new Date().toISOString(), rows: collectRows() };
+}
+
+function downloadJson(obj) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "cpq-bp3.json";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function authHeaders(tok, extra) {
+  return { ...GH_HEADERS, Authorization: "Bearer " + tok, ...(extra || {}) };
 }
 
 function cellValue(text) {
@@ -1091,7 +1120,7 @@ function addStep(parentId) {
     comment: ""
   }]);
   savedRows[parentId] = row;
-  setDirty(true);
+  setDirty(true, savedRows);
   renderBp3Table();
   const tr = document.querySelector("#bp3-table tr[data-id='" + CSS.escape(id) + "']");
   if (tr) {
@@ -1108,7 +1137,7 @@ function removeStep(stepId) {
     const steps = savedRows[pid].steps || [];
     savedRows[pid].steps = steps.filter(s => s.id !== stepId);
   });
-  setDirty(true);
+  setDirty(true, savedRows);
   renderBp3Table();
 }
 
@@ -1174,6 +1203,12 @@ function decodeB64(content) {
   return decodeURIComponent(escape(atob(String(content || "").replace(/\s/g, ""))));
 }
 
+function writeDeniedMessage(detail) {
+  return "GitHub вас узнаёт, но этому токену нельзя писать файлы в ai-agents-trace. Раньше зелёное «Токен OK» врало: проверяли владельца репо, не право Contents. "
+    + (detail ? detail + " " : "")
+    + "Classic PAT: галка public_repo. Fine-grained: только репозиторий ai-agents-trace и Contents → Read and write. Таблицу можно скачать кнопкой «Скачать JSON».";
+}
+
 async function loadBp3() {
   const r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH + "?ref=main", {
     headers: GH_HEADERS
@@ -1182,6 +1217,7 @@ async function loadBp3() {
     savedRows = {};
     fileSha = null;
     document.getElementById("save-meta").textContent = "таблица ещё пустая";
+    restoreDraft(null);
     return;
   }
   if (!r.ok) throw await ghError(r, "Загрузка");
@@ -1191,20 +1227,69 @@ async function loadBp3() {
   savedRows = payload.rows || {};
   const when = payload.updated_at ? payload.updated_at.slice(0, 16).replace("T", " ") : "";
   document.getElementById("save-meta").textContent = when ? ("сохранено " + when) : "";
-  setDirty(false);
+  restoreDraft(payload.updated_at || "");
+}
+
+function restoreDraft(remoteUpdatedAt) {
+  let draft = null;
+  try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (e) { draft = null; }
+  if (!draft || !draft.rows) {
+    setDirty(false);
+    return;
+  }
+  const localTs = Date.parse(draft.updated_at || "") || 0;
+  const remoteTs = Date.parse(remoteUpdatedAt || "") || 0;
+  if (localTs > remoteTs) {
+    savedRows = draft.rows;
+    setDirty(true, savedRows);
+    showAlert("Восстановлен черновик с этого компьютера. GitHub его ещё не принял.", "warn");
+  } else {
+    setDirty(false);
+  }
 }
 
 async function verifyToken() {
   const tok = token();
   if (!tok) throw new Error("Токен не задан");
-  const r = await fetch("https://api.github.com/repos/" + REPO, {
-    headers: { ...GH_HEADERS, Authorization: "Bearer " + tok }
+  const me = await fetch("https://api.github.com/user", {
+    headers: authHeaders(tok)
   });
-  if (!r.ok) throw await ghError(r, "Токен не принят");
-  const repo = await r.json();
-  if (!repo.permissions || !repo.permissions.push) {
-    throw new Error("Нет права записи в " + REPO + ". В токене: Contents → Read and write.");
+  if (me.status === 401) throw new Error("GitHub не принял токен. Вставьте его целиком, ghp_ или github_pat_.");
+  if (!me.ok) throw await ghError(me, "Токен");
+  const scopes = (me.headers.get("X-OAuth-Scopes") || "").split(",").map(s => s.trim()).filter(Boolean);
+  if (scopes.length) {
+    if (!scopes.includes("repo") && !scopes.includes("public_repo")) {
+      throw new Error(writeDeniedMessage("У classic PAT сейчас scope: " + scopes.join(", ") + "."));
+    }
+    return;
   }
+  const blob = await fetch("https://api.github.com/repos/" + REPO + "/git/blobs", {
+    method: "POST",
+    headers: { ...authHeaders(tok), "Content-Type": "application/json" },
+    body: JSON.stringify({ content: "cpq-path-tech token probe", encoding: "utf-8" })
+  });
+  if (blob.status === 403) throw new Error(writeDeniedMessage(""));
+  if (!blob.ok) throw await ghError(blob, "Проверка записи");
+}
+
+async function putContents(tok, payload, sha) {
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+  const body = { message: "cpq-bp3: web " + payload.updated_at.slice(0, 19), content, branch: "main" };
+  if (sha) body.sha = sha;
+  const jsonBody = JSON.stringify(body);
+  let r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
+    method: "PUT",
+    headers: { ...authHeaders(tok), "Content-Type": "application/json" },
+    body: jsonBody
+  });
+  if (r.status === 403) {
+    r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
+      method: "PUT",
+      headers: { ...GH_HEADERS, Authorization: "token " + tok, "Content-Type": "application/json" },
+      body: jsonBody
+    });
+  }
+  return r;
 }
 
 async function saveToGitHub() {
@@ -1219,24 +1304,28 @@ async function saveToGitHub() {
   try {
     await verifyToken();
     savedRows = collectRows();
+    persistDraft(savedRows);
     const now = new Date().toISOString();
     const payload = { updated_at: now, rows: savedRows };
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-    const body = { message: "cpq-bp3: web " + now.slice(0, 19), content, branch: "main" };
-    if (fileSha) body.sha = fileSha;
-    const r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH, {
-      method: "PUT",
-      headers: {
-        ...GH_HEADERS,
-        Authorization: "Bearer " + tok,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
+    const meta = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + JSON_PATH + "?ref=main", {
+      headers: authHeaders(tok)
     });
+    if (meta.ok) {
+      const data = await meta.json();
+      fileSha = data.sha;
+    } else if (meta.status === 404) {
+      fileSha = null;
+    }
+    const r = await putContents(tok, payload, fileSha);
+    if (r.status === 403) {
+      downloadJson(payload);
+      throw new Error(writeDeniedMessage("JSON скачан на компьютер, могу закоммитить его сам."));
+    }
     if (!r.ok) throw await ghError(r, "GitHub PUT");
     const saved = await r.json();
     fileSha = saved.content && saved.content.sha;
     setDirty(false);
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
     document.getElementById("save-meta").textContent = "сохранено " + now.slice(0, 16).replace("T", " ");
     showAlert("Сохранено. Коллеги увидят таблицу после обновления страницы.", "ok");
   } catch (err) {
@@ -1265,10 +1354,13 @@ document.getElementById("btn-save-token").onclick = function () {
   const v = document.getElementById("gh-token").value.trim();
   if (!v) { showAlert("Введите token", "warn"); return; }
   localStorage.setItem(TOKEN_KEY, v);
-  verifyToken().then(() => showAlert("Токен OK, запись разрешена", "ok"))
+  verifyToken().then(() => showAlert("Токен пишет в git, можно сохранять таблицу", "ok"))
     .catch(e => showAlert(String(e.message || e), "err"));
 };
 document.getElementById("btn-save").onclick = saveToGitHub;
+document.getElementById("btn-download").onclick = function () {
+  downloadJson(currentPayload());
+};
 document.getElementById("btn-reload").onclick = function () {
   loadBp3().then(() => { renderBp3Table(); showAlert("Обновлено", "ok"); })
     .catch(e => showAlert(String(e.message || e), "err"));
