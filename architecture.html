@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ARCH · ревью архитектуры</title>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    window.__mermaid = mermaid;
+    mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "loose" });
+  </script>
+  <style>
+    :root {
+      --bg: #14151c; --panel: #1e2030; --ink: #f3f4f8; --muted: #9aa0b4;
+      --line: #2e3148; --accent: #5b6cff; --ok: #6bcb6b; --warn: #e6b84d; --bad: #e06c75;
+      --chip: #2a2d44;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 14px/1.45 "Fira Sans", "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+    header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 5; }
+    .brand { font-weight: 700; }
+    .tabs button, .btn { font: inherit; font-weight: 600; border: 1px solid var(--line); background: var(--chip);
+      color: var(--ink); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+    .tabs button.active, .btn-primary { background: var(--accent); border-color: var(--accent); }
+    .btn:disabled { opacity: 0.5; cursor: wait; }
+    .counts { display: flex; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+    .counts b { color: var(--ink); }
+    .job { font-size: 13px; color: var(--warn); max-width: 52ch; }
+    .site-link { color: var(--muted); font-size: 13px; font-weight: 600; text-decoration: none; }
+    .site-link:hover { color: var(--ink); }
+    body.readonly details.edit,
+    body.readonly #pane-q textarea,
+    body.readonly #pane-q .row { display: none; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 20px; border-bottom: 1px solid var(--line); }
+    .filters select, .filters input { font: inherit; background: var(--panel); color: var(--ink); border: 1px solid var(--line);
+      border-radius: 8px; padding: 6px 10px; }
+    main { padding: 16px 20px 64px; }
+    .grid { display: grid; gap: 12px; }
+    .split { display: grid; grid-template-columns: 220px 1fr; gap: 16px; align-items: start; }
+    .nav { position: sticky; top: 76px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+    @media (max-width: 900px) {
+      .split { grid-template-columns: 1fr; }
+      .nav { position: static; max-height: 28vh; overflow: auto; }
+    }
+    .nav button { display: block; width: 100%; text-align: left; font: inherit; color: var(--ink); background: transparent;
+      border: 0; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+    .nav button.active { background: var(--accent); }
+    .nav .lbl { color: var(--muted); font-size: 11px; padding: 8px 8px 4px; text-transform: uppercase; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+    .card h3 { margin: 0 0 8px; font-size: 16px; }
+    .block-title { margin: 8px 0 4px; font-size: 18px; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .chip { font-size: 12px; background: var(--chip); border-radius: 999px; padding: 3px 8px; color: var(--muted); }
+    .chip.reality_check { color: #f0c674; }
+    .chip.spec_gap { color: #8ab4f8; }
+    .chip.contradiction { color: var(--bad); }
+    .chip.closed, .chip.known { color: var(--ok); }
+    .chip.partial { color: var(--warn); }
+    .chip.tbd { color: #8ab4f8; }
+    .chip.spec_only { color: #c9a0dc; }
+    .cite { font-size: 12px; color: var(--muted); margin: 6px 0; }
+    .claim, .ask { margin: 8px 0; }
+    .claim span, .ask span { color: var(--muted); display: block; font-size: 12px; }
+    textarea, .who { width: 100%; font: inherit; background: var(--bg); color: var(--ink); border: 1px solid var(--line);
+      border-radius: 8px; padding: 8px; }
+    .row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+    .row select { font: inherit; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px; }
+    .diag { background: #0f1118; border-radius: 12px; padding: 16px; overflow: auto; margin-bottom: 24px; }
+    .sources { font-size: 13px; color: var(--muted); margin: 0 0 12px; max-width: 90ch; }
+    .sources b { color: var(--ink); }
+    .diag svg { max-width: 100%; height: auto; }
+    .hidden { display: none; }
+    .opts { margin: 6px 0; }
+    .opts label { display: block; margin: 4px 0; color: var(--muted); cursor: pointer; }
+    .intro { color: var(--muted); max-width: 90ch; }
+    .from-general { margin: 0 0 10px; padding: 8px 10px; border-left: 2px solid var(--accent); }
+    .from-general .lbl { margin: 0 0 4px; font-size: 12px; color: var(--accent); }
+    .what { color: var(--muted); margin: 0 0 10px; }
+    .body { margin: 6px 0 4px; }
+    .body h4 { margin: 12px 0 4px; font-size: 13px; font-weight: 650; color: var(--muted); letter-spacing: 0.01em; }
+    .body ul { margin: 4px 0 10px; padding-left: 20px; }
+    .body li { margin: 3px 0; }
+    .body p { margin: 6px 0; }
+    details.edit { margin-top: 10px; }
+    details.edit summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+    details.edit textarea { margin-top: 8px; min-height: 12rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">Архитектура · канон, вопросы, схемы</div>
+  <a class="site-link" id="link-trace" hidden href="index.html">Трассировка</a>
+  <a class="site-link" id="link-tasks" hidden href="pm-tasks.html">Задачи</a>
+  <div class="tabs">
+    <button type="button" id="tab-c" class="active">Канон</button>
+    <button type="button" id="tab-q">Вопросы</button>
+    <button type="button" id="tab-d">Диаграммы</button>
+  </div>
+  <div class="counts" id="counts"></div>
+  <div class="job" id="job"></div>
+  <div>
+    <button class="btn" type="button" id="save">Сохранить правки</button>
+    <button class="btn btn-primary" type="button" id="redraw">Обновить остальное</button>
+  </div>
+</header>
+<div class="filters hidden" id="filters">
+  <select id="f-kind"><option value="">все типы</option>
+    <option value="reality_check">проверка реальности</option>
+    <option value="spec_gap">пробел в доке</option>
+    <option value="contradiction">противоречие</option>
+  </select>
+  <select id="f-status">
+    <option value="open">открытые</option>
+    <option value="all">включая закрытые</option>
+    <option value="closed">только закрытые</option>
+  </select>
+</div>
+<main>
+  <div id="pane-c"></div>
+  <div id="pane-q" class="grid hidden"></div>
+  <div id="pane-d" class="hidden"></div>
+</main>
+<script>
+let STATE = { questions: [], diagrams: [], job: {}, counts: {}, findings: { platform: [], agents: [] } };
+let CANON_TARGET = "platform";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+
+function statusRu(st) {
+  return { known: "известно", partial: "частично", tbd: "открыто", spec_only: "только spec", contradiction: "спор" }[st] || st;
+}
+function kindLabel(k) {
+  return { reality_check: "проверка реальности", spec_gap: "пробел в доке", contradiction: "противоречие" }[k] || k;
+}
+function qStatus(st) {
+  return { open: "открыт", closed: "закрыт" }[st] || st;
+}
+const CANON_POINT = {
+  2: "классы агентов",
+  5: "где крутятся сервисы",
+  7: "движок выполнения",
+  8: "узлы задания",
+  10: "инструменты агента",
+  11: "проверка на входе",
+  12: "вызов внешних систем",
+  14: "связи и секреты",
+  15: "очереди и потоки данных",
+  17: "поиск фрагментов",
+  18: "индекс эмбеддингов",
+  19: "поля фрагмента",
+  20: "нарезка документов",
+  21: "словарь смыслов",
+  22: "память разговора",
+  23: "шапка спецификации",
+  24: "насколько агент действует сам",
+  25: "исследование",
+  26: "ход рассуждения",
+  27: "выбор модели",
+  28: "что меняется без релиза",
+  29: "предупреждения",
+  30: "проверка качества",
+  31: "способы проверки",
+  32: "проверка на отказ",
+  33: "правила и персональные данные",
+  34: "уровень риска",
+  35: "проверка человеком",
+  36: "журнал вызовов",
+  37: "метрики для аналитика",
+  38: "контуры стендов",
+  39: "версия агента",
+  40: "повтор прогона",
+  41: "реестр профилей",
+};
+function agentName(id) {
+  const a = (STATE.findings.agents || []).find((x) => x.id === id);
+  return a ? a.name : id;
+}
+
+function collectAnswers() {
+  const items = {};
+  document.querySelectorAll("#pane-q .card[data-id]").forEach((card) => {
+    const ta = card.querySelector("textarea");
+    const st = card.querySelector(".ans-st");
+    if (!ta || !st) return;
+    items[card.dataset.id] = {
+      text: ta.value,
+      status: st.value,
+      by: card.querySelector(".who").value || "team",
+    };
+  });
+  return items;
+}
+
+function collectFindings() {
+  const platform = [];
+  const seen = new Set();
+  document.querySelectorAll("textarea[data-bind='platform']").forEach((ta) => {
+    const id = ta.dataset.findingId;
+    if (!id || seen.has(id)) return;
+    seen.add(id);
+    const st = ta.closest("article").querySelector("select.f-st[data-bind='platform']");
+    const rec = { id, finding: ta.value };
+    if (st) rec.status = st.value;
+    platform.push(rec);
+  });
+  const agents = [];
+  (STATE.findings.agents || []).forEach((ag) => {
+    const items = [];
+    document.querySelectorAll(`textarea[data-bind='agent'][data-agent='${ag.id}']`).forEach((ta) => {
+      const st = ta.closest("article").querySelector("select.f-st[data-bind='agent']");
+      const rec = { id: ta.dataset.findingId, finding: ta.value };
+      if (st) rec.status = st.value;
+      items.push(rec);
+    });
+    agents.push({ id: ag.id, items });
+  });
+  return { platform, agents };
+}
+
+function statusSelect(cur, bind) {
+  const opts = ["known","partial","spec_only","tbd","contradiction"];
+  return `<select class="f-st" data-bind="${bind || "platform"}">${opts.map((o) => `<option value="${o}" ${o===cur?"selected":""}>${statusRu(o)}</option>`).join("")}</select>`;
+}
+
+function formatBody(text) {
+  const lines = String(text || "").split("\n");
+  let html = "";
+  let inUl = false;
+  const close = () => { if (inUl) { html += "</ul>"; inUl = false; } };
+  const li = (inner) => {
+    if (!inUl) { html += "<ul>"; inUl = true; }
+    html += `<li>${inner}</li>`;
+  };
+  for (const raw of lines) {
+    const t = raw.replace(/\s+$/, "").trim();
+    if (!t) { close(); continue; }
+    if (/^Что описывает пункт:/.test(t)) {
+      close();
+      html += `<p class="what">${esc(t.replace(/^Что описывает пункт:\s*/, ""))}</p>`;
+      continue;
+    }
+    const bullet = t.match(/^[-•]\s+(.*)$/);
+    if (bullet) { li(esc(bullet[1])); continue; }
+    if (/^[^:]{1,70}:$/.test(t)) {
+      close();
+      html += `<h4>${esc(t.slice(0, -1))}</h4>`;
+      continue;
+    }
+    const colon = t.indexOf(":");
+    if (colon > 0 && colon < 48 && t.slice(colon + 1).trim() && t.length < 240) {
+      li(`<b>${esc(t.slice(0, colon))}</b>: ${esc(t.slice(colon + 1).trim())}`);
+      continue;
+    }
+    close();
+    html += `<p>${esc(t)}</p>`;
+  }
+  close();
+  return html;
+}
+
+function findingCard(rec, scope, agentId, linkHtml) {
+  const cites = (rec.citations || []).map((c) => `${(c.path || "").split("/").pop()}: ${c.note || ""}`).join("; ");
+  const qs = (rec.question_ids || []).join(", ");
+  const rows = Math.min(28, Math.max(10, String(rec.finding || "").split("\n").length + 1));
+  return `<article class="card" data-finding-id="${esc(rec.id)}" data-scope="${scope}" data-agent="${esc(agentId || "")}">
+    <h3>§${rec.n} · ${esc(rec.title)}</h3>
+    <div class="chips">
+      <span class="chip ${esc(rec.status)}">${statusRu(rec.status)}</span>
+      ${qs ? `<span class="chip">вопросы ${esc(qs)}</span>` : `<span class="chip">без открытого вопроса</span>`}
+    </div>
+    ${cites ? `<p class="cite">${esc(cites)}</p>` : ""}
+    ${linkHtml || ""}
+    <div class="body">${formatBody(rec.finding)}</div>
+    <details class="edit">
+      <summary>править список</summary>
+      <textarea data-bind="${scope}" data-finding-id="${esc(rec.id)}" ${agentId ? `data-agent="${esc(agentId)}"` : ""} rows="${rows}">${esc(rec.finding)}</textarea>
+    </details>
+    <div class="row">${statusSelect(rec.status, scope)}<span class="cite">список можно править, затем «Сохранить правки» или «Обновить остальное»</span></div>
+  </article>`;
+}
+
+const AGENT_MARKS = {
+  "AI-01": ["словарь смыслов", "семантик", "сервис wiki"],
+  "AI-02": ["настройщик"],
+  "AI-03": ["интегратор", "мастер интеграц"],
+  "AI-04": ["импорт", "добавление документа"],
+  "AI-05": ["переменн"],
+  "AI-06": ["договор"],
+  "AI-07": ["magic pad"],
+  "AI-08": ["контрагент"],
+  "AI-09": ["оркестратор", "ии на этапе"],
+  "AI-10": ["поиск в шапке", "сервис поиска"],
+  "AI-11": ["встреч"],
+  "AI-12": ["динамический статус", "виджет статуса"],
+  "AI-13": ["помощник"],
+};
+
+function bareLine(s) {
+  return String(s || "")
+    .replace(/\s*\([^)]*\)/g, " ")
+    .replace(/ai-\d\d\s*[….–-]+\s*ai-\d\d/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function subjectAgent(line) {
+  const m = String(line || "").trim().match(/^(?:[-•]\s*)?(AI-\d\d)\b/i);
+  return m ? m[1].toUpperCase() : null;
+}
+
+function lineAboutAgent(line, aid) {
+  const sub = subjectAgent(line);
+  if (sub) return sub === aid;
+  const bare = bareLine(line);
+  if (bare.includes(aid.toLowerCase())) return true;
+  return (AGENT_MARKS[aid] || []).some((m) => bare.includes(m));
+}
+
+function alreadyOnCard(line, ownBare) {
+  const payload = bareLine(line).replace(/^[-•]\s*/, "");
+  const after = payload.includes(":") ? payload.slice(payload.indexOf(":") + 1).trim() : payload;
+  if (after.length < 40 || ownBare.length < 40) return false;
+  for (let i = 0; i + 40 <= after.length; i += 10) {
+    if (ownBare.includes(after.slice(i, i + 40))) return true;
+  }
+  return false;
+}
+
+function sliceFromGeneral(text, aid, own) {
+  const ownBare = bareLine(own);
+  const kept = [];
+  String(text || "").split("\n").forEach((raw) => {
+    const t = raw.trim();
+    if (!t || /^Что описывает пункт:/.test(t) || /^Не определено:?$/.test(t)) return;
+    if (subjectAgent(t)) return;
+    if (/^(?:[-•]\s*)?(Прочитать|Записать после|Найти|Выполнить|Сообщить человеку)\b/.test(t)) return;
+    if (!lineAboutAgent(t, aid) || alreadyOnCard(t, ownBare)) return;
+    kept.push(t.startsWith("-") || t.startsWith("•") ? t : `- ${t}`);
+  });
+  return kept.join("\n");
+}
+
+function renderCanon() {
+  const f = STATE.findings || { platform: [], agents: [] };
+  const navPlat = `<button type="button" data-go="platform" class="${CANON_TARGET==="platform"?"active":""}">Общая архитектура · §1–48</button>`;
+  const navAg = (f.agents || []).map((a) =>
+    `<button type="button" data-go="${a.id}" class="${CANON_TARGET===a.id?"active":""}">${a.id} ${a.name}</button>`
+  ).join("");
+  let body = "";
+  if (CANON_TARGET === "platform") {
+    body = `<h2 class="block-title">Общая архитектура</h2>
+      <p class="intro">Содержание пункта: кто входит в каждый тип, и отдельно что не определено. Вопросы команде только там, где статус открыт или spec не равен стенду.</p>
+      ${(f.platform || []).map((p) => findingCard(p, "platform")).join("")}`;
+  } else {
+    const ag = (f.agents || []).find((a) => a.id === CANON_TARGET);
+    if (!ag) body = "<p>агент не найден</p>";
+    else {
+      const platByN = {};
+      (f.platform || []).forEach((p) => { platByN[p.n] = p; });
+      body = `<h2 class="block-title">${esc(ag.id)} · ${esc(ag.name)}</h2>
+      <p class="intro">Чеклист этого агента. Если в общей архитектуре того же пункта есть строки про ${esc(ag.id)}, они показаны сверху. Остальной текст общего сюда не копируется. Kind: ${esc(ag.kind)}. Таксономия: ${esc((ag.taxonomy || []).join(", "))}${ag.taxonomy_note ? ". " + esc(ag.taxonomy_note) : ""}. Spec: ${esc(ag.spec)}.</p>
+      ${(ag.items || []).map((it) => {
+        const plat = platByN[it.n];
+        const slice = plat ? sliceFromGeneral(plat.finding, ag.id, it.finding) : "";
+        const link = slice ? `<div class="from-general"><p class="lbl">Из общего §${it.n}, только про этого агента</p><div class="body">${formatBody(slice)}</div></div>` : "";
+        return findingCard(it, "agent", ag.id, link);
+      }).join("")}`;
+    }
+  }
+  $("pane-c").innerHTML = `<div class="split">
+    <nav class="nav">
+      <div class="lbl">общее</div>${navPlat}
+      <div class="lbl">агенты</div>${navAg}
+    </nav>
+    <div class="grid" id="canon-body">${body}</div>
+  </div>`;
+  $("pane-c").querySelectorAll("details.edit textarea").forEach((ta) => {
+    ta.addEventListener("input", () => {
+      const article = ta.closest("article");
+      const body = [...article.querySelectorAll(".body")].find((el) => !el.closest(".from-general"));
+      if (body) body.innerHTML = formatBody(ta.value);
+    });
+  });
+  $("pane-c").querySelectorAll(".nav button").forEach((b) => {
+    b.onclick = () => {
+      stashFindings();
+      CANON_TARGET = b.dataset.go;
+      renderCanon();
+    };
+  });
+}
+
+function stashAnswers() {
+  const items = collectAnswers();
+  (STATE.questions || []).forEach((q) => {
+    const hit = items[q.id];
+    if (!hit) return;
+    q.answer_text = hit.text;
+    q.answer_status = hit.status;
+    q.answer_by = hit.by;
+  });
+}
+
+function stashFindings() {
+  const cur = collectFindings();
+  (cur.platform || []).forEach((p) => {
+    const dest = (STATE.findings.platform || []).find((x) => x.id === p.id);
+    if (dest) { dest.finding = p.finding; dest.status = p.status; }
+  });
+  (cur.agents || []).forEach((ag) => {
+    const dest = (STATE.findings.agents || []).find((x) => x.id === ag.id);
+    if (!dest) return;
+    (ag.items || []).forEach((it) => {
+      const d = (dest.items || []).find((x) => x.id === it.id);
+      if (d) { d.finding = it.finding; d.status = it.status; }
+    });
+  });
+}
+
+function sideNav(active, counts) {
+  const mark = (n) => (counts && counts[n]) ? ` · ${counts[n]}` : "";
+  const plat = `<button type="button" data-go="platform" class="${active==="platform"?"active":""}">Общая архитектура${mark("platform")}</button>`;
+  const ag = (STATE.findings.agents || []).map((a) =>
+    `<button type="button" data-go="${a.id}" class="${active===a.id?"active":""}">${esc(a.id)} ${esc(a.name)}${mark(a.id)}</button>`
+  ).join("");
+  return `<nav class="nav"><div class="lbl">общее</div>${plat}<div class="lbl">агенты</div>${ag}</nav>`;
+}
+
+function renderQuestions() {
+  stashAnswers();
+  const kind = $("f-kind").value;
+  const stf = $("f-status").value;
+  const buckets = { platform: [] };
+  (STATE.findings.agents || []).forEach((a) => { buckets[a.id] = []; });
+  (STATE.questions || []).forEach((q) => {
+    const qs = q.status || "open";
+    if (stf === "open" && qs !== "open") return;
+    if (stf === "closed" && qs === "open") return;
+    if (kind && q.kind !== kind) return;
+    const key = q.scope === "agent" && q.agent_id && buckets[q.agent_id] ? q.agent_id : "platform";
+    buckets[key].push(q);
+  });
+  Object.values(buckets).forEach((list) => list.sort((a, b) => (a.canon_section || 0) - (b.canon_section || 0) || String(a.id).localeCompare(String(b.id))));
+  const counts = {};
+  Object.keys(buckets).forEach((k) => { if (buckets[k].length) counts[k] = buckets[k].length; });
+  if (!buckets[CANON_TARGET]) CANON_TARGET = "platform";
+  const items = buckets[CANON_TARGET] || [];
+  const ag = (STATE.findings.agents || []).find((a) => a.id === CANON_TARGET);
+  const title = CANON_TARGET === "platform" ? "Общая архитектура" : `${ag.name}`;
+  const intro = CANON_TARGET === "platform"
+    ? "Вопросы к общей архитектуре. Слева то же переключение, что в каноне."
+    : `Вопросы только по агенту «${ag.name}». Слева то же переключение, что в каноне.`;
+  const cards = items.map((q) => {
+    const qs = q.status || "open";
+    const point = CANON_POINT[q.canon_section] || "";
+    const opts = (q.options || []).map((o) => `<label><input type="radio" name="opt-${q.id}" value="${esc(o)}" ${q.answer_text===o?"checked":""}> ${esc(o)}</label>`).join("");
+    return `<article class="card" data-id="${esc(q.id)}">
+      <h3>${esc(q.title || q.id)}</h3>
+      <div class="chips">
+        <span class="chip ${esc(q.kind)}">${kindLabel(q.kind)}</span>
+        <span class="chip">${q.scope === "agent" ? esc(agentName(q.agent_id)) : "общее"}</span>
+        ${point ? `<span class="chip">канон: ${esc(point)}</span>` : ""}
+        <span class="chip ${qs}">${qStatus(qs)}</span>
+      </div>
+      <p class="claim"><span>В документах</span>${esc(q.docs_claim || "")}</p>
+      <p class="ask"><span>Уточнить у команды</span>${esc(q.ask_team || "")}</p>
+      ${opts ? `<div class="opts">${opts}</div>` : ""}
+      <textarea rows="3" placeholder="черновик ответа">${esc(q.answer_text || "")}</textarea>
+      <div class="row">
+        <select class="ans-st">
+          <option value="draft" ${q.answer_status==="confirmed"?"":"selected"}>черновик</option>
+          <option value="confirmed" ${q.answer_status==="confirmed"?"selected":""}>подтверждён командой</option>
+        </select>
+        <input class="who" placeholder="кто отвечает" value="${esc(q.answer_by || "")}"/>
+      </div>
+    </article>`;
+  }).join("");
+  const empty = `<p class="intro">В этом блоке по текущему фильтру вопросов нет. Сверху можно сменить тип или показать закрытые.</p>`;
+  $("pane-q").innerHTML = `<div class="split">
+    ${sideNav(CANON_TARGET, counts)}
+    <div class="grid">
+      <h2 class="block-title">${esc(title)}</h2>
+      <p class="intro">${esc(intro)}</p>
+      ${cards || empty}
+    </div>
+  </div>`;
+  $("pane-q").querySelectorAll(".nav button").forEach((b) => {
+    b.onclick = () => { CANON_TARGET = b.dataset.go; renderQuestions(); };
+  });
+  $("pane-q").querySelectorAll(".card").forEach((div) => {
+    div.querySelectorAll(".opts input").forEach((inp) => {
+      inp.addEventListener("change", () => { if (inp.checked) div.querySelector("textarea").value = inp.value; });
+    });
+  });
+}
+
+const PLATFORM_ORDER = ["A","E","B","C","F","G","H","I","J","K","L","M"];
+
+async function renderDiagrams() {
+  const pane = $("pane-d");
+  pane.innerHTML = "";
+  const mermaid = window.__mermaid;
+  if (!mermaid) { pane.textContent = "Mermaid ещё грузится, обновите вкладку."; return; }
+  const all = STATE.diagrams || [];
+  const plat = PLATFORM_ORDER.map((id) => all.find((d) => d.id === id)).filter(Boolean);
+  const restPlat = all.filter((d) => d.layer !== "agent" && d.id !== "D" && !PLATFORM_ORDER.includes(d.id));
+  const overview = all.filter((d) => d.id === "D");
+  const agents = all.filter((d) => d.layer === "agent");
+  async function block(title, list) {
+    if (!list.length) return;
+    const h = document.createElement("h2");
+    h.className = "block-title";
+    h.textContent = title;
+    pane.appendChild(h);
+    for (const d of list) {
+      const wrap = document.createElement("section");
+      wrap.className = "diag";
+      const src = (d.source_docs || []).map((s) => `<li><b>${esc((s.path || "").split("/").pop())}</b>: ${esc(s.role || s.path)}</li>`).join("");
+      const card = d.card || {};
+      const axes = Object.keys(card).map((k) => `<li><b>${esc(k)}</b>: ${esc(Array.isArray(card[k]) ? card[k].join(", ") : card[k])}</li>`).join("");
+      wrap.innerHTML = `<h2>${esc(d.id || "")} · ${esc(d.title || d.stem)}</h2>
+        <ul class="sources">${axes}</ul>
+        <ul class="sources">${src}</ul>
+        <div class="mmd"></div>`;
+      pane.appendChild(wrap);
+      try {
+        const { svg } = await mermaid.render("m-" + d.stem + "-" + Date.now(), d.mermaid);
+        wrap.querySelector(".mmd").innerHTML = svg;
+      } catch (e) {
+        wrap.querySelector(".mmd").textContent = d.mermaid + "\n\n" + e;
+      }
+    }
+  }
+  await block("Общая архитектура", plat.concat(restPlat));
+  await block("Агенты, обзор", overview);
+  await block("Агенты, чеклист канона", agents);
+}
+
+function paintMeta() {
+  const c = STATE.counts || {};
+  const plat = (STATE.findings.platform || []).length;
+  const ag = (STATE.findings.agents || []).length;
+  $("counts").innerHTML = `<span>открытых вопросов <b>${c.open || 0}</b></span>
+    <span>пунктов канона <b>${plat}</b></span>
+    <span>агентов <b>${ag}</b></span>`;
+  const j = STATE.job || {};
+  $("job").textContent = j.status ? `${j.status}: ${j.message || ""}` : "";
+  const busy = j.status === "queued" || j.status === "running" || j.status === "awaiting_agent";
+  $("redraw").disabled = busy;
+  $("redraw").textContent = busy ? "Идёт critic…" : "Обновить остальное";
+}
+
+const ON_PAGES = location.hostname.endsWith("github.io");
+
+async function refresh() {
+  const r = ON_PAGES
+    ? await fetch(new URL("arch-state.json", location.href), { cache: "no-store" })
+    : await fetch("/api/state", { cache: "no-store" });
+  STATE = await r.json();
+  if (!STATE.findings) STATE.findings = { platform: [], agents: [] };
+  if (ON_PAGES) {
+    document.body.classList.add("readonly");
+    $("save").hidden = true;
+    $("redraw").hidden = true;
+    $("link-trace").hidden = false;
+    $("link-tasks").hidden = false;
+    $("job").textContent = "Снимок для чтения. Правки остаются на локальной доске.";
+  }
+  paintMeta();
+  if (ON_PAGES) $("job").textContent = "Снимок для чтения. Правки остаются на локальной доске.";
+  renderCanon();
+  renderQuestions();
+  if (!$("pane-d").classList.contains("hidden")) await renderDiagrams();
+}
+
+async function save() {
+  await fetch("/api/answers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ items: collectAnswers(), by: "team" }),
+  });
+  await fetch("/api/findings", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...collectFindings(), by: "team" }),
+  });
+  await refresh();
+}
+
+async function redraw() {
+  $("redraw").disabled = true;
+  await fetch("/api/findings", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...collectFindings(), by: "team" }),
+  });
+  await fetch("/api/redraw", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ items: collectAnswers(), by: "team" }),
+  });
+  await refresh();
+  pollJob();
+}
+
+function pollJob() {
+  const t = setInterval(async () => {
+    const r = await fetch("/api/job", { cache: "no-store" });
+    const j = await r.json();
+    STATE.job = j;
+    paintMeta();
+    if (j.status === "done" || j.status === "error" || j.status === "idle") {
+      clearInterval(t);
+      await refresh();
+    }
+  }, 2000);
+}
+
+function showTab(name) {
+  ["c", "q", "d"].forEach((t) => {
+    $("tab-" + t).classList.toggle("active", t === name);
+    $("pane-" + t).classList.toggle("hidden", t !== name);
+  });
+  $("filters").classList.toggle("hidden", name !== "q");
+}
+$("tab-c").onclick = () => { stashFindings(); showTab("c"); renderCanon(); };
+$("tab-q").onclick = () => { stashAnswers(); showTab("q"); renderQuestions(); };
+$("tab-d").onclick = async () => { showTab("d"); await renderDiagrams(); };
+["f-kind", "f-status"].forEach((id) => $(id).addEventListener("input", renderQuestions));
+$("save").onclick = save;
+$("redraw").onclick = redraw;
+refresh();
+</script>
+</body>
+</html>
