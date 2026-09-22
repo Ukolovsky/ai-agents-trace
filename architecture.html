@@ -67,9 +67,12 @@
     .row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
     .row select { font: inherit; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px; }
     .diag { background: #0f1118; border-radius: 12px; padding: 16px; overflow: auto; margin-bottom: 24px; }
+    .diag-split { grid-template-columns: 268px 1fr; }
+    .diag-split .nav { max-height: calc(100vh - 108px); overflow: auto; }
+    .diag .mmd { overflow: auto; }
     .sources { font-size: 13px; color: var(--muted); margin: 0 0 12px; max-width: 90ch; }
     .sources b { color: var(--ink); }
-    .diag svg { max-width: 100%; height: auto; }
+    .diag svg { height: auto; min-width: 960px; }
     .hidden { display: none; }
     .opts { margin: 6px 0; }
     .opts label { display: block; margin: 4px 0; color: var(--muted); cursor: pointer; }
@@ -124,6 +127,7 @@
 <script>
 let STATE = { questions: [], diagrams: [], job: {}, counts: {}, findings: { platform: [], agents: [] } };
 let CANON_TARGET = "platform";
+let DIAGRAM_TARGET = "AI-01";
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
@@ -499,44 +503,61 @@ function renderQuestions() {
 
 const PLATFORM_ORDER = ["A","E","B","C","F","G","H","I","J","K","L","M"];
 
+function diagLabel(d) {
+  if (d.layer === "agent") {
+    const name = String(d.title || "").split("·").slice(1).join("·").trim();
+    return name ? `${d.id} ${name}` : d.id;
+  }
+  const title = String(d.title || d.id).replace(/ Architecture$/, "");
+  return `${d.id} · ${title}`;
+}
+
 async function renderDiagrams() {
   const pane = $("pane-d");
-  pane.innerHTML = "";
   const mermaid = window.__mermaid;
-  if (!mermaid) { pane.textContent = "Mermaid ещё грузится, обновите вкладку."; return; }
   const all = STATE.diagrams || [];
   const plat = PLATFORM_ORDER.map((id) => all.find((d) => d.id === id)).filter(Boolean);
   const restPlat = all.filter((d) => d.layer !== "agent" && d.id !== "D" && !PLATFORM_ORDER.includes(d.id));
   const overview = all.filter((d) => d.id === "D");
   const agents = all.filter((d) => d.layer === "agent");
-  async function block(title, list) {
-    if (!list.length) return;
-    const h = document.createElement("h2");
-    h.className = "block-title";
-    h.textContent = title;
-    pane.appendChild(h);
-    for (const d of list) {
-      const wrap = document.createElement("section");
-      wrap.className = "diag";
-      const src = (d.source_docs || []).map((s) => `<li><b>${esc((s.path || "").split("/").pop())}</b>: ${esc(s.role || s.path)}</li>`).join("");
-      const card = d.card || {};
-      const axes = Object.keys(card).map((k) => `<li><b>${esc(k)}</b>: ${esc(Array.isArray(card[k]) ? card[k].join(", ") : card[k])}</li>`).join("");
-      wrap.innerHTML = `<h2>${esc(d.id || "")} · ${esc(d.title || d.stem)}</h2>
-        <ul class="sources">${axes}</ul>
-        <ul class="sources">${src}</ul>
-        <div class="mmd"></div>`;
-      pane.appendChild(wrap);
-      try {
-        const { svg } = await mermaid.render("m-" + d.stem + "-" + Date.now(), d.mermaid);
-        wrap.querySelector(".mmd").innerHTML = svg;
-      } catch (e) {
-        wrap.querySelector(".mmd").textContent = d.mermaid + "\n\n" + e;
-      }
-    }
+  const groups = [
+    ["Общая архитектура", plat.concat(restPlat)],
+    ["Обзор", overview],
+    ["Агенты", agents],
+  ];
+  const known = groups.flatMap(([, list]) => list);
+  if (!known.some((d) => d.id === DIAGRAM_TARGET)) DIAGRAM_TARGET = (known[0] || {}).id || "";
+  const nav = groups.map(([label, list]) => {
+    if (!list.length) return "";
+    const buttons = list.map((d) =>
+      `<button type="button" data-go="${esc(d.id)}" class="${DIAGRAM_TARGET===d.id?"active":""}">${esc(diagLabel(d))}</button>`
+    ).join("");
+    return `<div class="lbl">${esc(label)}</div>${buttons}`;
+  }).join("");
+  const d = known.find((item) => item.id === DIAGRAM_TARGET);
+  pane.innerHTML = `<div class="split diag-split">
+    <nav class="nav">${nav}</nav>
+    <div class="grid" id="diag-view"></div>
+  </div>`;
+  pane.querySelectorAll(".nav button").forEach((b) => {
+    b.onclick = () => { DIAGRAM_TARGET = b.dataset.go; renderDiagrams(); };
+  });
+  const view = $("diag-view");
+  if (!d) { view.textContent = "Схем пока нет."; return; }
+  if (!mermaid) { view.textContent = "Mermaid ещё грузится, обновите вкладку."; return; }
+  const wrap = document.createElement("section");
+  wrap.className = "diag";
+  const agentNote = d.layer === "agent"
+    ? `<p class="intro">Круг это шаг агента, вилка это решение, знак &gt;_ это инструмент, значок пульса это запись в журнал. Прямоугольники внутри рамки читаются сверху вниз: как устроен слой и в каком порядке. Запрос клиента или системы стоит слева, вне рамок.</p>`
+    : "";
+  wrap.innerHTML = `<h2>${esc(diagLabel(d))}</h2>${agentNote}<div class="mmd"></div>`;
+  view.appendChild(wrap);
+  try {
+    const { svg } = await mermaid.render("m-" + d.stem + "-" + Date.now(), d.mermaid);
+    wrap.querySelector(".mmd").innerHTML = svg;
+  } catch (e) {
+    wrap.querySelector(".mmd").textContent = d.mermaid + "\n\n" + e;
   }
-  await block("Общая архитектура", plat.concat(restPlat));
-  await block("Агенты, обзор", overview);
-  await block("Агенты, цепочка работы", agents);
 }
 
 function paintMeta() {
