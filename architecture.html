@@ -548,7 +548,7 @@ async function renderDiagrams() {
   const wrap = document.createElement("section");
   wrap.className = "diag";
   const agentNote = d.layer === "agent"
-    ? `<p class="intro">Круг это шаг агента, вилка это решение, знак &gt;_ это инструмент, значок пульса это запись в журнал. Прямоугольники внутри рамки читаются сверху вниз: как устроен слой и в каком порядке. Запрос клиента или системы стоит слева, вне рамок.</p>`
+    ? `<p class="intro">Круг это шаг агента, вилка это решение, знак &gt;_ это инструмент, значок пульса это запись в журнал. Каждая рамка стоит на стрелке того шага, где она срабатывает. Запрос клиента или системы стоит в начале хода.</p>`
     : "";
   wrap.innerHTML = `<h2>${esc(diagLabel(d))}</h2>${agentNote}<div class="mmd"></div>`;
   view.appendChild(wrap);
