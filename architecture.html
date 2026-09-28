@@ -115,6 +115,7 @@
   <div>
     <button class="btn" type="button" id="save">Сохранить правки</button>
     <button class="btn btn-primary" type="button" id="redraw">Обновить остальное</button>
+    <button class="btn" type="button" id="export-xlsx" hidden>Выгрузить вопросы в Excel</button>
   </div>
 </header>
 <div class="filters hidden" id="filters">
@@ -505,6 +506,7 @@ function renderQuestions() {
     <div class="grid">
       <h2 class="block-title">${esc(title)}</h2>
       <p class="intro">${esc(intro)}</p>
+      ${ON_PAGES ? `<p class="intro">Ответы на этой странице не сохраняются. Кнопка «Выгрузить вопросы в Excel» в шапке скачивает файл: в нём только открытые вопросы, ответ пишут в колонке «Ответ» и присылают файл отдельно.</p>` : ""}
       ${cards || empty}
     </div>
   </div>`;
@@ -641,6 +643,193 @@ function paintMeta() {
   $("redraw").textContent = busy ? "Идёт critic…" : "Обновить остальное";
 }
 
+function crc32(data) {
+  let c = ~0;
+  for (let i = 0; i < data.length; i++) {
+    c ^= data[i];
+    for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1));
+  }
+  return ~c >>> 0;
+}
+
+function zipStore(files) {
+  const enc = new TextEncoder();
+  const locals = [];
+  const centrals = [];
+  let offset = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name);
+    const data = f.data instanceof Uint8Array ? f.data : enc.encode(f.data);
+    const crc = crc32(data);
+    const local = new Uint8Array(30 + name.length);
+    const dv = new DataView(local.buffer);
+    dv.setUint32(0, 0x04034b50, true);
+    dv.setUint16(4, 20, true);
+    dv.setUint16(8, 0, true);
+    dv.setUint32(14, crc, true);
+    dv.setUint32(18, data.length, true);
+    dv.setUint32(22, data.length, true);
+    dv.setUint16(26, name.length, true);
+    local.set(name, 30);
+    locals.push(local, data);
+    const central = new Uint8Array(46 + name.length);
+    const cd = new DataView(central.buffer);
+    cd.setUint32(0, 0x02014b50, true);
+    cd.setUint16(4, 20, true);
+    cd.setUint16(6, 20, true);
+    cd.setUint32(16, crc, true);
+    cd.setUint32(20, data.length, true);
+    cd.setUint32(24, data.length, true);
+    cd.setUint16(28, name.length, true);
+    cd.setUint32(42, offset, true);
+    central.set(name, 46);
+    centrals.push(central);
+    offset += local.length + data.length;
+  }
+  const centralSize = centrals.reduce((n, b) => n + b.length, 0);
+  const eocd = new Uint8Array(22);
+  const ed = new DataView(eocd.buffer);
+  ed.setUint32(0, 0x06054b50, true);
+  ed.setUint16(8, files.length, true);
+  ed.setUint16(10, files.length, true);
+  ed.setUint32(12, centralSize, true);
+  ed.setUint32(16, offset, true);
+  return new Blob([...locals, ...centrals, eocd], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+}
+
+function xlsxXml(s) {
+  return String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+}
+
+function xlsxCol(n) {
+  let s = "";
+  let x = n + 1;
+  while (x) {
+    const m = (x - 1) % 26;
+    s = String.fromCharCode(65 + m) + s;
+    x = Math.floor((x - 1) / 26);
+  }
+  return s;
+}
+
+function xlsxSheet(rows) {
+  const body = rows.map((values, ri) => {
+    const cells = values.map((value, ci) => {
+      const text = xlsxXml(value);
+      const space = String(value).length ? ' xml:space="preserve"' : "";
+      return `<c r="${xlsxCol(ci)}${ri + 1}" t="inlineStr" s="${ri === 0 ? 1 : 0}"><is><t${space}>${text}</t></is></c>`;
+    }).join("");
+    return `<row r="${ri + 1}">${cells}</row>`;
+  }).join("");
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
+  <cols>
+    <col min="1" max="1" width="16" customWidth="1"/>
+    <col min="2" max="2" width="24" customWidth="1"/>
+    <col min="3" max="3" width="28" customWidth="1"/>
+    <col min="4" max="6" width="22" customWidth="1"/>
+    <col min="7" max="10" width="48" customWidth="1"/>
+    <col min="11" max="11" width="42" customWidth="1"/>
+    <col min="12" max="13" width="22" customWidth="1"/>
+  </cols>
+  <sheetData>${body}</sheetData>
+</worksheet>`;
+}
+
+function questionsWorkbook() {
+  const header = [
+    "Код", "Раздел", "Агент", "Пункт канона", "Тип", "Статус вопроса",
+    "Вопрос", "В документах", "Что уточнить", "Варианты",
+    "Ответ", "Статус ответа", "Кто отвечает",
+  ];
+  const open = (STATE.questions || [])
+    .filter((q) => (q.status || "open") === "open")
+    .sort((a, b) => (a.canon_section || 0) - (b.canon_section || 0) || String(a.id).localeCompare(String(b.id)));
+  const rows = [header, ...open.map((q) => [
+    q.id,
+    q.scope === "agent" ? "агент" : "общая архитектура",
+    q.scope === "agent" ? agentName(q.agent_id) : "",
+    CANON_POINT[q.canon_section] || "",
+    kindLabel(q.kind),
+    qStatus(q.status || "open"),
+    q.title || "",
+    q.docs_claim || "",
+    q.ask_team || "",
+    (q.options || []).join("\n"),
+    q.answer_text || "",
+    q.answer_status === "confirmed" ? "подтверждён" : (q.answer_text ? "черновик" : ""),
+    q.answer_by && q.answer_by !== "team" ? q.answer_by : "",
+  ])];
+  const help = [
+    ["Как заполнять"],
+    ["Не меняйте колонку «Код». По ней ответ потом возвращается на доску."],
+    ["Пишите ответ в колонке «Ответ». Если подходит вариант из колонки «Варианты», впишите его дословно."],
+    ["В колонке «Статус ответа» оставьте «черновик» или поставьте «подтверждён», если решение уже принято."],
+    ["В колонке «Кто отвечает» укажите имя."],
+    ["В файле только открытые вопросы. Уже закрытые сюда не попадают."],
+    ["Пришлите файл Алексею Уколову. На сайте ответ сохранить нельзя."],
+  ];
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>
+  <fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>
+  <borders count="1"><border><left/><right/><top/><bottom/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="2">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>
+    <xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>
+  </cellXfs>
+</styleSheet>`;
+  const workbook = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Вопросы" sheetId="1" r:id="rId1"/>
+    <sheet name="Как заполнять" sheetId="2" r:id="rId2"/>
+  </sheets>
+</workbook>`;
+  const wbRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+  const types = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`;
+  return zipStore([
+    { name: "[Content_Types].xml", data: types },
+    { name: "_rels/.rels", data: rootRels },
+    { name: "xl/workbook.xml", data: workbook },
+    { name: "xl/_rels/workbook.xml.rels", data: wbRels },
+    { name: "xl/styles.xml", data: styles },
+    { name: "xl/worksheets/sheet1.xml", data: xlsxSheet(rows) },
+    { name: "xl/worksheets/sheet2.xml", data: xlsxSheet(help) },
+  ]);
+}
+
+function downloadQuestionsXlsx() {
+  const blob = questionsWorkbook();
+  const day = new Date().toISOString().slice(0, 10);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `voprosy-arhitektura-${day}.xlsx`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
 const ON_PAGES = location.hostname.endsWith("github.io");
 
 async function refresh() {
@@ -653,6 +842,7 @@ async function refresh() {
     document.body.classList.add("readonly");
     $("save").hidden = true;
     $("redraw").hidden = true;
+    $("export-xlsx").hidden = false;
     $("link-trace").hidden = false;
     $("link-tasks").hidden = false;
     $("job").textContent = "Снимок для чтения. Правки остаются на локальной доске.";
@@ -720,6 +910,7 @@ $("tab-d").onclick = async () => { showTab("d"); await renderDiagrams(); };
 ["f-kind", "f-status"].forEach((id) => $(id).addEventListener("input", renderQuestions));
 $("save").onclick = save;
 $("redraw").onclick = redraw;
+$("export-xlsx").onclick = downloadQuestionsXlsx;
 refresh();
 </script>
 </body>
