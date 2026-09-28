@@ -27,7 +27,11 @@
     .btn:disabled { opacity: 0.5; cursor: wait; }
     .counts { display: flex; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
     .counts b { color: var(--ink); }
-    .job { font-size: 13px; color: var(--warn); max-width: 52ch; }
+    .header-actions { display: flex; gap: 8px; flex: 0 0 auto; margin-left: auto; }
+    .toast { position: fixed; right: 16px; bottom: 16px; z-index: 30; max-width: 36ch;
+      padding: 10px 12px; background: var(--panel); color: var(--warn); border: 1px solid var(--line);
+      border-radius: 10px; font-size: 13px; line-height: 1.35; box-shadow: 0 8px 28px rgba(0,0,0,.4); }
+    .toast:not([hidden]) { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
     .site-link { color: var(--muted); font-size: 13px; font-weight: 600; text-decoration: none; }
     .site-link:hover { color: var(--ink); }
     body.readonly details.edit,
@@ -111,13 +115,13 @@
     <button type="button" id="tab-d">Диаграммы</button>
   </div>
   <div class="counts" id="counts"></div>
-  <div class="job" id="job"></div>
-  <div>
+  <div class="header-actions">
     <button class="btn" type="button" id="save">Сохранить правки</button>
     <button class="btn btn-primary" type="button" id="redraw">Обновить остальное</button>
     <button class="btn" type="button" id="export-xlsx" hidden>Выгрузить вопросы в Excel</button>
   </div>
 </header>
+<div id="toast" class="toast" hidden></div>
 <div class="filters hidden" id="filters">
   <select id="f-kind"><option value="">все типы</option>
     <option value="reality_check">проверка реальности</option>
@@ -637,7 +641,7 @@ function paintMeta() {
     <span>пунктов канона <b>${plat}</b></span>
     <span>агентов <b>${ag}</b></span>`;
   const j = STATE.job || {};
-  $("job").textContent = j.status ? `${j.status}: ${j.message || ""}` : "";
+  if (j.status && j.message) showToast(`${j.status}: ${j.message}`);
   const busy = j.status === "queued" || j.status === "running" || j.status === "awaiting_agent";
   $("redraw").disabled = busy;
   $("redraw").textContent = busy ? "Идёт critic…" : "Обновить остальное";
@@ -820,6 +824,19 @@ function questionsWorkbook() {
   ]);
 }
 
+let toastTimer = 0;
+let toastSeen = "";
+function showToast(text) {
+  const msg = String(text || "").trim();
+  if (!msg || msg === toastSeen) return;
+  toastSeen = msg;
+  const el = $("toast");
+  el.textContent = msg;
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, 5000);
+}
+
 function downloadQuestionsXlsx() {
   const blob = questionsWorkbook();
   const day = new Date().toISOString().slice(0, 10);
@@ -845,10 +862,9 @@ async function refresh() {
     $("export-xlsx").hidden = false;
     $("link-trace").hidden = false;
     $("link-tasks").hidden = false;
-    $("job").textContent = "Снимок для чтения. Правки остаются на локальной доске.";
   }
   paintMeta();
-  if (ON_PAGES) $("job").textContent = "Снимок для чтения. Правки остаются на локальной доске.";
+  if (ON_PAGES) showToast("Снимок для чтения. Правки остаются на локальной доске.");
   renderCanon();
   renderQuestions();
   if (!$("pane-d").classList.contains("hidden")) await renderDiagrams();
