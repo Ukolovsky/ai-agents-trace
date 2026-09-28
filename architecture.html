@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
-<title>ARCH · ревью архитектуры</title>
+  <title>ARCH · ревью архитектуры</title>
   <script type="module">
     import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
     window.__mermaid = mermaid;
@@ -63,6 +63,7 @@
     .cite { font-size: 12px; color: var(--muted); margin: 6px 0; }
     .claim, .ask { margin: 8px 0; }
     .claim span, .ask span { color: var(--muted); display: block; font-size: 12px; }
+    .claim.answer { white-space: pre-wrap; }
     textarea, .who { width: 100%; font: inherit; background: var(--bg); color: var(--ink); border: 1px solid var(--line);
       border-radius: 8px; padding: 8px; }
     .row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
@@ -86,9 +87,11 @@
     .intro { color: var(--muted); max-width: 90ch; }
     .from-general { margin: 0 0 10px; padding: 8px 10px; border-left: 2px solid var(--accent); }
     .from-general .lbl { margin: 0 0 4px; font-size: 12px; color: var(--accent); }
-    .what { color: var(--muted); margin: 0 0 10px; }
+    .card h3 { color: #7dd3fc; }
+    .what { color: #7dd3fc; margin: 0 0 10px; }
     .body { margin: 6px 0 4px; }
     .body h4 { margin: 12px 0 4px; font-size: 13px; font-weight: 650; color: var(--muted); letter-spacing: 0.01em; }
+    .body h4.undef { color: #e06c75; }
     .body ul { margin: 4px 0 10px; padding-left: 20px; }
     .body li { margin: 3px 0; }
     .body p { margin: 6px 0; }
@@ -257,7 +260,9 @@ function formatBody(text) {
     if (bullet) { li(esc(bullet[1])); continue; }
     if (/^[^:]{1,70}:$/.test(t)) {
       close();
-      html += `<h4>${esc(t.slice(0, -1))}</h4>`;
+      const title = t.slice(0, -1);
+      const cls = title === "Не определено" ? " class=\"undef\"" : "";
+      html += `<h4${cls}>${esc(title)}</h4>`;
       continue;
     }
     const colon = t.indexOf(":");
@@ -479,7 +484,11 @@ function renderQuestions() {
       </div>
       <p class="claim"><span>В документах</span>${esc(q.docs_claim || "")}</p>
       <p class="ask"><span>Уточнить у команды</span>${esc(q.ask_team || "")}</p>
-      ${opts ? `<div class="opts">${opts}</div>` : ""}
+      ${ON_PAGES ? (
+        q.answer_text
+          ? `<p class="claim answer"><span>${q.answer_status === "confirmed" ? "Ответ команды, подтверждён" : "Черновик ответа"}</span>${esc(q.answer_text)}</p>`
+          : `<p class="cite">Ответа пока нет. Его пишут на локальной доске и выкладывают снимком.</p>`
+      ) : `${opts ? `<div class="opts">${opts}</div>` : ""}
       <textarea rows="3" placeholder="черновик ответа">${esc(q.answer_text || "")}</textarea>
       <div class="row">
         <select class="ans-st">
@@ -487,7 +496,7 @@ function renderQuestions() {
           <option value="confirmed" ${q.answer_status==="confirmed"?"selected":""}>подтверждён командой</option>
         </select>
         <input class="who" placeholder="кто отвечает" value="${esc(q.answer_by || "")}"/>
-      </div>
+      </div>`}
     </article>`;
   }).join("");
   const empty = `<p class="intro">В этом блоке по текущему фильтру вопросов нет. Сверху можно сменить тип или показать закрытые.</p>`;
