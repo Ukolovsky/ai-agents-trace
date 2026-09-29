@@ -510,7 +510,7 @@ function renderQuestions() {
     <div class="grid">
       <h2 class="block-title">${esc(title)}</h2>
       <p class="intro">${esc(intro)}</p>
-      ${ON_PAGES ? `<p class="intro">Ответы на этой странице не сохраняются. Кнопка «Выгрузить вопросы в Excel» в шапке скачивает файл: в нём только открытые вопросы, ответ пишут в колонке «Ответ» и присылают файл отдельно.</p>` : ""}
+      ${ON_PAGES ? `<p class="intro">Ответы на этой странице не сохраняются. Кнопка «Выгрузить вопросы в Excel» в шапке скачивает файл. Общая архитектура на своём листе, у каждого агента свой. В файл попадают только открытые вопросы, ответ пишут в колонке «Ответ» и присылают файл отдельно.</p>` : ""}
       ${cards || empty}
     </div>
   </div>`;
@@ -743,16 +743,23 @@ function xlsxSheet(rows) {
 </worksheet>`;
 }
 
-function questionsWorkbook() {
-  const header = [
-    "Код", "Раздел", "Агент", "Пункт канона", "Тип", "Статус вопроса",
-    "Вопрос", "В документах", "Что уточнить", "Варианты",
-    "Ответ", "Статус ответа", "Кто отвечает",
-  ];
-  const open = (STATE.questions || [])
-    .filter((q) => (q.status || "open") === "open")
-    .sort((a, b) => (a.canon_section || 0) - (b.canon_section || 0) || String(a.id).localeCompare(String(b.id)));
-  const rows = [header, ...open.map((q) => [
+function sheetTitle(raw, used) {
+  let name = String(raw || "Лист").replace(/[\\/?*[\]:]/g, " ").replace(/\s+/g, " ").trim();
+  if (name.length > 31) name = name.slice(0, 31).trim();
+  if (!name) name = "Лист";
+  let unique = name;
+  let n = 2;
+  while (used.has(unique)) {
+    const suffix = ` ${n}`;
+    unique = (name.slice(0, 31 - suffix.length) + suffix).trim();
+    n += 1;
+  }
+  used.add(unique);
+  return unique;
+}
+
+function questionRow(q) {
+  return [
     q.id,
     q.scope === "agent" ? "агент" : "общая архитектура",
     q.scope === "agent" ? agentName(q.agent_id) : "",
@@ -766,16 +773,65 @@ function questionsWorkbook() {
     q.answer_text || "",
     q.answer_status === "confirmed" ? "подтверждён" : (q.answer_text ? "черновик" : ""),
     q.answer_by && q.answer_by !== "team" ? q.answer_by : "",
-  ])];
-  const help = [
-    ["Как заполнять"],
-    ["Не меняйте колонку «Код». По ней ответ потом возвращается на доску."],
-    ["Пишите ответ в колонке «Ответ». Если подходит вариант из колонки «Варианты», впишите его дословно."],
-    ["В колонке «Статус ответа» оставьте «черновик» или поставьте «подтверждён», если решение уже принято."],
-    ["В колонке «Кто отвечает» укажите имя."],
-    ["В файле только открытые вопросы. Уже закрытые сюда не попадают."],
-    ["Пришлите файл Алексею Уколову. На сайте ответ сохранить нельзя."],
   ];
+}
+
+function questionsWorkbook() {
+  const header = [
+    "Код", "Раздел", "Агент", "Пункт канона", "Тип", "Статус вопроса",
+    "Вопрос", "В документах", "Что уточнить", "Варианты",
+    "Ответ", "Статус ответа", "Кто отвечает",
+  ];
+  const open = (STATE.questions || [])
+    .filter((q) => (q.status || "open") === "open")
+    .sort((a, b) => (a.canon_section || 0) - (b.canon_section || 0) || String(a.id).localeCompare(String(b.id)));
+  const general = open.filter((q) => !(q.scope === "agent" && q.agent_id));
+  const used = new Set();
+  const sheets = [{ name: sheetTitle("Общая архитектура", used), rows: [header, ...general.map(questionRow)] }];
+  (STATE.findings.agents || []).forEach((agent) => {
+    const list = open.filter((q) => q.scope === "agent" && q.agent_id === agent.id);
+    if (!list.length) return;
+    sheets.push({ name: sheetTitle(`${agent.id} ${agent.name}`, used), rows: [header, ...list.map(questionRow)] });
+  });
+  const knownAgents = new Set((STATE.findings.agents || []).map((a) => a.id));
+  const extra = new Map();
+  open.filter((q) => q.scope === "agent" && q.agent_id && !knownAgents.has(q.agent_id)).forEach((q) => {
+    if (!extra.has(q.agent_id)) extra.set(q.agent_id, []);
+    extra.get(q.agent_id).push(q);
+  });
+  extra.forEach((list, id) => {
+    sheets.push({ name: sheetTitle(id, used), rows: [header, ...list.map(questionRow)] });
+  });
+  sheets.push({
+    name: sheetTitle("Как заполнять", used),
+    rows: [
+      ["Как заполнять"],
+      ["Не меняйте колонку «Код». По ней ответ потом возвращается на доску."],
+      ["Общая архитектура лежит на своём листе. У каждого агента свой лист."],
+      ["Пишите ответ в колонке «Ответ». Если подходит вариант из колонки «Варианты», впишите его дословно."],
+      ["В колонке «Статус ответа» оставьте «черновик» или поставьте «подтверждён», если решение уже принято."],
+      ["В колонке «Кто отвечает» укажите имя."],
+      ["В файле только открытые вопросы. Уже закрытые сюда не попадают."],
+      ["Пришлите файл Алексею Уколову. На сайте ответ сохранить нельзя."],
+    ],
+  });
+  const sheetXml = sheets.map((s) => xlsxSheet(s.rows));
+  const workbook = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    ${sheets.map((s, i) => `<sheet name="${xlsxXml(s.name).replaceAll('"', "&quot;")}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}
+  </sheets>
+</workbook>`;
+  const styleRid = sheets.length + 1;
+  const wbRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  ${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("")}
+  <Relationship Id="rId${styleRid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
   const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
   <fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>
@@ -787,30 +843,12 @@ function questionsWorkbook() {
     <xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>
   </cellXfs>
 </styleSheet>`;
-  const workbook = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <sheets>
-    <sheet name="Вопросы" sheetId="1" r:id="rId1"/>
-    <sheet name="Как заполнять" sheetId="2" r:id="rId2"/>
-  </sheets>
-</workbook>`;
-  const wbRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
-  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>`;
-  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
-</Relationships>`;
   const types = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml" ContentType="application/xml"/>
   <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
-  <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  ${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}
   <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
 </Types>`;
   return zipStore([
@@ -819,8 +857,7 @@ function questionsWorkbook() {
     { name: "xl/workbook.xml", data: workbook },
     { name: "xl/_rels/workbook.xml.rels", data: wbRels },
     { name: "xl/styles.xml", data: styles },
-    { name: "xl/worksheets/sheet1.xml", data: xlsxSheet(rows) },
-    { name: "xl/worksheets/sheet2.xml", data: xlsxSheet(help) },
+    ...sheetXml.map((xml, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: xml })),
   ]);
 }
 
