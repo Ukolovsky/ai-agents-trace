@@ -510,7 +510,7 @@ function renderQuestions() {
     <div class="grid">
       <h2 class="block-title">${esc(title)}</h2>
       <p class="intro">${esc(intro)}</p>
-      ${ON_PAGES ? `<p class="intro">Ответы на этой странице не сохраняются. Кнопка «Выгрузить вопросы в Excel» в шапке скачивает файл. Общая архитектура на своём листе, у каждого агента свой. В файл попадают только открытые вопросы, ответ пишут в колонке «Ответ» и присылают файл отдельно.</p>` : ""}
+      ${ON_PAGES ? `<p class="intro">Ответы на этой странице не сохраняются. Кнопка «Выгрузить вопросы в Excel» в шапке скачивает файл. На листе карточки, как здесь: текст вопроса, варианты, поле ответа, статус и имя. Общая архитектура на своём листе, у каждого агента свой.</p>` : ""}
       ${cards || empty}
     </div>
   </div>`;
@@ -718,31 +718,6 @@ function xlsxCol(n) {
   return s;
 }
 
-function xlsxSheet(rows) {
-  const body = rows.map((values, ri) => {
-    const cells = values.map((value, ci) => {
-      const text = xlsxXml(value);
-      const space = String(value).length ? ' xml:space="preserve"' : "";
-      return `<c r="${xlsxCol(ci)}${ri + 1}" t="inlineStr" s="${ri === 0 ? 1 : 0}"><is><t${space}>${text}</t></is></c>`;
-    }).join("");
-    return `<row r="${ri + 1}">${cells}</row>`;
-  }).join("");
-  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
-  <cols>
-    <col min="1" max="1" width="16" customWidth="1"/>
-    <col min="2" max="2" width="24" customWidth="1"/>
-    <col min="3" max="3" width="28" customWidth="1"/>
-    <col min="4" max="6" width="22" customWidth="1"/>
-    <col min="7" max="10" width="48" customWidth="1"/>
-    <col min="11" max="11" width="42" customWidth="1"/>
-    <col min="12" max="13" width="22" customWidth="1"/>
-  </cols>
-  <sheetData>${body}</sheetData>
-</worksheet>`;
-}
-
 function sheetTitle(raw, used) {
   let name = String(raw || "Лист").replace(/[\\/?*[\]:]/g, " ").replace(/\s+/g, " ").trim();
   if (name.length > 31) name = name.slice(0, 31).trim();
@@ -758,40 +733,168 @@ function sheetTitle(raw, used) {
   return unique;
 }
 
-function questionRow(q) {
-  return [
-    q.id,
-    q.scope === "agent" ? "агент" : "общая архитектура",
-    q.scope === "agent" ? agentName(q.agent_id) : "",
-    CANON_POINT[q.canon_section] || "",
-    kindLabel(q.kind),
-    qStatus(q.status || "open"),
-    q.title || "",
-    q.docs_claim || "",
-    q.ask_team || "",
-    (q.options || []).join("\n"),
-    q.answer_text || "",
-    q.answer_status === "confirmed" ? "подтверждён" : (q.answer_text ? "черновик" : ""),
-    q.answer_by && q.answer_by !== "team" ? q.answer_by : "",
+
+function xlsxCell(col, row, text, style) {
+  const value = String(text ?? "");
+  const space = value.length ? ' xml:space="preserve"' : "";
+  return `<c r="${xlsxCol(col)}${row}" t="inlineStr" s="${style}"><is><t${space}>${xlsxXml(value)}</t></is></c>`;
+}
+
+function textHeight(text, min) {
+  const lines = String(text || "").split("\n").reduce((n, line) => n + Math.max(1, Math.ceil(line.length / 78)), 0);
+  return Math.min(120, Math.max(min, lines * 16));
+}
+
+function formSheet(questions) {
+  const built = [];
+  questions.forEach((q, index) => {
+    if (index) built.push({ h: 18, cells: [] });
+    const point = CANON_POINT[q.canon_section] || "";
+    const meta = [
+      kindLabel(q.kind),
+      q.scope === "agent" ? agentName(q.agent_id) : "общее",
+      point ? `канон: ${point}` : "",
+      qStatus(q.status || "open"),
+      q.id,
+    ].filter(Boolean).join("   ·   ");
+    built.push({ h: 28, cells: [{ c: 0, t: q.title || q.id, s: 1 }], span: [0, 2] });
+    built.push({ h: 20, cells: [{ c: 0, t: meta, s: 4 }], span: [0, 2] });
+    built.push({
+      h: textHeight(q.docs_claim, 36),
+      cells: [{ c: 0, t: "В документах", s: 2 }, { c: 1, t: q.docs_claim || "", s: 0 }],
+      span: [1, 2],
+    });
+    built.push({
+      h: textHeight(q.ask_team, 36),
+      cells: [{ c: 0, t: "Уточнить у команды", s: 2 }, { c: 1, t: q.ask_team || "", s: 0 }],
+      span: [1, 2],
+    });
+    const options = q.options || [];
+    if (options.length) {
+      built.push({
+        h: 22,
+        cells: [
+          { c: 0, t: "Варианты", s: 2 },
+          { c: 1, t: "Отметьте «да» у одного варианта. Свой текст можно дописать ниже.", s: 4 },
+          { c: 2, t: "Отметка", s: 2 },
+        ],
+      });
+      options.forEach((option) => {
+        built.push({
+          h: textHeight(option, 22),
+          cells: [{ c: 1, t: option, s: 0 }, { c: 2, t: q.answer_text === option ? "да" : "", s: 3 }],
+          yes: 2,
+        });
+      });
+    }
+    const status = q.answer_status === "confirmed" ? "подтверждён командой" : "черновик";
+    built.push({
+      h: textHeight(q.answer_text, 58),
+      cells: [{ c: 0, t: "Черновик ответа", s: 2 }, { c: 1, t: q.answer_text || "", s: 3 }],
+      span: [1, 2],
+    });
+    built.push({
+      h: 24,
+      cells: [{ c: 0, t: "Статус", s: 2 }, { c: 1, t: status, s: 3 }],
+      status: true,
+    });
+    const who = q.answer_by && q.answer_by !== "team" ? q.answer_by : "";
+    built.push({
+      h: 24,
+      cells: [{ c: 0, t: "Кто отвечает", s: 2 }, { c: 1, t: who, s: 3 }],
+      span: [1, 2],
+    });
+  });
+  const yesRefs = [];
+  const statusRefs = [];
+  const merges = [];
+  const body = built.map((row, index) => {
+    const r = index + 1;
+    if (row.span) merges.push(`${xlsxCol(row.span[0])}${r}:${xlsxCol(row.span[1])}${r}`);
+    if (row.yes != null) yesRefs.push(`${xlsxCol(row.yes)}${r}`);
+    if (row.status) statusRefs.push(`B${r}`);
+    const cells = (row.cells || []).map((cell) => xlsxCell(cell.c, r, cell.t, cell.s)).join("");
+    return `<row r="${r}" ht="${row.h}" customHeight="1">${cells}</row>`;
+  }).join("");
+  const checks = [];
+  const chunk = (refs, formula) => {
+    for (let i = 0; i < refs.length; i += 16) {
+      const sqref = refs.slice(i, i + 16).join(" ");
+      checks.push(`<dataValidation type="list" allowBlank="1" showDropDown="0" sqref="${sqref}"><formula1>${formula}</formula1></dataValidation>`);
+    }
+  };
+  chunk(yesRefs, "Lists!$B$1");
+  chunk(statusRefs, "Lists!$A$1:$A$2");
+  const dv = checks.length ? `<dataValidations count="${checks.length}">${checks.join("")}</dataValidations>` : "";
+  const mergeXml = merges.length ? `<mergeCells count="${merges.length}">${merges.map((ref) => `<mergeCell ref="${ref}"/>`).join("")}</mergeCells>` : "";
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews>
+  <cols>
+    <col min="1" max="1" width="24" customWidth="1"/>
+    <col min="2" max="2" width="88" customWidth="1"/>
+    <col min="3" max="3" width="16" customWidth="1"/>
+  </cols>
+  <sheetData>${body}</sheetData>
+  ${mergeXml}
+  ${dv}
+</worksheet>`;
+}
+
+function helpSheet() {
+  const lines = [
+    ["Как заполнять", 1],
+    ["Каждый вопрос выглядит карточкой, как на сайте.", 0],
+    ["Общая архитектура на своём листе. У каждого агента свой лист.", 0],
+    ["У варианта поставьте «да» в колонке «Отметка», только у одного.", 0],
+    ["Свой текст пишите в жёлтое поле «Черновик ответа».", 0],
+    ["Статус выберите из списка: черновик или подтверждён командой.", 0],
+    ["В поле «Кто отвечает» укажите имя.", 0],
+    ["Код вопроса в серой строке под заголовком не меняйте.", 0],
+    ["Закрытые вопросы в файл не входят.", 0],
+    ["Пришлите файл Алексею Уколову. На сайте ответ сохранить нельзя.", 0],
   ];
+  const body = lines.map(([text, style], index) => {
+    const r = index + 1;
+    return `<row r="${r}" ht="${index === 0 ? 28 : 22}" customHeight="1">${xlsxCell(0, r, text, style)}</row>`;
+  }).join("");
+  const merges = lines.map((_, index) => `<mergeCell ref="A${index + 1}:C${index + 1}"/>`).join("");
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews>
+  <cols>
+    <col min="1" max="1" width="24" customWidth="1"/>
+    <col min="2" max="2" width="88" customWidth="1"/>
+    <col min="3" max="3" width="16" customWidth="1"/>
+  </cols>
+  <sheetData>${body}</sheetData>
+  <mergeCells count="${lines.length}">${merges}</mergeCells>
+</worksheet>`;
+}
+
+function listsSheet() {
+  const rows = [["черновик", "да"], ["подтверждён командой", ""]];
+  const body = rows.map((pair, index) => {
+    const r = index + 1;
+    return `<row r="${r}">${xlsxCell(0, r, pair[0], 0)}${pair[1] ? xlsxCell(1, r, pair[1], 0) : ""}</row>`;
+  }).join("");
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetData>${body}</sheetData>
+</worksheet>`;
 }
 
 function questionsWorkbook() {
-  const header = [
-    "Код", "Раздел", "Агент", "Пункт канона", "Тип", "Статус вопроса",
-    "Вопрос", "В документах", "Что уточнить", "Варианты",
-    "Ответ", "Статус ответа", "Кто отвечает",
-  ];
   const open = (STATE.questions || [])
     .filter((q) => (q.status || "open") === "open")
     .sort((a, b) => (a.canon_section || 0) - (b.canon_section || 0) || String(a.id).localeCompare(String(b.id)));
   const general = open.filter((q) => !(q.scope === "agent" && q.agent_id));
   const used = new Set();
-  const sheets = [{ name: sheetTitle("Общая архитектура", used), rows: [header, ...general.map(questionRow)] }];
+  const sheets = [{ name: sheetTitle("Общая архитектура", used), xml: formSheet(general) }];
   (STATE.findings.agents || []).forEach((agent) => {
     const list = open.filter((q) => q.scope === "agent" && q.agent_id === agent.id);
     if (!list.length) return;
-    sheets.push({ name: sheetTitle(`${agent.id} ${agent.name}`, used), rows: [header, ...list.map(questionRow)] });
+    sheets.push({ name: sheetTitle(`${agent.id} ${agent.name}`, used), xml: formSheet(list) });
   });
   const knownAgents = new Set((STATE.findings.agents || []).map((a) => a.id));
   const extra = new Map();
@@ -800,26 +903,14 @@ function questionsWorkbook() {
     extra.get(q.agent_id).push(q);
   });
   extra.forEach((list, id) => {
-    sheets.push({ name: sheetTitle(id, used), rows: [header, ...list.map(questionRow)] });
+    sheets.push({ name: sheetTitle(id, used), xml: formSheet(list) });
   });
-  sheets.push({
-    name: sheetTitle("Как заполнять", used),
-    rows: [
-      ["Как заполнять"],
-      ["Не меняйте колонку «Код». По ней ответ потом возвращается на доску."],
-      ["Общая архитектура лежит на своём листе. У каждого агента свой лист."],
-      ["Пишите ответ в колонке «Ответ». Если подходит вариант из колонки «Варианты», впишите его дословно."],
-      ["В колонке «Статус ответа» оставьте «черновик» или поставьте «подтверждён», если решение уже принято."],
-      ["В колонке «Кто отвечает» укажите имя."],
-      ["В файле только открытые вопросы. Уже закрытые сюда не попадают."],
-      ["Пришлите файл Алексею Уколову. На сайте ответ сохранить нельзя."],
-    ],
-  });
-  const sheetXml = sheets.map((s) => xlsxSheet(s.rows));
+  sheets.push({ name: sheetTitle("Как заполнять", used), xml: helpSheet() });
+  sheets.push({ name: sheetTitle("Lists", used), xml: listsSheet(), hidden: true });
   const workbook = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   <sheets>
-    ${sheets.map((s, i) => `<sheet name="${xlsxXml(s.name).replaceAll('"', "&quot;")}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}
+    ${sheets.map((s, i) => `<sheet name="${xlsxXml(s.name).replaceAll('"', "&quot;")}" sheetId="${i + 1}" r:id="rId${i + 1}"${s.hidden ? ' state="hidden"' : ""}/>`).join("")}
   </sheets>
 </workbook>`;
   const styleRid = sheets.length + 1;
@@ -834,13 +925,34 @@ function questionsWorkbook() {
 </Relationships>`;
   const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>
-  <fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>
-  <borders count="1"><border><left/><right/><top/><bottom/></border></borders>
+  <fonts count="4">
+    <font><sz val="12"/><color rgb="FF1F2430"/><name val="Calibri"/></font>
+    <font><b/><sz val="16"/><color rgb="FF1F2430"/><name val="Calibri"/></font>
+    <font><b/><sz val="11"/><color rgb="FF5C6378"/><name val="Calibri"/></font>
+    <font><sz val="11"/><color rgb="FF5C6378"/><name val="Calibri"/></font>
+  </fonts>
+  <fills count="4">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFF4F5F8"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFFF4CC"/><bgColor indexed="64"/></patternFill></fill>
+  </fills>
+  <borders count="2">
+    <border><left/><right/><top/><bottom/></border>
+    <border>
+      <left style="thin"><color rgb="FFE4E7EE"/></left>
+      <right style="thin"><color rgb="FFE4E7EE"/></right>
+      <top style="thin"><color rgb="FFE4E7EE"/></top>
+      <bottom style="thin"><color rgb="FFE4E7EE"/></bottom>
+    </border>
+  </borders>
   <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-  <cellXfs count="2">
-    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>
-    <xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>
+  <cellXfs count="5">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment wrapText="1" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="2" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>
+    <xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment wrapText="1" vertical="center"/></xf>
   </cellXfs>
 </styleSheet>`;
   const types = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -857,7 +969,7 @@ function questionsWorkbook() {
     { name: "xl/workbook.xml", data: workbook },
     { name: "xl/_rels/workbook.xml.rels", data: wbRels },
     { name: "xl/styles.xml", data: styles },
-    ...sheetXml.map((xml, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: xml })),
+    ...sheets.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: s.xml })),
   ]);
 }
 
