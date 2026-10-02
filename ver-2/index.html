@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Архитектура агентов, пробный прогон</title>
+  <link rel="icon" href="favicon.svg">
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; background: #0c0e13; color: #e7e9ef; font: 15px/1.45 "Segoe UI", sans-serif; }
+    header { padding: 16px 20px 8px; }
+    h1 { font-size: 18px; font-weight: 600; margin: 0 0 6px; }
+    p { margin: 0; color: #939bad; max-width: 78ch; }
+    a.back { color: #7dd3fc; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 4px; }
+    nav a { color: #e7e9ef; text-decoration: none; border: 1px solid #2a3142; border-radius: 8px; padding: 6px 10px; }
+    nav a:hover, nav a.active { border-color: #7dd3fc; color: #7dd3fc; }
+    iframe { display: block; width: 100%; height: calc(100vh - 148px); border: 0; background: #0c0e13; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Архитектура агентов, версия 2</h1>
+    <p>Пробный прогон. Канон тот же, схемы собраны нотацией agent-architecture из текущих листов. <a class="back" href="../architecture.html">Прежняя страница архитектуры</a> на месте.</p>
+  </header>
+  <nav id="nav">
+      <a href="ai-01-semantika.html">AI-01 · Семантика wiki</a>
+      <a href="ai-02-nastroyshchik.html">AI-02 · Настройщик</a>
+      <a href="ai-03-integrator.html">AI-03 · Интегратор</a>
+      <a href="ai-04-import.html">AI-04 · Импорт документов</a>
+      <a href="ai-05-peremennye.html">AI-05 · Переменное окружение</a>
+      <a href="ai-06-dogovor.html">AI-06 · Договор</a>
+      <a href="ai-07-magic-pad.html">AI-07 · Magic Pad</a>
+      <a href="ai-08-kontragent.html">AI-08 · Контрагент</a>
+      <a href="ai-09-harness.html">AI-09 · Harness</a>
+      <a href="ai-10-poisk.html">AI-10 · Поиск</a>
+      <a href="ai-11-vstrechi.html">AI-11 · Контекст встреч</a>
+      <a href="ai-12-status.html">AI-12 · Динамический статус</a>
+      <a href="ai-13-pomoshchnik.html">AI-13 · Помощник</a>
+  </nav>
+  <iframe id="view" src="ai-01-semantika.html" title="Схема агента"></iframe>
+  <script>
+    const view = document.getElementById("view");
+    const links = [...document.querySelectorAll("#nav a")];
+    function mark(a) { links.forEach(x => x.classList.toggle("active", x === a)); }
+    links.forEach(a => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      view.src = a.getAttribute("href");
+      mark(a);
+      history.replaceState(null, "", "#" + a.getAttribute("href"));
+    }));
+    const hash = location.hash.slice(1);
+    const hit = links.find(a => a.getAttribute("href") === hash);
+    if (hit) { view.src = hash; mark(hit); } else mark(links[0]);
+  </script>
+</body>
+</html>
