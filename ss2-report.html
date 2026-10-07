@@ -60,13 +60,14 @@
       box-shadow: 0 1px 0 rgba(5, 8, 25, 0.04);
     }
     .app-header-in {
-      max-width: var(--maxw); margin: 0 auto;
-      padding: 12px 24px;
-      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+      max-width: none; margin: 0;
+      padding: 10px 24px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: nowrap;
     }
     .brand {
       display: flex; align-items: center; gap: 10px;
       font-weight: 700; font-size: 16px; color: var(--primary);
+      flex: none; white-space: nowrap;
     }
     .brand-mark {
       width: 32px; height: 32px; border-radius: 8px;
@@ -75,14 +76,15 @@
       color: #fff; font-size: 14px; font-weight: 700;
     }
     .header-navs {
-      display: flex; align-items: center; gap: 12px;
-      flex-wrap: wrap; margin-left: auto;
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: nowrap; margin-left: auto;
     }
-    .nav { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav { display: flex; gap: 2px; flex-wrap: nowrap; }
     .nav a {
       font-size: 13px; font-weight: 500; color: var(--text-secondary);
-      padding: 8px 12px; border-radius: var(--radius-sm);
+      padding: 6px 10px; border-radius: var(--radius-sm);
       transition: 0.15s;
+      white-space: nowrap;
     }
     .nav a:hover { background: var(--primary-light); color: var(--primary); }
     .nav-docs {
