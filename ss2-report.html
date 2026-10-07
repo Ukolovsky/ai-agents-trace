@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
-<title>AI Products · Отчёты суперспринтов · BusinessPad</title>
+  <title>AI Products · Отчёт суперспринта 2 · BusinessPad</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -75,15 +74,39 @@
       display: grid; place-items: center;
       color: #fff; font-size: 14px; font-weight: 700;
     }
-    .nav { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+    .header-navs {
+      display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap; margin-left: auto;
+    }
+    .nav { display: flex; gap: 4px; flex-wrap: wrap; }
     .nav a {
       font-size: 13px; font-weight: 500; color: var(--text-secondary);
       padding: 8px 12px; border-radius: var(--radius-sm);
-      border: 1.5px solid transparent;
       transition: 0.15s;
     }
     .nav a:hover { background: var(--primary-light); color: var(--primary); }
-    .nav a.is-current {
+    .nav-docs {
+      padding: 4px;
+      background: var(--magic-50);
+      border: 1px solid var(--primary-light);
+      border-radius: 10px;
+    }
+    .nav-docs a {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .nav-docs a.is-current {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-docs a.is-current:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-page a {
+      border: 1.5px solid transparent;
+    }
+    .nav-page a.is-current {
       color: var(--primary);
       font-weight: 600;
       border-color: var(--primary);
@@ -564,418 +587,35 @@
       margin-left: 8px;
     }
 
-  
-    .ss-switch {
-      display: flex;
-      background: var(--primary-light);
-      border-radius: 999px;
-      padding: 3px;
-    }
-    .ss-switch button {
-      border: 0;
-      background: transparent;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 7px 14px;
-      border-radius: 999px;
-      color: var(--primary);
-      cursor: pointer;
-    }
-    .ss-switch button.is-on {
-      background: var(--bg-paper);
-      color: var(--text-primary);
-      box-shadow: var(--shadow-card);
-    }
-    .nav-ss { display: none; }
-    .nav-ss.is-on { display: flex; }
-    .report { display: none; }
-    .report.is-on { display: block; }
-
   </style>
 </head>
 <body>
+
   <header class="app-header">
     <div class="app-header-in">
       <div class="brand">
         <div class="brand-mark">BP</div>
         BusinessPad · AI Products
       </div>
-      <div class="ss-switch" role="tablist" aria-label="Суперспринт">
-        <button type="button" data-ss="ss1" role="tab">Суперспринт 1</button>
-        <button type="button" data-ss="ss2" class="is-on" role="tab">Суперспринт 2</button>
+      <div class="header-navs">
+        <nav class="nav nav-page" aria-label="Разделы страницы">
+          <a href="#plan">План</a>
+          <a href="#done">Сделано</a>
+          <a href="#cpq">CPQ</a>
+          <a href="#billing">Биллинг</a>
+          <a href="#next">Дальше</a>
+        </nav>
+        <nav class="nav nav-docs" aria-label="Отчёты суперспринтов">
+          <a href="supersprint.html#ss1">Отчёт SS1</a>
+          <a href="ss2-report.html" class="is-current" aria-current="page">Отчёт SS2</a>
+          <a href="ss3-report.html">Отчёт SS3</a>
+          <a href="ss3-plan.html">План SS3</a>
+        </nav>
       </div>
-      <nav class="nav nav-ss" data-for="ss1">
-        <a href="#ss1-plan">План</a>
-        <a href="#ss1-done">Сделано</a>
-        <a href="#ss1-cpq">CPQ</a>
-        <a href="#ss1-billing">Биллинг</a>
-        <a href="#ss1-next">Дальше</a>
-      </nav>
-      <nav class="nav nav-ss is-on" data-for="ss2">
-        <a href="#ss2-plan">План</a>
-        <a href="#ss2-done">Сделано</a>
-        <a href="#ss2-cpq">CPQ</a>
-        <a href="#ss2-billing">Биллинг</a>
-        <a href="#ss2-next">Дальше</a>
-      </nav>
     </div>
   </header>
 
-  <div id="report-ss1" class="report" data-ss="ss1">
-<div class="hero">
-    <div class="wrap">
-      <div class="eyebrow">
-        <span class="eyebrow-dot"></span>
-        Суперспринт · демо для АВК
-      </div>
-      <h1>Отчёт направления AI Products</h1>
-      <p class="lede">
-        Что планировали, что показали на стендах и капсулах, какие результаты
-        по CPQ и Биллингу, и куда идём в следующем суперспринте.
-      </p>
-      <div class="meta-row">
-        <span class="chip chip-accent">3 копилота на зеркальном BP3</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 1. PLAN -->
-  <section id="ss1-plan">
-    <div class="wrap">
-      <div class="sec-head">
-        <div class="sec-num">1</div>
-        <h2>Что мы планировали</h2>
-      </div>
-      <p class="sec-sub">
-        Подготовить несколько AI-копилотов для демонстрации автоматизаций BP3
-        к презентации для АВК, плюс discovery по смежным направлениям и подготовка
-        к встраиванию в основной продукт.
-      </p>
-
-      <div class="grid g-3">
-        <article class="paper">
-          <span class="tag tag-plan">Копилот</span>
-          <div class="paper-kicker">AI Настройщик процессов</div>
-          <h3>Процесс без разработчика и аналитика</h3>
-          <p>
-            Компания объясняет в чате с копилотом желаемый бизнес-результат
-            и уточняет важные аспекты создаваемого процесса. Копилот помогает
-            выстроить процесс без участия разработчика и аналитика.
-          </p>
-        </article>
-        <article class="paper">
-          <span class="tag tag-plan">Копилот</span>
-          <div class="paper-kicker">AI Импорт</div>
-          <h3>Файл → поля → запуск процесса</h3>
-          <p>
-            Распознаёт поля любого входящего файла и инициирует запуск процесса
-            без ручного ввода и лишней траты времени.
-          </p>
-        </article>
-        <article class="paper">
-          <span class="tag tag-plan">Копилот</span>
-          <div class="paper-kicker">AI Проверка договоров</div>
-          <h3>Сверка и протокол разногласий</h3>
-          <p>
-            Сравнивает входящие договоры с эталонными образцами, сам определяет
-            тип документа для сверки и готовит протокол разногласий.
-          </p>
-        </article>
-      </div>
-
-      <div class="divider-label">Дополнительно</div>
-
-      <div class="prose">
-        <p>
-          Дополнительно провести discovery и изучить возможности AI Поиска
-          по всему BusinessPad и AI проверки контрагентов. Подготовить алгоритм
-          сборки бизнес-окружения для конструкторов бизнес-процессов.
-        </p>
-        <p>
-          Подготовить капсулы с помощью вайбкод-решений без участия разработчиков:
-          визуализировать ТЗ и, при наличии нужных запросов, демонстрировать
-          исполнение задач. Подготовиться к внедрению создаваемых копилотов
-          и функций внутрь BP3 совместно с основной командой разработки.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2. DONE -->
-  <section id="ss1-done" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300); border-bottom: 1px solid var(--grey-300);">
-    <div class="wrap">
-      <div class="sec-head">
-        <div class="sec-num">2</div>
-        <h2>Что мы сделали</h2>
-      </div>
-      <p class="sec-sub">
-        Три агента на зеркальном BP3 стенде, локальные демо Александра К.
-        и Дмитрия К. на встрече, капсулы. Ниже то, что открываем по ссылке,
-        что показывают живьём, и что перечисляем без демо на стенде.
-      </p>
-
-      <div class="paper" style="margin-bottom: 20px; background: var(--magic-bg); border-color: var(--primary-light);">
-        <span class="tag tag-demo">Демо на стенде</span>
-        <h3 style="margin-bottom: 8px;">Все три агента на зеркальном BP3</h3>
-        <p style="margin-bottom: 4px;">
-          Настройщик, Импорт и Документ развернуты и доступны для показа.
-        </p>
-        <a class="link-btn" href="https://ai-service-wow.business-pad.com/processes" target="_blank" rel="noopener">
-          Открыть ai-service-wow → processes
-        </a>
-      </div>
-
-      <div class="divider-label">Локальные демо на встрече</div>
-
-      <div class="grid g-2" style="margin-bottom: 20px;">
-        <article class="paper" style="border-color: #FFD0C2; background: #FFF8F5;">
-          <span class="tag tag-live">Локальное демо</span>
-          <div class="paper-kicker">Интегратор</div>
-          <h3>Демонстрирует Александр К.</h3>
-          <p>
-            Локальная демонстрация для Интегратора: отдельно от стенда,
-            живой показ на встрече.
-          </p>
-          <div class="demo-focus">
-            <span class="demo-pill">
-              <span class="who">Александр К.</span>
-              <span class="sep">·</span>
-              локальное демо
-            </span>
-          </div>
-        </article>
-        <article class="paper" style="border-color: #FFD0C2; background: #FFF8F5;">
-          <span class="tag tag-live">Локальное демо</span>
-          <div class="paper-kicker">Переменное окружение</div>
-          <h3>Демонстрирует Дмитрий К.</h3>
-          <p>
-            Требование и рабочий инструмент для сверки бизнес (переменного)
-            окружения: живой показ на встрече.
-          </p>
-          <div class="demo-focus">
-            <span class="demo-pill">
-              <span class="who">Дмитрий К.</span>
-              <span class="sep">·</span>
-              локальное демо
-            </span>
-          </div>
-        </article>
-      </div>
-
-      <div class="grid g-2" style="margin-bottom: 8px;">
-        <article class="paper">
-          <span class="tag tag-demo">Капсула</span>
-          <div class="paper-kicker">Чтение документа</div>
-          <h3>Капсула от Михаила</h3>
-          <p>Рабочее место подготовки документа: сценарий чтения и обработки.</p>
-          <a class="link-btn link-btn-sec" href="https://capsules-vibe2.business-pad.com/process-documents/?entity_id=3" target="_blank" rel="noopener">
-            capsules-vibe2 · process-documents
-          </a>
-        </article>
-        <article class="paper">
-          <span class="tag tag-demo">Капсула</span>
-          <div class="paper-kicker">Казначейство</div>
-          <h3>Рабочее место казначея от Леонида</h3>
-          <p>Вайбкод-капсула без классической разработки: визуализация рабочего места.</p>
-          <a class="link-btn link-btn-sec" href="https://capsules-vibe4.business-pad.com/treasury" target="_blank" rel="noopener">
-            capsules-vibe4 · treasury
-          </a>
-        </article>
-      </div>
-
-      <div class="divider-label">Не демонстрируем сейчас, но обязаны перечислить</div>
-
-      <div class="list-stack">
-        <div class="list-item">
-          <div class="ico">1</div>
-          <div class="body">
-            <strong>AI Поиск по всему BP</strong>
-            <span>Подготовлено ТЗ. Сервис развернут, но требует обновления.</span>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="ico">2</div>
-          <div class="body">
-            <strong>Семантика оптовой торговли</strong>
-            <span>Описание для ОКВЭД-агента и Настройщика с целью автоматической настройки бизнес-процесса.</span>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="ico">3</div>
-          <div class="body">
-            <strong>Аналитика и дизайн для Импорта</strong>
-            <span>Путь подготовки пройден. Реализация внутри BP3 запланирована на следующий суперспринт и ускорит подготовку остальных функций.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. CPQ -->
-  <section id="ss1-cpq">
-    <div class="wrap">
-      <div class="sec-head">
-        <div class="sec-num">3</div>
-        <h2>CPQ: результаты</h2>
-      </div>
-      <p class="sec-sub">
-        Бэкенд управления клиентом и финальный фронт по ключевым экранам пилота.
-      </p>
-
-      <div class="track">
-        <div class="track-label">
-          Backend
-          <span>Управление клиентом</span>
-        </div>
-        <div>
-          <p>
-            Подготовлен бэкенд для управления клиентом: каталог товаров,
-            материалы, конфигурации, роли, доступы и пользователи.
-          </p>
-          <ul>
-            <li>Каталог товаров</li>
-            <li>Материалы</li>
-            <li>Конфигурации</li>
-            <li>Роли и доступы</li>
-            <li>Пользователи</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="track">
-        <div class="track-label">
-          Frontend
-          <span>Финальная готовность</span>
-        </div>
-        <div>
-          <p>
-            Финально готов фронт для управления: комментарии, карточка клиента,
-            конфигурации.
-          </p>
-          <ul>
-            <li>Комментарии</li>
-            <li>Карточка клиента</li>
-            <li>Конфигурации</li>
-          </ul>
-          <a class="link-btn" href="https://cpq.business-pad.com/orders" target="_blank" rel="noopener" style="margin-top: 16px;">
-            Открыть CPQ стенд → orders
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. BILLING -->
-  <section id="ss1-billing" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300); border-bottom: 1px solid var(--grey-300);">
-    <div class="wrap">
-      <div class="sec-head">
-        <div class="sec-num">4</div>
-        <h2>Биллинг: результаты</h2>
-      </div>
-      <p class="sec-sub">
-        Онбординг, аккаунт и мобильная вёрстка на стенде billing-front-test.
-      </p>
-
-      <div class="track">
-        <div class="track-label">
-          Billing
-          <span>Стенд my</span>
-        </div>
-        <div>
-          <p>
-            Пресеты, онбординг, регистрация с новыми условиями согласия,
-            данные об аккаунте, уведомления и мобильная вёрстка.
-          </p>
-          <ul>
-            <li>Пресеты</li>
-            <li>Онбординг</li>
-            <li>Регистрация (новые согласия)</li>
-            <li>Данные об аккаунте</li>
-            <li>Уведомления</li>
-            <li>Мобильная вёрстка</li>
-          </ul>
-          <a class="link-btn" href="https://billing-front-test.business-pad.com/" target="_blank" rel="noopener" style="margin-top: 16px;">
-            Открыть Billing стенд → billing-front-test
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. NEXT -->
-  <section id="ss1-next">
-    <div class="wrap">
-      <div class="sec-head">
-        <div class="sec-num">5</div>
-        <h2>Дальнейшие планы</h2>
-      </div>
-      <p class="sec-sub">
-        Фокус следующего суперспринта: встраивание копилотов в BP3, пресет
-        «Оптовая торговля» до конца цикла, тасктрекер команды и закрытие
-        контуров Биллинга и CPQ.
-      </p>
-
-      <div class="plan-block">
-        <span class="tag tag-next">AI направление</span>
-        <h3>Копилоты в BP3, настройщик, тасктрекер</h3>
-        <p>
-          Внедрить разработанные копилоты (минимум 2) в BusinessPad, отладить
-          процедуру взаимодействия. Расширить функционал и привести к виду
-          стандартных компонентов BusinessPad.
-        </p>
-        <p>
-          Довести настройщик до MVP: возможность развернуть и настроить пресет
-          «Оптовая торговля» через полный цикл от биллинга до использования клиентом.
-        </p>
-        <p>
-          Сделать MVP-версию тасктрекера для команды: интегрировать в минимальной
-          связке сервисы Мита и Вики через капсулы ИИ-сервисов для демонстрации
-          клиенту. Функционал задач нарастить до процессов разработки BusinessPad
-          (проверка кода, утверждение и правки) для собственного использования
-          и последующих продаж.
-        </p>
-        <a class="link-btn link-btn-sec" href="https://docs.google.com/spreadsheets/d/1zrRFTgqUFuOTrbdbRbvJHs6rycsX3nwvYLcEuo5sjXo/edit?gid=683764858#gid=683764858" target="_blank" rel="noopener">
-          Планирование суперспринта (Google Sheets)
-        </a>
-      </div>
-
-      <div class="plan-block billing">
-        <span class="tag tag-next">Биллинг</span>
-        <h3>Полный цикл с пресетом</h3>
-        <p>
-          Доделать планируемые работы и реализовать связь с созданным пресетом:
-          полный цикл оплаты, создания, настройки, инициации работы с пресетом
-          и стендом.
-        </p>
-      </div>
-
-      <div class="plan-block cpq">
-        <span class="tag tag-next">CPQ</span>
-        <h3>Пилот Швецъ и рефакторинг</h3>
-        <p>
-          Завершить задачи по бэклогу пилотного кейса Швецъ и приступить
-          к рефакторингу с аналитикой.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <div class="wrap">
-      <p>
-        BusinessPad · AI Products · отчёт суперспринта · июль 2026<br />
-        Стенды:
-        <a href="https://ai-service-wow.business-pad.com/processes" target="_blank" rel="noopener">AI</a> ·
-        <a href="https://cpq.business-pad.com/orders" target="_blank" rel="noopener">CPQ</a> ·
-        <a href="https://billing-front-test.business-pad.com/" target="_blank" rel="noopener">Billing</a>
-      </p>
-    </div>
-  </footer>
-  </div>
-
-  <div id="report-ss2" class="report is-on" data-ss="ss2">
-<div class="hero">
+  <div class="hero">
     <div class="wrap">
       <div class="eyebrow"><span class="eyebrow-dot"></span> Суперспринт 2 · 20.07–30.08.2026</div>
       <h1>Отчёт текущего суперспринта</h1>
@@ -986,7 +626,7 @@
     </div>
   </div>
 
-  <section id="ss2-plan">
+  <section id="plan">
     <div class="wrap">
       <div class="sec-head"><div class="sec-num">1</div><h2>Что мы планировали</h2></div>
       <p class="sec-sub">
@@ -1030,7 +670,7 @@
     </div>
   </section>
 
-  <section id="ss2-done" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300); border-bottom: 1px solid var(--grey-300);">
+  <section id="done" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300); border-bottom: 1px solid var(--grey-300);">
     <div class="wrap">
       <div class="sec-head"><div class="sec-num">2</div><h2>Что мы сделали</h2></div>
       <p class="sec-sub">Показываем импорт и поиск на демо-стенде BP3, не на тестовом: хранилище ещё на ревью Максима Цветкова, в тест и прод не принимали. Чтобы не блокировать показ сервисов, на демо взяли промежуточный контур Василия Киселева.</p>
@@ -1101,7 +741,7 @@
     </div>
   </section>
 
-  <section id="ss2-cpq" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300);">
+  <section id="cpq" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300);">
     <div class="wrap">
       <div class="sec-head"><div class="sec-num">3</div><h2>CPQ</h2></div>
       <p class="sec-sub">Только то, что планировали в этом суперспринте: фронт конфигуратора с загрузкой файла, ролевая модель, материалы, каталог товаров.</p>
@@ -1125,7 +765,7 @@
     </div>
   </section>
 
-  <section id="ss2-billing" style="background: var(--bg-default); border-top: 1px solid var(--grey-300); border-bottom: 1px solid var(--grey-300);">
+  <section id="billing" style="background: var(--bg-default); border-top: 1px solid var(--grey-300); border-bottom: 1px solid var(--grey-300);">
     <div class="wrap">
       <div class="sec-head"><div class="sec-num">4</div><h2>Биллинг</h2></div>
       <p class="sec-sub">На тестовом фронте закрыли мобильный экран, поиск, просмотр стенда и вторую часть онбординга. Цепочка «оплата → стенд с пресетом» остаётся ядром следующего суперспринта.</p>
@@ -1146,7 +786,7 @@
     </div>
   </section>
 
-  <section id="ss2-next">
+  <section id="next">
     <div class="wrap">
       <div class="sec-head"><div class="sec-num">5</div><h2>Куда идём</h2></div>
       <p class="sec-sub">Следующий суперспринт утверждаем вокруг минимального ценностного продукта.</p>
@@ -1161,6 +801,7 @@
           <li>CPQ: перенос кейса в слой BP3</li>
           <li>Дальше по AI на стенде: интегратор, договор, переменное окружение, контрагент</li>
         </ul>
+        <a class="link-btn" href="ss3-plan.html">Открыть план следующего суперспринта</a>
       </div>
     </div>
   </section>
@@ -1173,49 +814,16 @@
       </p>
     </div>
   </footer>
-  </div>
-
   <script>
     (function () {
-      function show(id) {
-        document.querySelectorAll(".report").forEach(function (el) {
-          el.classList.toggle("is-on", el.getAttribute("data-ss") === id);
-        });
-        document.querySelectorAll(".ss-switch button").forEach(function (btn) {
-          btn.classList.toggle("is-on", btn.getAttribute("data-ss") === id);
-        });
-        document.querySelectorAll(".nav-ss").forEach(function (nav) {
-          nav.classList.toggle("is-on", nav.getAttribute("data-for") === id);
-        });
-        document.title = id === "ss1"
-          ? "AI Products · Отчёт суперспринта 1 · BusinessPad"
-          : "AI Products · Отчёт суперспринта 2 · BusinessPad";
-        spy();
-      }
-      function fromHash() {
-        var h = (location.hash || "#ss2").replace("#", "");
-        if (h.indexOf("ss1") === 0) show("ss1");
-        else show("ss2");
-      }
-      document.querySelectorAll(".ss-switch button").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          var id = btn.getAttribute("data-ss");
-          show(id);
-          history.replaceState(null, "", "#" + id);
-          window.scrollTo(0, 0);
-        });
-      });
       var header = document.querySelector(".app-header");
+      var nav = document.querySelector(".nav-page");
+      if (!nav) return;
+      var links = [].slice.call(nav.querySelectorAll('a[href^="#"]'));
+      var sections = links.map(function (a) {
+        return document.getElementById((a.getAttribute("href") || "").slice(1));
+      });
       function spy() {
-        var nav = document.querySelector(".nav-ss.is-on");
-        if (!nav) return;
-        document.querySelectorAll(".nav-ss a").forEach(function (a) {
-          a.classList.remove("is-current");
-        });
-        var links = [].slice.call(nav.querySelectorAll('a[href^="#"]'));
-        var sections = links.map(function (a) {
-          return document.getElementById((a.getAttribute("href") || "").slice(1));
-        });
         var y = window.scrollY + (header ? header.offsetHeight + 20 : 96);
         var current = null;
         for (var i = 0; i < sections.length; i++) {
@@ -1226,8 +834,7 @@
         });
       }
       window.addEventListener("scroll", spy, { passive: true });
-      window.addEventListener("hashchange", fromHash);
-      fromHash();
+      spy();
     })();
   </script>
 </body>

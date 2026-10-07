@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Products · Отчёт суперспринта 3 · BusinessPad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #343A7E;
+      --primary-dark: #5D6198;
+      --primary-light: #E7E7F0;
+      --secondary: #FF5722;
+      --secondary-light: #FFEBE4;
+      --text-primary: #050819;
+      --text-secondary: #85868A;
+      --text-disabled: #CCCCCC;
+      --grey-300: #D9DADF;
+      --grey-800: #424242;
+      --bg-default: #F5F5F5;
+      --bg-paper: #FFFFFF;
+      --success: #599C16;
+      --success-light: #EDF7ED;
+      --info: #0B79D0;
+      --info-light: #E0EDFF;
+      --warning: #FCCA25;
+      --warning-light: #FFF2D2;
+      --magic-800: #4D59FA;
+      --magic-600: #749EF2;
+      --magic-100: #EBF2FF;
+      --magic-50: #F6F8FE;
+      --magic-gradient: linear-gradient(290deg, #4D59FA 0%, #749EF2 100%);
+      --magic-bg: linear-gradient(290deg, #F6F8FE 0%, #EBF2FF 100%);
+      --shadow-card: 0 2px 8px rgba(5, 8, 25, 0.06), 0 1px 2px rgba(5, 8, 25, 0.04);
+      --shadow-hover: 0 8px 24px rgba(52, 58, 126, 0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --maxw: 1080px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Fira Sans", sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-default);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--secondary); }
+
+    /* Header */
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg-paper);
+      border-bottom: 1px solid var(--grey-300);
+      box-shadow: 0 1px 0 rgba(5, 8, 25, 0.04);
+    }
+    .app-header-in {
+      max-width: var(--maxw); margin: 0 auto;
+      padding: 12px 24px;
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 16px; color: var(--primary);
+    }
+    .brand-mark {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--magic-gradient);
+      display: grid; place-items: center;
+      color: #fff; font-size: 14px; font-weight: 700;
+    }
+    .header-navs {
+      display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap; margin-left: auto;
+    }
+    .nav { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav a {
+      font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      transition: 0.15s;
+    }
+    .nav a:hover { background: var(--primary-light); color: var(--primary); }
+    .nav-docs {
+      padding: 4px;
+      background: var(--magic-50);
+      border: 1px solid var(--primary-light);
+      border-radius: 10px;
+    }
+    .nav-docs a {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .nav-docs a.is-current {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-docs a.is-current:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-page a {
+      border: 1.5px solid transparent;
+    }
+    .nav-page a.is-current {
+      color: var(--primary);
+      font-weight: 600;
+      border-color: var(--primary);
+      background: var(--bg-paper);
+    }
+
+    /* Layout */
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+    section { padding: 48px 0; }
+
+    /* Hero */
+    .hero {
+      background: var(--magic-bg);
+      border-bottom: 1px solid var(--grey-300);
+      padding: 56px 0 48px;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--primary);
+      background: var(--bg-paper);
+      border: 1px solid var(--primary-light);
+      padding: 6px 12px; border-radius: 999px;
+      margin-bottom: 20px;
+    }
+    .eyebrow-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--secondary);
+    }
+    h1 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700; line-height: 1.15;
+      color: var(--text-primary); margin-bottom: 12px;
+      max-width: 18ch;
+    }
+    .lede {
+      font-size: 17px; color: var(--text-secondary);
+      max-width: 62ch; margin-bottom: 28px;
+    }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 500;
+      padding: 8px 14px; border-radius: 999px;
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      color: var(--text-primary);
+    }
+    .chip b { color: var(--primary); font-weight: 600; }
+    .chip-accent {
+      background: var(--secondary-light);
+      border-color: transparent;
+      color: var(--secondary);
+    }
+
+    /* Section heads */
+    .sec-head {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 10px;
+    }
+    .sec-num {
+      flex: none;
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--magic-gradient);
+      color: #fff; font-weight: 700; font-size: 15px;
+      display: grid; place-items: center;
+    }
+    h2 {
+      font-size: clamp(22px, 2.5vw, 28px);
+      font-weight: 700; color: var(--text-primary);
+    }
+    .sec-sub {
+      color: var(--text-secondary); font-size: 15px;
+      margin: 0 0 28px; max-width: 72ch; padding-left: 50px;
+    }
+
+    /* Cards */
+    .grid { display: grid; gap: 16px; }
+    .g-3 { grid-template-columns: repeat(3, 1fr); }
+    .g-2 { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 860px) {
+      .g-3, .g-2 { grid-template-columns: 1fr; }
+      .sec-sub { padding-left: 0; }
+    }
+
+    .paper {
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-card);
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .paper:hover {
+      box-shadow: var(--shadow-hover);
+      border-color: var(--primary-light);
+    }
+    .paper-kicker {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+    .paper h3 {
+      font-size: 17px; font-weight: 600;
+      margin-bottom: 10px; color: var(--text-primary);
+    }
+    .paper-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .paper-head h3 { margin-bottom: 0; flex: 1; min-width: 0; }
+    .paper-head .link-btn { margin-top: 0; flex: none; white-space: nowrap; }
+    .paper p {
+      font-size: 14.5px; color: var(--text-secondary);
+      margin: 0;
+    }
+    .paper p + p { margin-top: 10px; }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .tag-demo {
+      background: var(--success-light); color: var(--success);
+    }
+    .tag-list {
+      background: var(--info-light); color: var(--info);
+    }
+    .tag-next {
+      background: var(--warning-light); color: #8a6d00;
+    }
+    .tag-plan {
+      background: var(--primary-light); color: var(--primary);
+    }
+    .tag-live {
+      background: var(--secondary-light);
+      color: var(--secondary);
+    }
+
+    .demo-focus {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      margin-top: 16px;
+    }
+    .demo-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600;
+      padding: 9px 14px; border-radius: var(--radius-sm);
+      background: var(--secondary);
+      color: #FFFFFF;
+      border: none;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .demo-pill-soft {
+      background: var(--secondary-light);
+      color: var(--secondary);
+      border: 1px solid #FFD0C2;
+    }
+    .demo-pill .who {
+      font-weight: 700;
+    }
+    .demo-pill .sep {
+      opacity: 0.55; font-weight: 400;
+    }
+
+    a.link-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 14px;
+      font-size: 13px; font-weight: 600;
+      color: #FFFFFF !important;
+      background: var(--primary);
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      transition: background 0.15s;
+    }
+    a.link-btn:hover {
+      background: var(--primary-dark);
+      color: #FFFFFF !important;
+    }
+    a.link-btn.link-btn-sec {
+      background: transparent;
+      color: var(--primary) !important;
+      border: 1px solid var(--primary-light);
+    }
+    a.link-btn.link-btn-sec:hover {
+      background: var(--primary-light);
+      color: var(--primary) !important;
+    }
+
+    /* Prose block */
+    .prose {
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+    }
+    .prose p {
+      font-size: 15px; color: var(--grey-800);
+      margin: 0 0 12px;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .prose ul li {
+      font-size: 15px;
+      color: var(--grey-800);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--grey-300);
+    }
+    .prose ul li:last-child { border-bottom: none; padding-bottom: 0; }
+    .prose ul li:first-child { padding-top: 0; }
+    .prose ul li strong {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-right: 6px;
+    }
+
+    /* List cards for "cannot demo" */
+    .list-stack { display: flex; flex-direction: column; gap: 12px; }
+    .list-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+    }
+    .list-item .ico {
+      flex: none; width: 28px; height: 28px; border-radius: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 700;
+    }
+    .list-item .body { flex: 1; }
+    .list-item .body strong {
+      display: block; font-size: 14.5px; font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .list-item .body span {
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+
+    /* Track banners */
+    .track {
+      display: grid; grid-template-columns: 140px 1fr;
+      gap: 20px; align-items: start;
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 16px;
+    }
+    @media (max-width: 640px) {
+      .track { grid-template-columns: 1fr; }
+    }
+    .track-label {
+      font-size: 13px; font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .track-label span {
+      display: block;
+      font-size: 11px; font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: none; letter-spacing: 0;
+      margin-top: 4px;
+    }
+    .track p {
+      font-size: 14.5px; color: var(--grey-800);
+      margin: 0 0 10px;
+    }
+    .track p:last-child { margin-bottom: 0; }
+    .track ul {
+      list-style: none; display: flex; flex-wrap: wrap; gap: 8px;
+      margin: 12px 0 0;
+    }
+    .track ul li {
+      font-size: 12.5px; font-weight: 500;
+      padding: 5px 11px; border-radius: 999px;
+      background: var(--magic-50);
+      border: 1px solid var(--primary-light);
+      color: var(--primary);
+    }
+
+    /* Plans */
+    .plan-block {
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-card);
+    }
+    .plan-block.billing { border-left-color: var(--secondary); }
+    .plan-block.cpq { border-left-color: var(--magic-600); }
+    .plan-block h3 {
+      font-size: 16px; font-weight: 600; margin-bottom: 10px;
+    }
+    .plan-block p {
+      font-size: 14.5px; color: var(--grey-800); margin: 0 0 10px;
+    }
+    .plan-block p:last-child { margin-bottom: 0; }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--grey-300);
+      background: var(--bg-paper);
+      padding: 28px 0 40px;
+      text-align: center;
+    }
+    .footer p {
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .footer a { font-weight: 600; }
+
+    /* Divider label */
+    .divider-label {
+      display: flex; align-items: center; gap: 12px;
+      margin: 28px 0 16px;
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .divider-label::before,
+    .divider-label::after {
+      content: ""; flex: 1; height: 1px; background: var(--grey-300);
+    }
+
+    /* Print / PDF: блок с новой страницы, карточки без разрыва */
+    @media print {
+      @page {
+        size: A4;
+        margin: 14mm 12mm;
+      }
+
+      html, body {
+        background: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .app-header {
+        position: static;
+        box-shadow: none;
+      }
+      .app-header .nav { display: none; }
+
+      .hero {
+        page-break-after: always;
+        break-after: page;
+        padding: 28px 0 24px;
+      }
+
+      section {
+        page-break-before: always;
+        break-before: page;
+        page-break-inside: auto;
+        break-inside: auto;
+        padding: 20px 0 12px;
+        border: none !important;
+        background: #fff !important;
+      }
+
+      .footer {
+        page-break-before: always;
+        break-before: page;
+      }
+
+      .paper,
+      .track,
+      .plan-block,
+      .list-item,
+      .prose,
+      .grid > article,
+      .list-stack > .list-item {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        box-shadow: none;
+      }
+
+      .divider-label {
+        page-break-after: avoid;
+        break-after: avoid;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .sec-head {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      .sec-sub {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      a.link-btn {
+        color: #FFFFFF !important;
+        background: var(--primary) !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      a.link-btn.link-btn-sec {
+        color: var(--primary) !important;
+        background: transparent !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .demo-pill {
+        color: #FFFFFF !important;
+        background: var(--secondary) !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .demo-pill-soft {
+        color: var(--secondary) !important;
+        background: var(--secondary-light) !important;
+      }
+
+      .paper:hover,
+      .track:hover,
+      .plan-block:hover {
+        box-shadow: none;
+      }
+    }
+  
+    .wbs { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 8px; }
+    .wbs th, .wbs td { border: 1px solid var(--grey-300); padding: 10px 12px; vertical-align: top; text-align: left; }
+    .wbs th { background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 600; }
+    .wbs td.who { white-space: nowrap; font-weight: 600; color: var(--primary); }
+    .contour { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-right: 6px; }
+    .c-demo { background: var(--success-light); color: var(--success); }
+    .c-local { background: var(--secondary-light); color: var(--secondary); }
+    .c-video { background: var(--warning-light); color: #8a6d00; }
+    .c-no { background: #FFEBEE; color: #C62828; }
+    .c-dev { background: var(--info-light); color: var(--info); }
+    .plan-block ul {
+      list-style: none; display: flex; flex-wrap: wrap; gap: 8px;
+      margin: 12px 0 0;
+    }
+    .plan-block ul.stack {
+      display: block;
+      list-style: decimal;
+      padding-left: 22px;
+      margin: 12px 0 4px;
+    }
+    .plan-block ul.stack li {
+      display: list-item;
+      font-size: 14.5px;
+      font-weight: 400;
+      color: var(--grey-800);
+      padding: 4px 0;
+      border: none;
+      background: none;
+      border-radius: 0;
+    }
+    .plan-block .link-btn + .link-btn {
+      margin-left: 8px;
+    }
+    .c-new { background: var(--magic-100); color: var(--magic-800); }
+    .c-draft { background: var(--warning-light); color: #8a6d00; }
+
+    .pbar { margin: 0 0 14px; }
+    .pbar-meta {
+      display: flex; align-items: baseline;
+      gap: 10px; margin-bottom: 6px;
+    }
+    .pbar-meta b {
+      font-size: 13px; font-weight: 600; color: var(--primary);
+    }
+    .pbar-over {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      min-height: 26px;
+      margin-bottom: 4px;
+      align-items: center;
+    }
+    .pbar-eta {
+      justify-self: center;
+      white-space: nowrap;
+      font-size: 11px; font-weight: 700;
+      color: var(--secondary);
+      background: var(--secondary-light);
+      padding: 3px 10px; border-radius: 999px;
+    }
+    .pbar-track {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      height: 8px;
+      margin-bottom: 8px;
+    }
+    .pbar-track i {
+      display: block; height: 100%;
+      box-sizing: border-box;
+      background: transparent;
+      border: 2px solid var(--primary);
+      border-radius: 99px;
+    }
+    .pbar-track i.is-done {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .pbar-track i.is-now {
+      --pbar-fill: 100%;
+      background: linear-gradient(to right, var(--secondary) var(--pbar-fill), transparent var(--pbar-fill));
+      border-color: var(--secondary);
+    }
+    .pbar-track i.is-partial {
+      --pbar-fill: 90%;
+      background: linear-gradient(to right, var(--primary) var(--pbar-fill), transparent var(--pbar-fill));
+      border-color: var(--primary);
+    }
+    .pbar-track i.is-na {
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent 0 3px,
+        rgba(133, 134, 138, 0.28) 3px 5px
+      );
+      border: 1.5px dashed var(--grey-300);
+    }
+    .pbar-steps {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      font-size: 10px; font-weight: 600;
+      color: var(--primary);
+      text-align: center;
+      line-height: 1.25;
+    }
+    .pbar-steps .is-done { color: var(--primary); }
+    .pbar-steps .is-now { color: var(--secondary); font-weight: 700; }
+    .pbar-steps .is-partial { color: var(--primary); }
+    .pbar-steps .is-na {
+      color: var(--text-disabled);
+      font-weight: 500;
+      text-decoration: line-through;
+      text-decoration-color: var(--grey-300);
+    }
+    @media (max-width: 860px) { .pbar-steps { font-size: 9px; } }
+    .pbar-legend {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin: -8px 0 24px; padding-left: 50px;
+    }
+    @media (max-width: 860px) { .pbar-legend { padding-left: 0; } }
+    .pbar-key {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 999px;
+    }
+    .pbar-key.is-done { background: var(--primary-light); color: var(--primary); }
+    .pbar-key.is-now { background: var(--secondary-light); color: var(--secondary); }
+    .pbar-key.is-wait {
+      background: transparent;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+    }
+    .pbar-key.is-na {
+      background: transparent;
+      color: var(--text-disabled);
+      border: 1.5px dashed var(--grey-300);
+      text-decoration: line-through;
+    }
+    .feat-note {
+      font-size: 13.5px;
+      color: var(--secondary);
+      margin: 0 0 12px;
+      padding: 8px 12px;
+      background: var(--secondary-light);
+      border: 1px solid #FFCCBC;
+      border-radius: 8px;
+    }
+    .feat-note.is-comment {
+      color: var(--grey-800);
+      background: var(--magic-50);
+      border-color: var(--primary-light);
+    }
+    .feat-line b { color: var(--text-primary); font-weight: 600; }
+
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-header-in">
+      <div class="brand">
+        <div class="brand-mark">BP</div>
+        BusinessPad · AI Products
+      </div>
+      <div class="header-navs">
+        <nav class="nav nav-page" aria-label="Разделы страницы">
+          <a href="#plan">План</a>
+          <a href="#done">Сделано</a>
+          <a href="#extra">Дополнительно</a>
+          <a href="#new">Новое</a>
+          <a href="#cpq">CPQ</a>
+          <a href="#billing">Биллинг</a>
+          <a href="#out">Вне ядра</a>
+        </nav>
+        <nav class="nav nav-docs" aria-label="Отчёты суперспринтов">
+          <a href="supersprint.html#ss1">Отчёт SS1</a>
+          <a href="ss2-report.html">Отчёт SS2</a>
+          <a href="ss3-report.html" class="is-current" aria-current="page">Отчёт SS3</a>
+          <a href="ss3-plan.html">План SS3</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> Суперспринт 3 · 31.08–11.10.2026 · черновик 07.10</div>
+      <h1>Отчёт текущего суперспринта</h1>
+      <p class="lede">
+        Собираем первый продаваемый пакет вокруг пресета «Задачи»:
+        процессы проект, задача и документ, файлы, импорт и поиск,
+        встречи, wiki под эти материалы и разворот стенда через Billing.
+      </p>
+      <div class="meta-row">
+        <span class="chip chip-accent">пресет Задачи</span>
+      </div>
+    </div>
+  </div>
+
+  <section id="plan">
+    <div class="wrap">
+      <div class="sec-head"><div class="sec-num">1</div><h2>Что мы планировали</h2></div>
+      <p class="sec-sub">
+        Рамка: пресет «Задачи», не казначейство как первый продукт.
+        Внутри пресета наши куски: файлы и поиск, настройщик со стендами Billing,
+        видеоконференции с wiki записей, помощники по договору и ориентации в системе.
+      </p>
+      <div class="grid g-2">
+        <article class="paper">
+          <div class="paper-kicker">Блок 1</div>
+          <h3>Хранилище, импорт, поиск</h3>
+          <p>Файл в платформе. ИИ-импорт заводит связанные экземпляры. Поиск находит процессы, людей и вложения.</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Блок 2</div>
+          <h3>Настройщик, пресет, Billing</h3>
+          <p>Правка полотна в диалоге. Дамп пресета. Мультитенант и создание стенда BP3 через Billing.</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Блок 3</div>
+          <h3>Видеоконференции</h3>
+          <p>Meet, календарь, саммаризация. Wiki как место хранения записи, транскрипта и саммари.</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Блок 4</div>
+          <h3>Помощники</h3>
+          <p>Помощник по договорам. Помощник диалога с клиентом и ориентации в системе и wiki.</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Блок 5</div>
+          <h3>Остальное</h3>
+          <p>Динамический статус, полноценный агент контрагента, переменное окружение, CPQ как капсула-пресет.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="done" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300);">
+    <div class="wrap">
+      <div class="sec-head"><div class="sec-num">2</div><h2>Что мы сделали</h2></div>
+      <div class="pbar-legend">
+        <span class="pbar-key is-done">пройдено</span>
+        <span class="pbar-key is-now">сейчас</span>
+        <span class="pbar-key is-wait">в плане</span>
+        <span class="pbar-key is-na">пропуск</span>
+      </div>
+
+      <p class="divider-label">Блок 1 · хранилище, импорт, поиск</p>
+      <div class="grid g-2">
+        <article class="paper">
+          <div class="paper-kicker">Хранилище файлов</div>
+          <h3>Файловый менеджер в контуре BP3</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Разработка</b>
+            </div>
+            <div class="pbar-over">
+              <span class="pbar-eta" style="grid-column: 5 / 7">+1 спринт</span>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Разработка"><i class="is-done"></i><i class="is-na"></i><i class="is-now" style="--pbar-fill: 75%"></i><i class="is-na"></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-na">Дизайн</span><span class="is-now">Разраб.</span><span class="is-na">Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> TDR закрыт. Декомпозицию разложили: монолит у Фарруха, файл-менеджер и BFF у Александра Дорожинского. Первые замечания ревью поправлены и проходят ревью, ветка с Docker готова, чтобы появился конвейер сборки.</p>
+          <p class="feat-line"><b>Осталось.</b> Довести ревью Фарруха, закрыть файловый процессор, выкатить сервис. Импорт и поиск в test и прод от этого отсчитывают свои спринты.</p>
+          <p class="feat-line"><b>Когда.</b> Плюс 1 спринт после текущего. Пессимистично, может хватить половины спринта.</p>
+          <a class="link-btn" href="https://docs.google.com/spreadsheets/d/1UDWSRHL5FlQvl_5_Rs6_VudmDiZyjAcdDAtEVKjy6S0/edit?gid=0#gid=0" target="_blank" rel="noopener">Файловое хранилище · задачи</a>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Импорт</div>
+          <h3>Автоматизация создания экземпляров процесса</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Фронт</b>
+            </div>
+            <div class="pbar-over">
+              <span class="pbar-eta" style="grid-column: 5 / 7">+3 спринта</span>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Фронт"><i class="is-done"></i><i class="is-done"></i><i class="is-partial" style="--pbar-fill: 75%"></i><i class="is-now" style="--pbar-fill: 75%"></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-done">Дизайн</span><span class="is-partial">Разраб.</span><span class="is-now">Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-note">Файловое хранилище, объекты учёта</p>
+          <p class="feat-line"><b>Сделали.</b> Аналитика и макеты закрыты: документ плюс шаги контрагента, товара, материального потока. Бэкенд и фронт добавили материальный поток, справочники.</p>
+          <p class="feat-line"><b>Осталось.</b> Прикрутить API и файловое хранилище, объекты учёта для связывания ЭБП, перенести сервис на актуальный DEV, пройдя ревью Максима Цветкова.</p>
+          <p class="feat-line"><b>Когда.</b> Итого плюс 3 спринта: хранилище, спринт после него и спринт на ревью Максима Цветкова.</p>
+          <a class="link-btn" href="https://s14.kapsule3.business-pad.com/settings" target="_blank" rel="noopener">S14*</a>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Поиск</div>
+          <h3>Поиск с цитированием</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Ревью</b>
+            </div>
+            <div class="pbar-over">
+              <span class="pbar-eta" style="grid-column: 5 / 7">+2 спринта</span>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Ревью"><i class="is-done"></i><i class="is-done"></i><i class="is-partial"></i><i class="is-partial"></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-done">Дизайн</span><span class="is-partial">Разраб.</span><span class="is-partial">Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-note">Файловое хранилище</p>
+          <p class="feat-line"><b>Сделали.</b> Цитирование на фронте уже есть. Сервис лежит на демо-стенде S14, показывали ещё на прошлом демо.</p>
+          <p class="feat-line"><b>Осталось.</b> Перенести кодовую базу на новую версию BP, доделать стык с хранилищем, пройти ревью.</p>
+          <p class="feat-line"><b>Когда.</b> Итого плюс 2 спринта: хранилище и спринт на доделки с ревью.</p>
+          <a class="link-btn" href="https://s14.kapsule3.business-pad.com/settings" target="_blank" rel="noopener">S14*</a>
+        </article>
+      </div>
+
+      <p class="divider-label">Блок 2 · настройщик, пресет, Billing</p>
+      <div class="grid g-2">
+        <article class="paper">
+          <div class="paper-kicker">Настройщик</div>
+          <h3>Правка полотна в диалоге</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Разработка</b>
+            </div>
+            <div class="pbar-over">
+              <span class="pbar-eta" style="grid-column: 5 / 7">+3 спринта</span>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Разработка"><i class="is-done"></i><i class="is-done"></i><i class="is-now" style="--pbar-fill: 75%"></i><i class="is-partial" style="--pbar-fill: 50%"></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-done">Дизайн</span><span class="is-now">Разраб.</span><span class="is-partial">Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-note">Centrifugo в чате</p>
+          <p class="feat-line"><b>Сделали.</b> Дизайн закрыт. TDR, автотулы, Centrifugo, middleware набора тулов. Полотно можно править в диалоге после разворота.</p>
+          <p class="feat-line"><b>Осталось.</b> Закрыть разработку после хранилища, состыковать Centrifugo с Чатами, на фронте только API, ревью Максима Цветкова.</p>
+          <p class="feat-line"><b>Когда.</b> Итого плюс 3 спринта: хранилище, спринт после него и спринт на ревью Максима Цветкова.</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Billing и пресет</div>
+          <h3>Пустой стенд вместо дампа «Задачи»</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Релиз витрины</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Релиз витрины"><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-done">Дизайн</span><span class="is-done">Разраб.</span><span class="is-done">Фронт</span><span class="is-done">Ревью</span><span class="is-done">Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> Команда Platform довела пустой стенд BP3. Billing завели отдельную ветку и стенды под переход развёртывания на BP3 и внедрили мультитенант с кластеризацией. Демо 09.10.2026 со стороны Максима Цветкова.</p>
+          <p class="feat-line"><b>Осталось.</b> После демо снять вопросы на согласование, чтобы дойти до целевого результата: дамп пресета, контракт идентификатора и применение при развороте.</p>
+          <p class="feat-line"><b>Когда.</b> Демо 09.10. Согласования после него.</p>
+          <a class="link-btn" href="https://billing-front-test.business-pad.com/" target="_blank" rel="noopener">billing-front-test*</a>
+        </article>
+      </div>
+
+      <p class="divider-label">Блок 3 · видеоконференции</p>
+      <div class="grid g-2">
+        <article class="paper">
+          <div class="paper-kicker">Видео трекер</div>
+          <h3>Meet, календарь, саммари</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Разработка</b>
+            </div>
+            <div class="pbar-over">
+              <span class="pbar-eta" style="grid-column: 5 / 7">+2 спринта</span>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Разработка"><i class="is-done"></i><i class="is-done"></i><i class="is-now" style="--pbar-fill: 50%"></i><i class="is-partial" style="--pbar-fill: 50%"></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-done">Дизайн</span><span class="is-now">Разраб.</span><span class="is-partial">Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> TDR согласован. Meet, календарь и саммаризация живут отдельными сервисами, BFF связывает их с платформой. Репозитории созданы, документацию чистили к ревью. Модель расшифровки пересадили на GPU.</p>
+          <p class="feat-line"><b>Осталось.</b> Довести разработку BFF, отдать на ревью Максиму Цветкову, описать выкладку на DEV, забрать фронт.</p>
+          <p class="feat-line"><b>Когда.</b> Итого плюс 2 спринта. На s06 не тащим, цель сразу DEV. Это ещё не полноценная клиентская wiki.</p>
+        </article>
+      </div>
+
+      <p class="divider-label">Блок 4 · помощники</p>
+      <div class="grid g-2">
+        <article class="paper">
+          <div class="paper-kicker">Договор</div>
+          <h3>Помощник по договорам</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Разработка</b>
+            </div>
+            <div class="pbar-over">
+              <span class="pbar-eta" style="grid-column: 4 / 7">+3 спринта</span>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Разработка"><i class="is-done"></i><i></i><i class="is-now" style="--pbar-fill: 50%"></i><i></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span>Дизайн</span><span class="is-now">Разраб.</span><span>Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-note">Долго делали аналитику, дизайн не принял задачу, нет ясности с ответственным</p>
+          <p class="feat-line"><b>Сделали.</b> TDR 28.09: отдельный микросервис, эталоны в своей базе, файл сейчас в S3 мимо менеджера. Большая часть кода у Дмитрия Кульбиды готова, очередь заводится.</p>
+          <p class="feat-line"><b>Осталось.</b> Нарисовать макеты, сверстать фронт, переложить бэк на хранилище, доработать индексацию, пройти ревью.</p>
+          <p class="feat-line"><b>Когда.</b> Итого плюс 3 спринта.</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Ориентация в системе</div>
+          <h3>Короткий помощник инструкций</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Аналитика</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Аналитика"><i class="is-now" style="--pbar-fill: 50%"></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-now">Аналитика</span><span>Дизайн</span><span>Разраб.</span><span>Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-note">Аналитика</p>
+          <p class="feat-line"><b>Сделали.</b> Вводные отданы.</p>
+          <p class="feat-line"><b>Осталось.</b> Дописать аналитику, выбрать, кто рисует и кто верстает.</p>
+          <p class="feat-line"><b>Когда.</b> Срок отдельным спринтом не ставили. Идёт рядом с wiki, не закрывает её.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="extra" style="background: var(--bg-default); border-top: 1px solid var(--grey-300);">
+    <div class="wrap">
+      <div class="sec-head"><div class="sec-num">3</div><h2>Дополнительные темы</h2></div>
+      <div class="grid g-2">
+        <article class="paper">
+          <div class="paper-kicker">Интегратор</div>
+          <h3>ИИ Интегратор</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Разработка и фронт</b>
+            </div>
+            <div class="pbar-over">
+              <span class="pbar-eta" style="grid-column: 5 / 7">+3 спринта</span>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Разработка и фронт"><i class="is-done"></i><i class="is-done"></i><i class="is-now" style="--pbar-fill: 50%"></i><i class="is-now" style="--pbar-fill: 50%"></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-done">Дизайн</span><span class="is-now">Разраб.</span><span class="is-now">Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> Агент читает схему базы, сопоставляет справочник, переносит пачками. Макеты экранов готовы. На бэкенде прогнали сотни тысяч строк, боевое API протестировали вместе с контрагентом.</p>
+          <p class="feat-line"><b>Осталось.</b> Дотестировать на живом датасете (Швецъ и его 1С), отдать ручки на фронт, закрыть вёрстку, пройти ревью.</p>
+          <p class="feat-line"><b>Когда.</b> Итого плюс 3 спринта.</p>
+          <a class="link-btn" href="#">Демо*</a>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Семантика</div>
+          <h3>Слой W1 для админов и аналитиков</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Аналитика</b>
+            </div>
+            <div class="pbar-over">
+              <span class="pbar-eta" style="grid-column: 4 / 7">+3 спринта</span>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Аналитика"><i class="is-partial" style="--pbar-fill: 90%"></i><i></i><i class="is-now" style="--pbar-fill: 10%"></i><i></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-partial">Аналитика</span><span>Дизайн</span><span class="is-now">Разраб.</span><span>Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> Цель зафиксирована: собрать семантику системы, инструкции по системе и пресеты по выделенному URL, нужен граф связей. Декомпозицию Дмитрий Кульбида уже расписал по этапам в Wiki Hub, в том числе хранение и клиентские данные в wiki.</p>
+          <p class="feat-line"><b>Осталось.</b> Добавить графовую БД, собрать все данные на основном URL, разработать Wiki Hub.</p>
+          <p class="feat-line"><b>Когда.</b> Итого плюс 3 спринта вместе с wiki.</p>
+          <a class="link-btn" href="#">Архитектура*</a>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Контрагенты</div>
+          <h3>Помощник по контрагентам</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Аналитика</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Аналитика"><i class="is-now" style="--pbar-fill: 25%"></i><i></i><i class="is-partial" style="--pbar-fill: 25%"></i><i></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-now">Аналитика</span><span>Дизайн</span><span class="is-partial">Разраб.</span><span>Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-note">Аналитика</p>
+          <p class="feat-line"><b>Сделали.</b> Отобраны бесплатные сервисы сбора информации. Подготовлено демо и видео ожидаемого эффекта работы сервиса.</p>
+          <p class="feat-line"><b>Осталось.</b> Прогнать API, при необходимости подключить платный доступ, обновить под ТЗ, дизайн, фронт и ревью. Почти полный цикл.</p>
+          <p class="feat-line"><b>Когда.</b> Срок отдельным спринтом не ставили.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="new" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300);">
+    <div class="wrap">
+      <div class="sec-head"><div class="sec-num">4</div><h2>Новые темы последнего спринта</h2></div>
+      <p class="sec-sub">Взяли ближе к концу суперспринта. Это задел следующего цикла.</p>
+      <div class="grid g-2">
+        <article class="paper">
+          <div class="paper-kicker">Wiki</div>
+          <h3>Полноценная клиентская wiki</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Аналитика</b>
+            </div>
+            <div class="pbar-over">
+              <span class="pbar-eta" style="grid-column: 2 / 7">+3 спринта</span>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Аналитика"><i class="is-now" style="--pbar-fill: 80%"></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-now">Аналитика</span><span>Дизайн</span><span>Разраб.</span><span>Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-note">Семантика и wiki считаем вместе. Оценка очень примерная: архитектуру только утвердили.</p>
+          <p class="feat-line"><b>Сделали.</b> Аналитика по разделам готова. Утвердили архитектуру и составили план работ. Первым приоритетом реализуем видео трекер и клиентские разделы wiki по демо Дмитрия Кульбиды.</p>
+          <p class="feat-line"><b>Осталось.</b> Дизайн, фронт, разработка. Совместить прототип, TDR и блок встреч.</p>
+          <p class="feat-line"><b>Когда.</b> Итого плюс 3 спринта вместе с семантикой.</p>
+          <a class="link-btn" href="#">Декомпозиция работ*</a>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Архитектура агентов</div>
+          <h3>Шаблоны, кейсы, скиллы</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Ревью правил</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Ревью правил"><i class="is-done"></i><i class="is-na"></i><i class="is-now"></i><i class="is-na"></i><i class="is-now"></i><i class="is-na"></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-na">Дизайн</span><span class="is-now">Разраб.</span><span class="is-na">Фронт</span><span class="is-now">Ревью</span><span class="is-na">Релиз</span></div>
+          </div>
+          <p class="feat-note is-comment">Это правила поставки, для ускорения прохождения ревью и повышения прозрачности архитектурного решения.</p>
+          <p class="feat-line"><b>Сделали.</b> Утвердили шаблоны, собрали первые пять кейсов, настроили скиллы документации по правилам. Скилл схем Саша Котовенко прогонял на импорте и интеграторе.</p>
+          <p class="feat-line"><b>Осталось.</b> Циклическое улучшение скиллов по каждому кейсу обратной связи.</p>
+          <p class="feat-line"><b>Когда.</b> -</p>
+          <a class="link-btn" href="#">TDR агента*</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="cpq" style="background: var(--bg-default); border-top: 1px solid var(--grey-300);">
+    <div class="wrap">
+      <div class="sec-head"><div class="sec-num">5</div><h2>CPQ</h2></div>
+      <div class="grid g-2">
+        <article class="paper">
+          <div class="paper-kicker">Роли</div>
+          <h3>Ролевая модель</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Ревью</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Ревью"><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-now"></i><i></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-done">Дизайн</span><span class="is-done">Разраб.</span><span class="is-done">Фронт</span><span class="is-now">Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> Роли добавили, визуальные баги и пустую страницу закрыли. С 01.10 на тесте у Анастасии.</p>
+          <p class="feat-line"><b>Осталось.</b> Протестировать.</p>
+          <p class="feat-line"><b>Когда.</b> Тест уже идёт.</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Каталог</div>
+          <h3>Парсинг данных и цен</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Релиз</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Релиз"><i class="is-done"></i><i class="is-na"></i><i class="is-done"></i><i class="is-na"></i><i class="is-done"></i><i class="is-done"></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-na">Дизайн</span><span class="is-done">Разраб.</span><span class="is-na">Фронт</span><span class="is-done">Ревью</span><span class="is-done">Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> Автоматический разбор каталога и цен.</p>
+          <p class="feat-line"><b>Осталось.</b> -</p>
+          <p class="feat-line"><b>Когда.</b> -</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Интеграция с 1С</div>
+          <h3>Интеграция с 1С</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Разработка</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Разработка"><i class="is-done"></i><i class="is-na"></i><i class="is-now" style="--pbar-fill: 90%"></i><i class="is-na"></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-na">Дизайн</span><span class="is-now">Разраб.</span><span class="is-na">Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-note">Клиент доступ так и не дал. Это комментарий к сроку, не шаг конвейера.</p>
+          <p class="feat-line"><b>Сделали.</b> Материалы для чтения схемы подготовили.</p>
+          <p class="feat-line"><b>Осталось.</b> Получить доступ клиента и начать чтение схемы.</p>
+          <p class="feat-line"><b>Когда.</b> Пока доступа нет, спринт не ставим.</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Коммерческое предложение</div>
+          <h3>Генерация КП</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Дизайн</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Дизайн"><i class="is-now"></i><i class="is-now" style="--pbar-fill: 50%"></i><i></i><i></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-now">Аналитика</span><span class="is-now">Дизайн</span><span>Разраб.</span><span>Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> Аналитика и дизайн проведены частично.</p>
+          <p class="feat-line"><b>Осталось.</b> Слот дизайна, разработка агента для генерации, фронт.</p>
+          <p class="feat-line"><b>Когда.</b> За следующий суперспринт.</p>
+        </article>
+        <article class="paper">
+          <div class="paper-kicker">Пресет</div>
+          <h3>CPQ как пресет</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Аналитика</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Аналитика"><i class="is-now"></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-now">Аналитика</span><span>Дизайн</span><span>Разраб.</span><span>Фронт</span><span>Ревью</span><span>Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> С Сергеем Понариным передана аналитика CPQ, согласовали дальнейшие действия по рефакторингу, выделили зоны, которые требуют доработки, и определили состав пресетов.</p>
+          <p class="feat-line"><b>Осталось.</b> Согласовать приоритеты разработки пробелов.</p>
+          <p class="feat-line"><b>Когда.</b> Продолжительно в 2026 Q4 и 2027 Q1.</p>
+        </article>
+      </div>
+      <a class="link-btn" href="https://cpq.business-pad.com/orders" target="_blank" rel="noopener">CPQ · стенд</a>
+    </div>
+  </section>
+
+  <section id="billing" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300); border-bottom: 1px solid var(--grey-300);">
+    <div class="wrap">
+      <div class="sec-head"><div class="sec-num">6</div><h2>Биллинг</h2></div>
+        <article class="paper">
+          <div class="paper-kicker">Онбординг</div>
+          <h3>Витрина и пустой стенд BP3</h3>
+          <div class="pbar">
+            <div class="pbar-meta">
+              <b>Релиз</b>
+            </div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Релиз"><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i></div>
+            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-done">Дизайн</span><span class="is-done">Разраб.</span><span class="is-done">Фронт</span><span class="is-done">Ревью</span><span class="is-done">Релиз</span></div>
+          </div>
+          <p class="feat-line"><b>Сделали.</b> Маскоты, фон онбординга, рефактор по замечаниям лидов, кнопка пустого стенда BP3 (Камиль).</p>
+          <p class="feat-line"><b>Осталось.</b> -</p>
+          <p class="feat-line"><b>Когда.</b> -</p>
+          <a class="link-btn" href="https://billing-front-test.business-pad.com/" target="_blank" rel="noopener">billing-front-test*</a>
+        </article>
+    </div>
+  </section>
+
+<section id="out">
+    <div class="wrap">
+      <div class="sec-head"><div class="sec-num">7</div><h2>Вне ядра этого суперспринта</h2></div>
+      <div class="prose">
+        <ul>
+          <li><strong>Динамический статус.</strong> История статуса, не закрывали.</li>
+          <li><strong>Переменное окружение.</strong> Ниже приоритетом, на схеме серым.</li>
+          <li><strong>Агент на этапе внутри полотна BP.</strong> Data-flow / Runtime.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>
+        BusinessPad · AI Products · отчёт суперспринта 3 · 31.08–11.10.2026<br />
+        Черновик 07.10.2026 · рамка: пресет «Задачи»
+      </p>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var header = document.querySelector(".app-header");
+      var nav = document.querySelector(".nav-page");
+      if (!nav) return;
+      var links = [].slice.call(nav.querySelectorAll('a[href^="#"]'));
+      var sections = links.map(function (a) {
+        return document.getElementById((a.getAttribute("href") || "").slice(1));
+      });
+      function spy() {
+        var y = window.scrollY + (header ? header.offsetHeight + 20 : 96);
+        var current = null;
+        for (var i = 0; i < sections.length; i++) {
+          if (sections[i] && sections[i].offsetTop <= y) current = sections[i];
+        }
+        links.forEach(function (a, i) {
+          a.classList.toggle("is-current", sections[i] === current);
+        });
+      }
+      window.addEventListener("scroll", spy, { passive: true });
+      spy();
+    })();
+  </script>
+</body>
+</html>
