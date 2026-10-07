@@ -636,6 +636,11 @@
       background: linear-gradient(to right, var(--secondary) var(--pbar-fill), transparent var(--pbar-fill));
       border-color: var(--secondary);
     }
+    .pbar-track i.is-mix {
+      --pbar-prev: 75%;
+      background: linear-gradient(to right, var(--primary) var(--pbar-prev), var(--secondary) var(--pbar-prev));
+      border-color: var(--secondary);
+    }
     .pbar-track i.is-partial {
       --pbar-fill: 90%;
       background: linear-gradient(to right, var(--primary) var(--pbar-fill), transparent var(--pbar-fill));
@@ -660,6 +665,7 @@
     }
     .pbar-steps .is-done { color: var(--primary); }
     .pbar-steps .is-now { color: var(--secondary); font-weight: 700; }
+    .pbar-steps .is-mix { color: var(--secondary); font-weight: 700; }
     .pbar-steps .is-partial { color: var(--primary); }
     .pbar-steps .is-na {
       color: var(--text-disabled);
@@ -829,8 +835,8 @@
             <div class="pbar-over">
               <span class="pbar-eta" style="grid-column: 5 / 7">+3 спринта</span>
             </div>
-            <div class="pbar-track" role="img" aria-label="Прогресс: Фронт"><i class="is-done"></i><i class="is-done"></i><i class="is-now" style="--pbar-fill: 75%"></i><i class="is-now" style="--pbar-fill: 75%"></i><i></i><i></i></div>
-            <div class="pbar-steps"><span class="is-done">Аналитика</span><span class="is-done">Дизайн</span><span class="is-now">Разраб.</span><span class="is-now">Фронт</span><span>Ревью</span><span>Релиз</span></div>
+            <div class="pbar-track" role="img" aria-label="Прогресс: Фронт"><i class="is-mix" style="--pbar-prev: 75%"></i><i class="is-mix" style="--pbar-prev: 75%"></i><i class="is-now" style="--pbar-fill: 75%"></i><i class="is-now" style="--pbar-fill: 75%"></i><i></i><i></i></div>
+            <div class="pbar-steps"><span class="is-mix">Аналитика</span><span class="is-mix">Дизайн</span><span class="is-now">Разраб.</span><span class="is-now">Фронт</span><span>Ревью</span><span>Релиз</span></div>
           </div>
           <p class="feat-note">Файловое хранилище, объекты учёта</p>
           <p class="feat-line"><b>Сделали.</b> Аналитика и макеты закрыты: документ плюс шаги контрагента, товара, материального потока. Бэкенд и фронт добавили материальный поток, справочники.</p>
