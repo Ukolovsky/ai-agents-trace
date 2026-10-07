@@ -75,15 +75,39 @@
       display: grid; place-items: center;
       color: #fff; font-size: 14px; font-weight: 700;
     }
-    .nav { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+    .header-navs {
+      display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap; margin-left: auto;
+    }
+    .nav { display: flex; gap: 4px; flex-wrap: wrap; }
     .nav a {
       font-size: 13px; font-weight: 500; color: var(--text-secondary);
       padding: 8px 12px; border-radius: var(--radius-sm);
-      border: 1.5px solid transparent;
       transition: 0.15s;
     }
     .nav a:hover { background: var(--primary-light); color: var(--primary); }
-    .nav a.is-current {
+    .nav-docs {
+      padding: 4px;
+      background: var(--magic-50);
+      border: 1px solid var(--primary-light);
+      border-radius: 10px;
+    }
+    .nav-docs a {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .nav-docs a.is-current {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-docs a.is-current:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-page a {
+      border: 1.5px solid transparent;
+    }
+    .nav-page a.is-current {
       color: var(--primary);
       font-weight: 600;
       border-color: var(--primary);
@@ -565,30 +589,6 @@
     }
 
   
-    .ss-switch {
-      display: flex;
-      background: var(--primary-light);
-      border-radius: 999px;
-      padding: 3px;
-    }
-    .ss-switch button {
-      border: 0;
-      background: transparent;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 7px 14px;
-      border-radius: 999px;
-      color: var(--primary);
-      cursor: pointer;
-    }
-    .ss-switch button.is-on {
-      background: var(--bg-paper);
-      color: var(--text-primary);
-      box-shadow: var(--shadow-card);
-    }
-    .nav-ss { display: none; }
-    .nav-ss.is-on { display: flex; }
     .report { display: none; }
     .report.is-on { display: block; }
 
@@ -601,28 +601,25 @@
         <div class="brand-mark">BP</div>
         BusinessPad · AI Products
       </div>
-      <div class="ss-switch" role="tablist" aria-label="Суперспринт">
-        <button type="button" data-ss="ss1" role="tab">Суперспринт 1</button>
-        <button type="button" data-ss="ss2" class="is-on" role="tab">Суперспринт 2</button>
+      <div class="header-navs">
+        <nav class="nav nav-page" aria-label="Разделы страницы">
+          <a href="#ss1-plan">План</a>
+          <a href="#ss1-done">Сделано</a>
+          <a href="#ss1-cpq">CPQ</a>
+          <a href="#ss1-billing">Биллинг</a>
+          <a href="#ss1-next">Дальше</a>
+        </nav>
+        <nav class="nav nav-docs" aria-label="Отчёты суперспринтов">
+          <a href="supersprint.html#ss1" class="is-current" aria-current="page">Отчёт SS1</a>
+          <a href="ss2-report.html">Отчёт SS2</a>
+          <a href="ss3-report.html">Отчёт SS3</a>
+          <a href="ss3-plan.html">План SS3</a>
+        </nav>
       </div>
-      <nav class="nav nav-ss" data-for="ss1">
-        <a href="#ss1-plan">План</a>
-        <a href="#ss1-done">Сделано</a>
-        <a href="#ss1-cpq">CPQ</a>
-        <a href="#ss1-billing">Биллинг</a>
-        <a href="#ss1-next">Дальше</a>
-      </nav>
-      <nav class="nav nav-ss is-on" data-for="ss2">
-        <a href="#ss2-plan">План</a>
-        <a href="#ss2-done">Сделано</a>
-        <a href="#ss2-cpq">CPQ</a>
-        <a href="#ss2-billing">Биллинг</a>
-        <a href="#ss2-next">Дальше</a>
-      </nav>
     </div>
   </header>
 
-  <div id="report-ss1" class="report" data-ss="ss1">
+  <div id="report-ss1" class="report is-on" data-ss="ss1">
 <div class="hero">
     <div class="wrap">
       <div class="eyebrow">
@@ -1177,45 +1174,14 @@
 
   <script>
     (function () {
-      function show(id) {
-        document.querySelectorAll(".report").forEach(function (el) {
-          el.classList.toggle("is-on", el.getAttribute("data-ss") === id);
-        });
-        document.querySelectorAll(".ss-switch button").forEach(function (btn) {
-          btn.classList.toggle("is-on", btn.getAttribute("data-ss") === id);
-        });
-        document.querySelectorAll(".nav-ss").forEach(function (nav) {
-          nav.classList.toggle("is-on", nav.getAttribute("data-for") === id);
-        });
-        document.title = id === "ss1"
-          ? "AI Products · Отчёт суперспринта 1 · BusinessPad"
-          : "AI Products · Отчёт суперспринта 2 · BusinessPad";
-        spy();
-      }
-      function fromHash() {
-        var h = (location.hash || "#ss2").replace("#", "");
-        if (h.indexOf("ss1") === 0) show("ss1");
-        else show("ss2");
-      }
-      document.querySelectorAll(".ss-switch button").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          var id = btn.getAttribute("data-ss");
-          show(id);
-          history.replaceState(null, "", "#" + id);
-          window.scrollTo(0, 0);
-        });
-      });
       var header = document.querySelector(".app-header");
+      var nav = document.querySelector(".nav-page");
+      if (!nav) return;
+      var links = [].slice.call(nav.querySelectorAll('a[href^="#"]'));
+      var sections = links.map(function (a) {
+        return document.getElementById((a.getAttribute("href") || "").slice(1));
+      });
       function spy() {
-        var nav = document.querySelector(".nav-ss.is-on");
-        if (!nav) return;
-        document.querySelectorAll(".nav-ss a").forEach(function (a) {
-          a.classList.remove("is-current");
-        });
-        var links = [].slice.call(nav.querySelectorAll('a[href^="#"]'));
-        var sections = links.map(function (a) {
-          return document.getElementById((a.getAttribute("href") || "").slice(1));
-        });
         var y = window.scrollY + (header ? header.offsetHeight + 20 : 96);
         var current = null;
         for (var i = 0; i < sections.length; i++) {
@@ -1226,8 +1192,7 @@
         });
       }
       window.addEventListener("scroll", spy, { passive: true });
-      window.addEventListener("hashchange", fromHash);
-      fromHash();
+      spy();
     })();
   </script>
 </body>
