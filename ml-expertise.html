@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Экспертиза работы AI ML команды · 13 октября 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #ffffff;
+      --muted: rgba(255,255,255,.78);
+      --soft: rgba(255,255,255,.62);
+      --glass: rgba(255,255,255,.14);
+      --line: rgba(255,255,255,.22);
+      --orange: #ff5a1f;
+      --green-bg: #d9f7e3;
+      --orange-bg: #ffe4d6;
+      --shadow: 0 18px 50px rgba(28, 42, 140, .28);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Manrope, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 480px at 8% 0%, rgba(170, 196, 255, .55), transparent 60%),
+        radial-gradient(700px 420px at 100% 12%, rgba(90, 110, 230, .45), transparent 55%),
+        linear-gradient(160deg, #7aa4f2 0%, #5b78ee 28%, #4a62e4 58%, #3d4ed8 100%);
+      background-attachment: fixed;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+    header.top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 0 8px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px 6px 6px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .mark {
+      width: 26px; height: 26px; border-radius: 8px;
+      background: linear-gradient(135deg, #7aa2ff, #3a4fe0);
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 800;
+    }
+    .date { font-size: 14px; color: var(--muted); font-weight: 600; }
+    .hero { padding: 28px 0 10px; }
+    .pill {
+      display: inline-flex;
+      background: var(--orange);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 6px 12px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      max-width: 16ch;
+    }
+    .lead {
+      margin: 0;
+      max-width: 720px;
+      font-size: 18px;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 28px 0 8px;
+    }
+    .stat, .glass {
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .stat { padding: 18px 20px; text-decoration: none; color: inherit; }
+    .stat:hover { background: rgba(255,255,255,.2); }
+    .stat b { display: block; font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin: 10px 0 6px; }
+    .stat .tag { display: inline-flex; }
+    .stat .desc { color: var(--muted); font-size: 13px; font-weight: 600; line-height: 1.35; display: block; }
+    section { padding: 28px 0; }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .sub { margin: 0 0 18px; color: var(--muted); font-size: 16px; max-width: 760px; line-height: 1.45; }
+    .prose { max-width: 760px; }
+    .prose p, .panel p, .person p { margin: 0 0 14px; line-height: 1.5; color: var(--muted); font-size: 16px; }
+    .prose p strong, .panel p strong { color: #fff; font-weight: 700; }
+    .shot {
+      background: #0c0e13;
+      border-radius: 18px;
+      overflow: auto;
+      box-shadow: var(--shadow);
+    }
+    .shot img, .shot object { display: block; width: 100%; min-width: 920px; height: auto; }
+    .cap {
+      padding: 10px 14px 12px;
+      color: #24306e;
+      font-size: 13px;
+      font-weight: 700;
+      background: #fff;
+      line-height: 1.4;
+    }
+    .tag {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .tag.go { background: var(--green-bg); color: #147a32; }
+    .tag.work { background: var(--orange-bg); color: #c2410c; }
+    .tag.draft { background: rgba(255,255,255,.85); color: #3d4ed8; }
+    .split { display: grid; grid-template-columns: 1.05fr .95fr; gap: 16px; }
+    .scheme { display: block; width: 100%; height: auto; }
+    .panel { padding: 18px 20px; }
+    .panel h3 { margin: 0 0 12px; font-size: 20px; }
+    .line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+      font-weight: 650;
+    }
+    .line:first-of-type { border-top: 0; }
+    .line span { font-weight: 500; color: var(--muted); text-align: right; }
+    .people { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .person { padding: 18px 20px; }
+    .person h3 { margin: 10px 0 8px; font-size: 20px; }
+    .person strong { color: #fff; }
+    .links { display: flex; gap: 18px; flex-wrap: wrap; padding: 8px 0 8px; }
+    .links a { color: #fff; font-weight: 700; }
+    .figma-row { margin: 16px 0 0; }
+    .figma-btn {
+      display: inline-flex;
+      align-items: center;
+      background: #fff;
+      color: #3d4ed8;
+      font-weight: 800;
+      font-size: 15px;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+    }
+    .figma-btn:hover { background: #f3f6ff; }
+    footer { color: var(--soft); font-size: 13px; padding-bottom: 36px; line-height: 1.45; }
+    .shot.zoomable img { cursor: zoom-in; }
+    .shot.zoomable .cap::after { content: " Нажмите, чтобы открыть крупно."; font-weight: 600; color: #5b678f; }
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(18, 28, 78, .92);
+    }
+    .lightbox[hidden] { display: none; }
+    .lb-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+    }
+    .lb-stage.grabbing { cursor: grabbing; }
+    .lb-stage img {
+      position: absolute;
+      max-width: none;
+      width: auto;
+      height: auto;
+      visibility: hidden;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .lb-stage img.ready { visibility: visible; }
+    .lb-bar {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.28);
+      backdrop-filter: blur(12px);
+      color: #fff;
+    }
+    .lb-bar p { margin: 0; font-size: 14px; font-weight: 600; }
+    .lb-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .lb-actions button {
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      color: #24306e;
+      background: #fff;
+      cursor: pointer;
+    }
+    .lb-actions button[data-act="close"] { background: var(--orange); color: #fff; }
+    @media (max-width: 900px) {
+      .stats, .split, .people { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="mark">AI</span> Product AI · экспертиза команды</div>
+      <div class="date">13 октября 2026</div>
+    </header>
+
+    <section class="hero">
+      <div class="pill">Отчёт для руководства</div>
+      <h1>Экспертиза работы AI ML команды</h1>
+      <p class="lead">Команда забирает работающий эксперимент и доводит его до решения, которое стоит в продукте: с архитектурой, границей с монолитом и измеримым качеством. Ниже четыре части этого контура. Три уже описаны документами и встречами. Четвёртая, подробный регламент стыка с разработкой монолита, ещё оформляется Сашей Котовенко по разговору на TDR.</p>
+      <div class="stats">
+        <a class="stat" href="#idea"><span class="tag go">Описание</span><b>Идея взаимодействия</b><span class="desc">Распределение ответственности и экспертизы команд</span></a>
+        <a class="stat" href="#team"><span class="tag go">Описание</span><b>ML Команда</b><span class="desc">Четыре роли и экспертизы в агентах</span></a>
+        <a class="stat" href="#arch"><span class="tag go">Шаблон и схема</span><b>TDR Агента</b><span class="desc">Шаблон текстового описания работы агента и стандартизированные схемы составных узлов его работы</span></a>
+        <a class="stat" href="#tdr"><span class="tag go">Процесс и схема</span><b>Интеграция</b><span class="desc">Архитектура встраивания в монолит каждого агента и сервиса, в порядке приоритета продукта и развития целостной системы</span></a>
+      </div>
+    </section>
+
+    <section id="idea">
+      <h2>Идея взаимодействия</h2>
+      <p class="sub">Источник: «Видение AI-команды по внедрению продуктовых решений» и функциональная модель того же контура. Оба текста лежат в папке сентября.</p>
+      <div class="split">
+        <article class="glass panel prose">
+          <p><strong>Vibe Coding</strong> проверяет гипотезу: нужен ли сценарий клиенту и какой опыт из него получается.</p>
+          <p><strong>ML-команда</strong> забирает этот прототип и доводит его до рабочего решения в продукте.</p>
+          <p><strong>Основная разработка</strong> держит ядро: бэкенд, фронт, модель данных и стабильность того, что уже продаётся.</p>
+          <p><strong>Экспертиза ML-команды в детальном составе агента и в архитектуре встраивания в монолит.</strong> Агента описывают целиком: сценарий, контекст, инструменты, допустимые и запрещённые действия, уровень автономности, критерии остановки. В этот состав входят валидация, HITL, evals, stress testing и governance. Валидация проверяет результат до записи в продукт. Вторая часть той же экспертизы это архитектура встраивания в монолит: какие данные, API, права и события нужны, что уже есть в ядре и что в него добавить. Контракт фиксируют на TDR вместе с основной разработкой.</p>
+          <p><strong>На выходе рабочий продукт и новые правила для следующих гипотез.</strong> <strong>ML-команда</strong> отдаёт решение, которое стоит в продукте и выдерживает эксплуатацию. В <strong>Vibe Coding</strong> возвращаются правила и шаблоны: по ним новые бизнес-продукты и гипотезы собирают уже внутри этих границ.</p>
+        </article>
+        <article class="glass panel">
+          <h3>Кто что делает</h3>
+          <svg class="scheme" viewBox="0 0 400 408" role="img" aria-label="Vibe Coding проверяет идею и отдаёт прототип AI-команде. Capability возвращается стрелкой от AI-команды в Vibe Coding. Дальше решение идёт в TDR и основную разработку.">
+            <defs>
+              <marker id="flow-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z" fill="#ffffff"/>
+              </marker>
+              <marker id="back-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z" fill="#ff5a1f"/>
+              </marker>
+            </defs>
+            <g font-family="Manrope, sans-serif">
+              <rect x="12" y="8" width="248" height="72" rx="14" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.55)"/>
+              <text x="28" y="38" fill="#fff" font-size="16" font-weight="800">Vibe Coding</text>
+              <text x="28" y="60" fill="rgba(255,255,255,.78)" font-size="13" font-weight="600">Проверка идеи и прототип</text>
+
+              <line x1="136" y1="80" x2="136" y2="104" stroke="#fff" stroke-width="1.6" marker-end="url(#flow-arrow)"/>
+              <text x="148" y="98" fill="rgba(255,255,255,.78)" font-size="12" font-weight="700">прототип</text>
+
+              <rect x="12" y="112" width="248" height="72" rx="14" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.55)"/>
+              <text x="28" y="142" fill="#fff" font-size="16" font-weight="800">AI-команда</text>
+              <text x="28" y="164" fill="rgba(255,255,255,.78)" font-size="13" font-weight="600">Архитектура и код агента</text>
+
+              <line x1="136" y1="184" x2="136" y2="208" stroke="#fff" stroke-width="1.6" marker-end="url(#flow-arrow)"/>
+              <text x="148" y="202" fill="rgba(255,255,255,.78)" font-size="12" font-weight="700">решение</text>
+
+              <rect x="12" y="216" width="248" height="72" rx="14" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.55)"/>
+              <text x="28" y="246" fill="#fff" font-size="16" font-weight="800">TDR</text>
+              <text x="28" y="268" fill="rgba(255,255,255,.78)" font-size="13" font-weight="600">Контракт с ядром продукта</text>
+
+              <line x1="136" y1="288" x2="136" y2="312" stroke="#fff" stroke-width="1.6" marker-end="url(#flow-arrow)"/>
+              <text x="148" y="306" fill="rgba(255,255,255,.78)" font-size="12" font-weight="700">изменения ядра</text>
+
+              <rect x="12" y="320" width="248" height="72" rx="14" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.55)"/>
+              <text x="28" y="350" fill="#fff" font-size="16" font-weight="800">Основная разработка</text>
+              <text x="28" y="372" fill="rgba(255,255,255,.78)" font-size="13" font-weight="600">Бэкенд, фронт и данные</text>
+
+              <path d="M260 148 H348 V44 H268" fill="none" stroke="#ff5a1f" stroke-width="2.2" marker-end="url(#back-arrow)"/>
+              <text x="0" y="0" transform="translate(368,96) rotate(-90)" text-anchor="middle" fill="#ff5a1f" font-size="13" font-weight="800">capability</text>
+            </g>
+          </svg>
+        </article>
+      </div>
+      <div class="links">
+        <a href="../2026-09/ТЗ_видение_AI_команды_внедрение_продуктовых_решений.md">Видение внедрения</a>
+        <a href="../2026-09/ТЗ_функциональная_модель_AI_команды.md">Функциональная модель</a>
+      </div>
+    </section>
+
+    <section id="team">
+      <h2>ML Команда</h2>
+      <p class="sub">Целевая модель описана в ТЗ на команду из четырёх человек: лид и три разработчика с общим фундаментом и разной глубиной.</p>
+      <p class="prose" style="margin-bottom:16px">Общий фундамент у всех один: модель, агент, инструменты, MCP, оркестрация, API, семантика, проверка качества, правила допуска и эксплуатация. Специализация это второй уровень:</p>
+      <div class="glass panel" style="margin-bottom:16px">
+        <h3>Четыре места в ТЗ</h3>
+        <div class="line">Лид <span>что строим и как это попадёт в продукт</span></div>
+        <div class="line">Инженер агентов <span>рантайм, оркестрация, инструменты, MCP</span></div>
+        <div class="line">Инженер интеграции <span>продукт, API, семантический слой, TDR</span></div>
+        <div class="line">Инженер качества <span>прогоны, правила допуска, наблюдаемость</span></div>
+      </div>
+      <div class="people">
+        <article class="glass person">
+          <span class="tag go">Лид</span>
+          <h3>Саша Котовенко</h3>
+          <p><strong>Ведёт:</strong> техническое лидерство, архитектура решений и агентов, tech scouting, бизнес-аналитика. <strong>Участвует</strong> во всём остальном на уровне design review.</p>
+        </article>
+        <article class="glass person">
+          <span class="tag go">Инженер агентов</span>
+          <h3>Лёша Шремзер</h3>
+          <p><strong>Ведёт:</strong> агентная логика и оркестрация, AI Security и Governance агентов. <strong>Участвует:</strong> MCP и tools, Solution Architecture, Semantic Layer.</p>
+        </article>
+        <article class="glass person">
+          <span class="tag go">Инженер интеграции</span>
+          <h3>Александр Дорожинский</h3>
+          <p><strong>Ведёт:</strong> backend и интеграция с core product, MCP, качество кода, правила разработки для AI-агентов (AGENTS.md и CLAUDE.md). <strong>Участвует:</strong> Semantic Layer, архитектура агентов.</p>
+        </article>
+        <article class="glass person">
+          <span class="tag go">Инженер качества</span>
+          <h3>Дмитрий Кульбида</h3>
+          <p><strong>Ведёт:</strong> evals, пайплайны для сервисов, Production AI, Semantic Layer. <strong>Участвует:</strong> AI Security, Governance, Solution Architecture.</p>
+        </article>
+      </div>
+      <article class="glass person" style="margin-top:16px">
+        <span class="tag go">Эксперименты</span>
+        <h3>Василий Киселев</h3>
+        <p>Фокус в экспериментальных темах и новом исследовательском направлении. Это повод советоваться с Сашей Котовенко и параллельно изучать обновления технологий.</p>
+      </article>
+      <div class="links">
+        <a href="../2026-09/ТЗ_оргструктура_AI_команды.md">ТЗ оргструктуры</a>
+        <a href="2026.10.14_ План развития ML команды.md">План развития</a>
+      </div>
+    </section>
+
+    <section id="arch">
+      <h2>TDR Агента</h2>
+      <div class="prose">
+        <p><strong>Каждого агента разбираем по одним и тем же блокам, чтобы в работе не оставалось слепых зон.</strong> В описании фиксируем паспорт, User Query, Gateway и Auth, Application Core, Agent Runtime, Pipeline, Reasoning, Tool Execution, Human Validation, Stress testing, Data Processing, Database Layer, Evaluation, логи и наблюдаемость, версии и повторяемость.</p>
+        <p><strong>Разобранный агент становится скилом, которым пользуются все.</strong> Так ускоряется разработка следующих агентов. После удачного цикла опыт, правила и шаблоны возвращаем команде Vibe Coding, и новые гипотезы собирают уже по ним.</p>
+        <p><strong>Правила интеграции с монолитом тоже складываем в скилы.</strong> Из них получаем шаблоны, артефакты и правила написания кода. Перед передачей в ревью ставим слой валидации и тестирования.</p>
+      </div>
+      <div class="shot zoomable" id="scheme-shot" style="margin-top:8px">
+        <img src="ai-04-import.svg" alt="Схема агента импорта документов AI-04, версия 0.3" />
+        <div class="cap">Импорт документов, AI-04, версия 0.3. Картинка собрана из шаблона. Это образец результата по одному агенту, не общая схема платформы.</div>
+      </div>
+      <div class="links">
+        <a href="../../../2.%20instructions/agent-architecture/template.md">Шаблон документа агента</a>
+        <a href="../../../2.%20instructions/agent-architecture/examples/ai-04-import/ai-04-import.md">Текст импорта, из которого собрана схема</a>
+        <a href="../2026-09/ТЗ_Отрисовка_архитектуры_агента.md">Как описывать и рисовать, версия 3.2</a>
+        <a href="../../../2.%20instructions/agent-architecture/examples/ai-04-import/ai-04-import.html">Интерактивный просмотр той же схемы</a>
+      </div>
+      <p class="figma-row"><a class="figma-btn" href="https://www.figma.com/board/1WjUOARJJmEvmeQkrWU48I/WIP-%D1%81%D0%BC%D0%B5%D0%BC%D0%B0?node-id=0-1&t=CJB24rpMazTmGltd-1" target="_blank" rel="noopener">Схемы в Figma</a></p>
+    </section>
+
+    <section id="tdr">
+      <h2>Интеграция</h2>
+      <div class="split">
+        <article class="glass panel prose">
+          <p><strong>ML-команда ведёт две схемы.</strong> Первая это целевая общая схема будущего со всеми сервисами AI. Вторая это итерация архитектуры в текущем виде: план внедрения и подробные связи.</p>
+          <p><strong>Схемы служат артефактом для TDR.</strong> По ним обсуждают встречу и рассматривают сервис.</p>
+          <p><strong>После согласования схема уходит в продукт.</strong> Составляют декомпозицию интеграции и передают её в разработку. Затем проходит ревью, решение внедряют в основной продукт и проверяют тестированием.</p>
+        </article>
+        <article class="glass panel">
+          <h3>Ближайшие инкременты</h3>
+          <div class="line">Первый <span>Импорт, Поиск</span></div>
+          <div class="line">Второй <span>File-Indexer, Видео-Трекер, Договор</span></div>
+          <div class="line">Далее <span>Настройщик</span></div>
+          <div class="line">Подготовить <span>актуализировать схемы и согласовать на TDR встрече</span></div>
+        </article>
+      </div>
+    </section>
+
+    <footer>Собрано 13 октября 2026 из ТЗ сентября, протоколов 21 сентября, 7, 8 и 9 октября и шаблона архитектуры агента. Подробный текст процесса с монолитом появится, когда его оформит Саша Котовенко.</footer>
+  </div>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <div class="lb-stage" id="lb-stage">
+      <img id="lb-img" alt="Схема агента импорта документов AI-04" draggable="false" />
+    </div>
+    <div class="lb-bar">
+      <p>Колёсико приближает, перетаскивание двигает схему</p>
+      <div class="lb-actions">
+        <button type="button" data-act="out">−</button>
+        <button type="button" data-act="in">+</button>
+        <button type="button" data-act="fit">Вся схема</button>
+        <button type="button" data-act="close">Закрыть</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var shot = document.querySelector("#scheme-shot img");
+      var lb = document.getElementById("lightbox");
+      var stage = document.getElementById("lb-stage");
+      var img = document.getElementById("lb-img");
+      var scale = 1;
+      var x = 0;
+      var y = 0;
+      var dragging = false;
+      var originX = 0;
+      var originY = 0;
+
+      function layout() {
+        img.style.width = (img.naturalWidth * scale) + "px";
+        img.style.height = (img.naturalHeight * scale) + "px";
+        img.style.left = x + "px";
+        img.style.top = y + "px";
+        img.classList.add("ready");
+      }
+
+      function closeScale() {
+        return Math.max((stage.clientWidth - 24) / img.naturalWidth, 0.05);
+      }
+
+      function fitScale() {
+        var w = (stage.clientWidth - 32) / img.naturalWidth;
+        var h = (stage.clientHeight - 88) / img.naturalHeight;
+        return Math.min(w, h);
+      }
+
+      function showClose() {
+        scale = closeScale();
+        x = (stage.clientWidth - img.naturalWidth * scale) / 2;
+        y = 16;
+        layout();
+      }
+
+      function showFit() {
+        scale = fitScale();
+        x = (stage.clientWidth - img.naturalWidth * scale) / 2;
+        y = (stage.clientHeight - 72 - img.naturalHeight * scale) / 2;
+        if (y < 16) y = 16;
+        layout();
+      }
+
+      function zoomAt(next, cx, cy) {
+        var min = fitScale() * 0.85;
+        var max = 2;
+        next = Math.min(max, Math.max(min, next));
+        var k = next / scale;
+        x = cx - (cx - x) * k;
+        y = cy - (cy - y) * k;
+        scale = next;
+        layout();
+      }
+
+      function open() {
+        img.src = shot.currentSrc || shot.src;
+        lb.hidden = false;
+        document.body.style.overflow = "hidden";
+        if (img.complete && img.naturalWidth) showClose();
+      }
+
+      function close() {
+        lb.hidden = true;
+        document.body.style.overflow = "";
+        dragging = false;
+        stage.classList.remove("grabbing");
+      }
+
+      img.addEventListener("load", function () {
+        if (!lb.hidden) showClose();
+      });
+
+      shot.addEventListener("click", open);
+
+      stage.addEventListener("wheel", function (e) {
+        e.preventDefault();
+        var rect = stage.getBoundingClientRect();
+        var factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        zoomAt(scale * factor, e.clientX - rect.left, e.clientY - rect.top);
+      }, { passive: false });
+
+      stage.addEventListener("pointerdown", function (e) {
+        if (e.button !== 0) return;
+        dragging = true;
+        stage.classList.add("grabbing");
+        originX = e.clientX - x;
+        originY = e.clientY - y;
+        stage.setPointerCapture(e.pointerId);
+      });
+      stage.addEventListener("pointermove", function (e) {
+        if (!dragging) return;
+        x = e.clientX - originX;
+        y = e.clientY - originY;
+        layout();
+      });
+      function stopDrag() {
+        dragging = false;
+        stage.classList.remove("grabbing");
+      }
+      stage.addEventListener("pointerup", stopDrag);
+      stage.addEventListener("pointercancel", stopDrag);
+
+      stage.addEventListener("dblclick", function (e) {
+        var rect = stage.getBoundingClientRect();
+        var target = scale < closeScale() * 1.05 ? 1 : closeScale();
+        zoomAt(target, e.clientX - rect.left, e.clientY - rect.top);
+      });
+
+      document.querySelector(".lb-actions").addEventListener("click", function (e) {
+        var btn = e.target.closest("button");
+        if (!btn) return;
+        var act = btn.getAttribute("data-act");
+        var rect = stage.getBoundingClientRect();
+        if (act === "in") zoomAt(scale * 1.25, rect.width / 2, rect.height / 2);
+        if (act === "out") zoomAt(scale / 1.25, rect.width / 2, rect.height / 2);
+        if (act === "fit") showFit();
+        if (act === "close") close();
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (lb.hidden) return;
+        if (e.key === "Escape") close();
+      });
+    })();
+  </script>
+</body>
+</html>
