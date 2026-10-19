@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BusinessPad · пилот ИИ-сценариев</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app">
+  <nav class="drawer" id="drawer" aria-label="Главное меню"></nav>
+  <div class="main">
+    <header class="appbar" id="appbar"></header>
+    <div class="work">
+      <main class="content" id="content"></main>
+      <aside class="mp" id="mp" hidden></aside>
+    </div>
+  </div>
+</div>
+<div id="overlay"></div>
+<div class="snacks" id="snacks"></div>
+<div class="hint hide" id="hint"></div>
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/app.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/search.js"></script>
+<script src="js/magicpad.js"></script>
+<script src="js/import.js"></script>
+<script>APP.start();</script>
+</body>
+</html>
