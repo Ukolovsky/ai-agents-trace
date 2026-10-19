@@ -1,0 +1,82 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Образцы</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Fira Sans',sans-serif;background:#EEF0F6;color:#1A1A2E;font-size:13px}
+.app{display:flex;min-height:100vh}
+.nav{width:220px;background:#fff;border-right:1px solid #E4E6EF;padding:16px 12px;flex-shrink:0}
+.logo{font-weight:700;color:#343A7E;font-size:15px;margin-bottom:18px;padding:0 8px}
+.n{padding:8px 10px;border-radius:8px;margin-bottom:4px;color:#4A4A68}
+.n.on{background:#EEF0FA;color:#343A7E;font-weight:600}
+.adminnav{width:220px;background:#1E2347;color:#fff;padding:16px 12px}
+.adminnav .logo{color:#fff}
+.adminnav .n{color:#C9CDE8}
+.adminnav .n.on{background:#343A7E;color:#fff}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{height:56px;background:#fff;border-bottom:1px solid #E4E6EF;display:flex;align-items:center;padding:0 20px;gap:10px}
+.h{font-size:18px;font-weight:600;color:#343A7E}
+.sp{flex:1}
+.chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:16px;background:#EEF0FA;color:#343A7E;font-size:12px;font-weight:500}
+.chip.o{background:#FFE8E0;color:#FF5722}
+.btn{border:0;border-radius:8px;padding:8px 14px;font-family:inherit;font-weight:600;font-size:13px;cursor:default}
+.btn.p{background:#FF5722;color:#fff}
+.btn.g{background:#fff;border:1px solid #D5D8E8;color:#343A7E}
+.body{padding:20px;display:flex;gap:16px;align-items:flex-start}
+.col{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(26,26,46,.06)}
+.tree{width:260px;flex-shrink:0}
+.item{padding:7px 8px;border-radius:6px;margin-bottom:2px}
+.item.on{background:#EEF0FA;color:#343A7E;font-weight:600}
+.item.sub{padding-left:22px;color:#5A5A78}
+.fold{font-weight:600;color:#343A7E;margin:8px 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.art{flex:1;min-width:0}
+.art h1{font-size:22px;color:#343A7E;margin-bottom:8px}
+.meta{color:#6B6B88;font-size:12px;margin-bottom:14px}
+.p{line-height:1.55;margin-bottom:10px;color:#2A2A40}
+.hl{background:#FFF3A3}
+.tb{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tb b{background:#F6F7FB;border:1px solid #E4E6EF;border-radius:6px;padding:4px 8px;font-weight:500;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:#6B6B88;font-weight:500;padding:8px;border-bottom:1px solid #E4E6EF}
+td{padding:8px;border-bottom:1px solid #F0F1F6}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%}
+.card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(26,26,46,.06)}
+.card h3{color:#343A7E;margin-bottom:6px;font-size:15px}
+.drop{border:2px dashed #C5C9E0;border-radius:12px;padding:28px;text-align:center;color:#6B6B88;background:#FAFBFE}
+.banner{background:#EEF0FA;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:#343A7E}
+.warn{background:#FFF4E5;color:#8A4B08}
+.ok{background:#E8F6EE;color:#1B6B3A}
+.search{display:flex;gap:8px;align-items:center;background:#F6F7FB;border-radius:8px;padding:6px 10px;margin-bottom:12px}
+.search input{border:0;background:transparent;flex:1;font-family:inherit;font-size:13px;outline:none}
+.av{width:36px;height:36px;border-radius:50%;background:#343A7E;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600}
+.row{display:flex;gap:12px;align-items:center}
+.toggle{width:40px;height:22px;border-radius:11px;background:#343A7E;position:relative}
+.toggle:after{content:'';width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px}
+.toggle.off{background:#C5C9E0}
+.toggle.off:after{right:auto;left:2px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .d{padding:10px 6px;border-radius:8px;background:#F6F7FB;min-height:64px;font-size:12px}
+.cal .d.on{background:#EEF0FA;outline:2px solid #343A7E}
+.ev{margin-top:4px;background:#FF5722;color:#fff;border-radius:4px;padding:2px 4px;font-size:10px}
+.side{width:280px;flex-shrink:0}
+label{display:block;font-size:12px;color:#6B6B88;margin:10px 0 4px}
+input[type=text],select,textarea{width:100%;border:1px solid #D5D8E8;border-radius:8px;padding:8px;font-family:inherit}
+</style></head><body><div class="app">
+<aside class="nav"><div class="logo">BusinessPad</div>
+<div class="n">Главная</div>
+<div class="n on">Источники</div>
+<div class="n">Агенты</div>
+<div class="n">Процессы</div>
+<div class="n">Календарь</div>
+</aside>
+<div class="main">
+<div class="top"><div class="h">Образцы документов</div><div class="sp"></div>
+<button class="btn p">Загрузить образец</button></div>
+<div class="body" style="flex-direction:column">
+<div class="drop">Перетащите эталонный договор, КП или акт. Индексатор снимет текст, wiki опубликует образец в тенанте.</div>
+<div class="grid">
+<div class="card"><h3>Договор поставки v5</h3><p class="p">Эталон для агента договора. Сравнивает черновик с этой версией.</p></div>
+<div class="card"><h3>КП стандарт 15 позиций</h3><p class="p">Образец коммерческого предложения пилота.</p></div>
+<div class="card"><h3>Акт расхождений склада</h3><p class="p">Форма, на которую ссылается регламент комплектации.</p></div>
+</div></div>
+</div></div></body></html>

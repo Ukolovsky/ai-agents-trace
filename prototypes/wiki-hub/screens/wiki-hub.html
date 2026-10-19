@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wiki Hub · разработка сервиса · 12 октября 2026</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #ffffff;
+      --muted: rgba(255,255,255,.78);
+      --soft: rgba(255,255,255,.62);
+      --glass: rgba(255,255,255,.14);
+      --glass-2: rgba(255,255,255,.22);
+      --line: rgba(255,255,255,.22);
+      --orange: #ff5a1f;
+      --orange-2: #ff7a45;
+      --green: #3dcb6b;
+      --green-bg: #d9f7e3;
+      --orange-bg: #ffe4d6;
+      --shadow: 0 18px 50px rgba(28, 42, 140, .28);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Manrope, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 480px at 8% 0%, rgba(170, 196, 255, .55), transparent 60%),
+        radial-gradient(700px 420px at 100% 12%, rgba(90, 110, 230, .45), transparent 55%),
+        linear-gradient(160deg, #7aa4f2 0%, #5b78ee 28%, #4a62e4 58%, #3d4ed8 100%);
+      background-attachment: fixed;
+    }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+    header.top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 0 8px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px 6px 6px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .mark {
+      width: 26px; height: 26px; border-radius: 8px;
+      background: linear-gradient(135deg, #7aa2ff, #3a4fe0);
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 800;
+    }
+    .date { font-size: 14px; color: var(--muted); font-weight: 600; }
+    .hero { padding: 28px 0 10px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      background: var(--orange);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 6px 12px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      max-width: 16ch;
+    }
+    .lead {
+      margin: 0;
+      max-width: 640px;
+      font-size: 18px;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 28px 0 8px;
+    }
+    .stat, .glass {
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .stat { padding: 18px 20px; }
+    .stat b {
+      display: block;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .stat span { color: var(--muted); font-size: 14px; font-weight: 600; }
+    section { padding: 28px 0; }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .sub { margin: 0 0 18px; color: var(--muted); font-size: 16px; max-width: 720px; }
+    .shot {
+      background: rgba(255,255,255,.92);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .shot img { display: block; width: 100%; height: auto; }
+    .cap {
+      padding: 10px 14px 12px;
+      color: #24306e;
+      font-size: 13px;
+      font-weight: 700;
+      background: #fff;
+    }
+    .sources {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .src { padding: 16px; }
+    .src h3 { margin: 8px 0 6px; font-size: 22px; font-weight: 800; }
+    .src p { margin: 0 0 12px; color: var(--muted); font-size: 15px; line-height: 1.4; }
+    .tag {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .tag.go { background: var(--green-bg); color: #147a32; }
+    .tag.work { background: var(--orange-bg); color: #c2410c; }
+    .tag.draft { background: rgba(255,255,255,.85); color: #3d4ed8; }
+    .row-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .split article { padding: 20px 22px; }
+    .split h3 { margin: 8px 0 8px; font-size: 26px; font-weight: 800; }
+    .split ul { margin: 0; padding-left: 18px; color: var(--muted); }
+    .split li { margin: 6px 0; }
+    .dev {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 16px;
+    }
+    .panel { padding: 18px; }
+    .panel h3 { margin: 0 0 12px; font-size: 20px; }
+    .line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+      font-weight: 650;
+    }
+    .line:first-of-type { border-top: 0; }
+    .line span { font-weight: 500; color: var(--muted); text-align: right; }
+    .links { display: flex; gap: 18px; flex-wrap: wrap; padding-bottom: 48px; }
+    .links a { color: #fff; font-weight: 700; }
+    .figma-row { margin: 4px 0 36px; }
+    .figma-btn {
+      display: inline-flex;
+      align-items: center;
+      background: #fff;
+      color: #3d4ed8;
+      font-weight: 800;
+      font-size: 15px;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+    }
+    .figma-btn:hover { background: #f3f6ff; }
+    footer { color: var(--soft); font-size: 13px; padding-bottom: 36px; }
+    .shot.zoomable img { cursor: zoom-in; }
+    .shot.zoomable .cap::after { content: " Нажмите, чтобы открыть крупно."; font-weight: 600; color: #5b678f; }
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(18, 28, 78, .92);
+    }
+    .lightbox[hidden] { display: none; }
+    .lb-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+    }
+    .lb-stage.grabbing { cursor: grabbing; }
+    .lb-stage img {
+      position: absolute;
+      max-width: none;
+      width: auto;
+      height: auto;
+      visibility: hidden;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .lb-stage img.ready { visibility: visible; }
+    .lb-bar {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.28);
+      backdrop-filter: blur(12px);
+      color: #fff;
+    }
+    .lb-bar p { margin: 0; font-size: 14px; font-weight: 600; }
+    .lb-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .lb-actions button {
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      color: #24306e;
+      background: #fff;
+      cursor: pointer;
+    }
+    .lb-actions button[data-act="close"] { background: var(--orange); color: #fff; }
+
+    .bp-live { height: 880px; background: #f5f5f5; }
+    .bp-live iframe { width: 100%; height: 880px; border: 0; display: block; background: #f5f5f5; }
+    @media (max-width: 860px) {
+      .stats, .sources, .dev, .split { grid-template-columns: 1fr; }
+      h1 { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="mark">B</span> BusinessPad</div>
+      <div class="date">12 октября 2026</div>
+    </header>
+
+    <div class="hero">
+      <div class="pill">Wiki Hub</div>
+      <h1>Два слоя знаний под одним входом</h1>
+      <p class="lead">Wiki1 хранит семантику платформы и корпоративную память. Wiki2 хранит знания клиента. Хаб их не смешивает: у каждой свой канон, свои права и свой поиск.</p>
+      <div class="stats">
+        <div class="stat"><b>Wiki1</b><span>семантика, пресеты, граф связей</span></div>
+        <div class="stat"><b>Wiki2</b><span>тенант: регламенты, встречи, файлы</span></div>
+        <div class="stat"><b>Hub</b><span>общий поиск и MCP, без своего CRUD</span></div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Где что лежит</h2>
+      <p class="sub">Клиент работает в Wiki2 и не видит Wiki1. Агент в рантайме читает Wiki1 всегда и Wiki2, если есть тенант. Хаб сам тексты не хранит.</p>
+      <div class="split">
+        <article class="glass">
+          <span class="tag draft">Wiki1 · платформа</span>
+          <h3>Семантика платформы</h3>
+          <ul>
+            <li>Семантика кодовой базы BusinessPad: текстовое описание и граф связей, обновляется по факту релиза</li>
+            <li>Семантика пресетов: как собраны бизнес-процессы и как они связаны</li>
+            <li>Инструкции по системе и по работе пользователя с ней. Их отдаём в мультитенантные копии wiki, на сайт и агентам</li>
+          </ul>
+        </article>
+        <article class="glass">
+          <span class="tag work">Wiki2 · тенант</span>
+          <h3>Знания клиента</h3>
+          <ul>
+            <li>Help-центр BusinessPad, копия из Wiki1</li>
+            <li>Help-центр клиента</li>
+            <li>Проектная база клиента</li>
+            <li>Встречи: результаты и транскрибации</li>
+            <li>Образцы документов: эталоны и сверка входящих</li>
+            <li>История бесед: опубликованные диалоги Magic Pad</li>
+            <li>Меню «Агенты»: какие источники wiki агенту можно читать</li>
+            <li>Коннекторы внешних баз знаний</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Архитектура Wiki Hub</h2>
+      <p class="sub">Целевая схема от 12 октября. Зелёное уже есть в коде Wiki2. Синий пунктир ещё подключаем. Серое принадлежит платформе BP.</p>
+      <div class="shot zoomable" id="arch-shot">
+        <img src="wiki-hub-architecture-full.png" alt="WikiHub: общая архитектура, Wiki1 и Wiki2" />
+        <div class="cap">WikiHub: общая архитектура. Общий поиск и MCP, самостоятельные Wiki1 и Wiki2.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Что уже на схеме</h2>
+      <p class="sub">Снизу той же схемы: агент пишет в wiki через MCP, данные обновляются событием, опросом или сверкой. Срез на 12 октября.</p>
+      <div class="dev">
+        <div class="panel glass">
+          <h3>Кто чем владеет</h3>
+          <div class="line">Wiki1 <span>канон, Neo4j, свой worker</span></div>
+          <div class="line">Wiki2 <span>страницы тенанта, Weaviate, свой worker</span></div>
+          <div class="line">Wiki Hub <span>маршрут, поиск, MCP, без текстов</span></div>
+          <div class="line">File Indexer <span>разбор файла в текст</span></div>
+          <div class="line">Meeting Platform <span>встреча, в wiki уходит снимок</span></div>
+          <div class="line">Keycloak <span>кто вошёл, хаб проверяет права</span></div>
+        </div>
+        <div class="panel glass">
+          <h3>Спринт 1</h3>
+          <div class="line">Фокус <span>Встречи: результаты и транскрибации</span></div>
+          <div class="line">Аналитика <span class="tag go">готова</span></div>
+          <div class="line">Дизайн <span class="tag draft">частично</span></div>
+          <div class="line">Фронт <span class="tag work">в работе</span></div>
+          <div class="line">Разработка <span class="tag work">в работе</span></div>
+          <div class="line">TDR <span>19 октября</span></div>
+        </div>
+      </div>
+      <div class="links">
+        <a href="https://wiki.yandex.ru/homepage/ai-napravlenie/bf644885fb3e/wiki-hub-i-obedinenie-sushhestvujushhix-realizacij/">Wiki Hub, описание сборки</a>
+        <a href="https://docs.google.com/spreadsheets/d/1sqm1pZ8Pm_iMfWwjXBzv1RAkp6V-hf75/edit?gid=1142926831#gid=1142926831">Декомпозиция работ</a>
+      </div>
+    </section>
+
+    <section id="wiki2-screens">
+      <h2>Экраны Wiki2</h2>
+      <p class="sub">Утверждённый состав внутри BusinessPad, не отдельным окном wiki. Слева узкое меню платформы, сверху раздел «База знаний» и поиск по системе. Строки стоят как в первом каталоге источников. По строке открывается страница: тёмное дерево и текст.</p>
+      <div class="shot bp-live">
+        <iframe id="bp-frame" title="Экраны Wiki2 в BusinessPad"></iframe>
+      </div>
+    </section>
+    <p class="figma-row"><a class="figma-btn" href="https://www.figma.com/design/9bmJSWOAo6FZpeYPab4TOc/BP-CPQ-AI?node-id=2333-252107&p=f&t=x7JpTEbvbMixglf7-0" target="_blank" rel="noopener">Макеты в Figma</a></p>
+    <footer>Кадры: макеты/png пакета «Клиентская wiki». Оформление страницы как у презентации продуктового релиза BP3, октябрь 2026.</footer>
+  </div>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <div class="lb-stage" id="lb-stage">
+      <img id="lb-img" alt="WikiHub: общая архитектура" draggable="false" />
+    </div>
+    <div class="lb-bar">
+      <p>Колёсико приближает, перетаскивание двигает схему</p>
+      <div class="lb-actions">
+        <button type="button" data-act="out">−</button>
+        <button type="button" data-act="in">+</button>
+        <button type="button" data-act="fit">Вся схема</button>
+        <button type="button" data-act="close">Закрыть</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var shot = document.querySelector("#arch-shot img");
+      var lb = document.getElementById("lightbox");
+      var stage = document.getElementById("lb-stage");
+      var img = document.getElementById("lb-img");
+      var scale = 1;
+      var x = 0;
+      var y = 0;
+      var dragging = false;
+      var originX = 0;
+      var originY = 0;
+
+      function layout() {
+        img.style.width = (img.naturalWidth * scale) + "px";
+        img.style.height = (img.naturalHeight * scale) + "px";
+        img.style.left = x + "px";
+        img.style.top = y + "px";
+        img.classList.add("ready");
+      }
+
+      function closeScale() {
+        return Math.max((stage.clientWidth - 24) / img.naturalWidth, 0.05);
+      }
+
+      function fitScale() {
+        var w = (stage.clientWidth - 32) / img.naturalWidth;
+        var h = (stage.clientHeight - 88) / img.naturalHeight;
+        return Math.min(w, h);
+      }
+
+      function showClose() {
+        scale = closeScale();
+        x = (stage.clientWidth - img.naturalWidth * scale) / 2;
+        y = 16;
+        layout();
+      }
+
+      function showFit() {
+        scale = fitScale();
+        x = (stage.clientWidth - img.naturalWidth * scale) / 2;
+        y = (stage.clientHeight - 72 - img.naturalHeight * scale) / 2;
+        if (y < 16) y = 16;
+        layout();
+      }
+
+      function zoomAt(next, cx, cy) {
+        var min = fitScale() * 0.85;
+        var max = 2;
+        next = Math.min(max, Math.max(min, next));
+        var k = next / scale;
+        x = cx - (cx - x) * k;
+        y = cy - (cy - y) * k;
+        scale = next;
+        layout();
+      }
+
+      function open() {
+        img.src = shot.currentSrc || shot.src;
+        lb.hidden = false;
+        document.body.style.overflow = "hidden";
+        if (img.complete && img.naturalWidth) showClose();
+      }
+
+      img.addEventListener("load", function () {
+        if (!lb.hidden) showClose();
+      });
+
+      shot.addEventListener("click", open);
+
+      stage.addEventListener("wheel", function (e) {
+        e.preventDefault();
+        var rect = stage.getBoundingClientRect();
+        var factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        zoomAt(scale * factor, e.clientX - rect.left, e.clientY - rect.top);
+      }, { passive: false });
+
+      stage.addEventListener("pointerdown", function (e) {
+        if (e.button !== 0) return;
+        dragging = true;
+        stage.classList.add("grabbing");
+        originX = e.clientX - x;
+        originY = e.clientY - y;
+        stage.setPointerCapture(e.pointerId);
+      });
+      stage.addEventListener("pointermove", function (e) {
+        if (!dragging) return;
+        x = e.clientX - originX;
+        y = e.clientY - originY;
+        layout();
+      });
+      function stopDrag() {
+        dragging = false;
+        stage.classList.remove("grabbing");
+      }
+      stage.addEventListener("pointerup", stopDrag);
+      stage.addEventListener("pointercancel", stopDrag);
+
+      stage.addEventListener("dblclick", function (e) {
+        var rect = stage.getBoundingClientRect();
+        var target = scale < closeScale() * 1.05 ? 1 : closeScale();
+        zoomAt(target, e.clientX - rect.left, e.clientY - rect.top);
+      });
+
+      document.querySelector(".lb-actions").addEventListener("click", function (e) {
+        var btn = e.target.closest("button");
+        if (!btn) return;
+        var act = btn.getAttribute("data-act");
+        var rect = stage.getBoundingClientRect();
+        var cx = rect.width / 2;
+        var cy = rect.height / 2;
+        if (act === "in") zoomAt(scale * 1.25, cx, cy);
+        if (act === "out") zoomAt(scale / 1.25, cx, cy);
+        if (act === "fit") showFit();
+        if (act === "close") close();
+      });
+
+      function close() {
+        lb.hidden = true;
+        document.body.style.overflow = "";
+        stopDrag();
+      }
+
+      document.addEventListener("keydown", function (e) {
+        if (lb.hidden) return;
+        if (e.key === "Escape") close();
+      });
+    })();
+  </script>
+  <script type="text/plain" id="bp-src">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wiki2 в BusinessPad · макет для проверки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #343A7E;
+      --primary-dark: #5D6198;
+      --primary-light: #E7E7F0;
+      --secondary: #FF5722;
+      --secondary-light: #FFEBE4;
+      --text: #050819;
+      --muted: #85868A;
+      --disabled: #CCCCCC;
+      --bg: #F5F5F5;
+      --paper: #FFFFFF;
+      --line: #D9DADF;
+      --grey-800: #424242;
+      --success: #599C16;
+      --success-bg: #EDF7ED;
+      --warning-bg: #FFF2D2;
+      --info-bg: #E0EDFF;
+      --pastel-blue: #C8EEF9;
+      --pastel-green: #BCD7A2;
+      --pastel-lav: #D9DBFF;
+      --pastel-orange: #FFBAA5;
+      --pastel-yellow: #FDE592;
+      --violet-200: #EFF0F6;
+      --shadow: 0 8px 24px rgba(52, 58, 126, .16);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "Fira Sans", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      letter-spacing: 0;
+    }
+    button, input { font: inherit; letter-spacing: 0; }
+    .app { display: flex; height: 100%; min-height: 100vh; }
+    .rail {
+      width: 72px;
+      flex: 0 0 72px;
+      background: var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 8px;
+    }
+    .rail .logo {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #fff; color: var(--primary);
+      display: grid; place-items: center;
+      font-weight: 700; font-size: 16px; margin-bottom: 12px;
+    }
+    .rail button {
+      width: 40px; height: 40px; border: 0; border-radius: 8px;
+      background: transparent; color: #fff; cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .rail button.active { background: rgba(255,255,255,.16); }
+    .rail .spacer { flex: 1; }
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .top {
+      height: 64px; flex: 0 0 64px;
+      background: var(--paper);
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 20px;
+      box-shadow: 0 4px 16px rgba(52, 58, 126, .08);
+      z-index: 2;
+    }
+    .section-name {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 16px; line-height: 20px; font-weight: 500;
+      min-width: 180px;
+    }
+    .section-name i {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--primary-light); color: var(--primary);
+      display: grid; place-items: center; font-style: normal; font-weight: 600;
+    }
+    .search {
+      margin-left: auto;
+      width: min(420px, 40vw);
+      height: 40px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--bg);
+      padding: 0 12px 0 36px;
+      color: var(--text);
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%2385868A' stroke-width='1.8' stroke-linecap='round'><circle cx='9' cy='9' r='6'/><path d='M14 14l4 4'/></svg>");
+      background-repeat: no-repeat;
+      background-position: 10px 50%;
+    }
+    .search:focus { outline: 2px solid var(--primary-light); }
+    .icon-btn {
+      width: 40px; height: 40px; border: 0; border-radius: 8px;
+      background: transparent; color: var(--grey-800); cursor: pointer;
+    }
+    .stage { flex: 1; min-height: 0; overflow: auto; }
+    .page { padding: 32px; max-width: 1180px; }
+    h1 { margin: 0; font-size: 32px; line-height: 40px; font-weight: 600; }
+    .sub { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 16px; }
+    .tabs { display: flex; gap: 8px; margin: 20px 0 16px; border-bottom: 1px solid var(--line); }
+    .tabs button {
+      border: 0; background: transparent; cursor: pointer;
+      padding: 12px 16px; font-size: 14px; font-weight: 500; color: var(--muted);
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .tabs button.on { color: var(--primary); border-bottom-color: var(--primary); }
+    .paper {
+      background: var(--paper);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .paper-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px 8px;
+      font-size: 16px; font-weight: 500;
+    }
+    .paper-head span { color: var(--muted); font-size: 14px; font-weight: 400; }
+    .row {
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 20px;
+      border-top: 1px solid var(--line);
+      cursor: pointer;
+    }
+    .row:hover { background: rgba(0,0,0,.04); }
+    .row.dim { background: var(--bg); }
+    .row.dim:hover { background: var(--bg); }
+    .row.dim h2,
+    .row.dim p,
+    .row.dim .btn { color: var(--muted); }
+    .row.dim .mark { background: #EBEBEB; color: var(--muted); }
+    .row.dim .btn { background: transparent; }
+    .mark {
+      width: 40px; height: 40px; border-radius: 8px;
+      display: grid; place-items: center;
+      background: var(--primary-light); color: var(--primary);
+    }
+    .mark svg { width: 20px; height: 20px; fill: currentColor; display: block; }
+    .row h2 { margin: 0; font-size: 16px; line-height: 20px; font-weight: 500; }
+    .row p { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 16px; }
+    .btn {
+      height: 36px; padding: 0 14px; border-radius: 8px; cursor: pointer;
+      border: 1px solid var(--line); background: #fff; color: var(--text);
+      font-size: 14px; font-weight: 500;
+    }
+    .btn.primary { background: var(--secondary); border-color: var(--secondary); color: #fff; }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn.ghost { border-color: transparent; background: transparent; color: var(--primary); }
+    .wiki { display: flex; height: 100%; min-height: 100%; }
+    .tree {
+      width: 280px; flex: 0 0 280px;
+      background: var(--primary); color: #fff;
+      display: flex; flex-direction: column;
+      padding: 16px 12px 20px;
+      overflow: auto;
+    }
+    .back {
+      display: flex; align-items: center; gap: 8px;
+      border: 0; background: transparent; color: #fff;
+      cursor: pointer; font-size: 14px; font-weight: 500;
+      padding: 8px; border-radius: 8px; text-align: left;
+    }
+    .back:hover { background: rgba(255,255,255,.12); }
+    .space {
+      margin: 12px 8px 16px;
+      background: rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px; font-weight: 500;
+    }
+    .space small { display: block; font-weight: 400; opacity: .75; font-size: 12px; line-height: 14px; margin-top: 2px; }
+    .tree button.page-link {
+      display: block; width: 100%; text-align: left;
+      border: 0; background: transparent; color: #fff;
+      padding: 8px 12px; border-radius: 8px;
+      font-size: 14px; line-height: 16px; cursor: pointer;
+    }
+    .tree button.page-link.child { padding-left: 28px; font-weight: 400; opacity: .92; }
+    .tree button.page-link.on { background: rgba(255,255,255,.16); font-weight: 500; }
+    .tree .group { margin: 8px 12px 4px; font-size: 12px; line-height: 14px; opacity: .7; }
+    .article { flex: 1; min-width: 0; overflow: auto; background: var(--paper); }
+    .article-in { max-width: 820px; padding: 28px 40px 64px; }
+    .meta { color: var(--muted); font-size: 12px; line-height: 14px; margin-bottom: 16px; }
+    .article h1 { margin-bottom: 16px; }
+    .article h3 { margin: 28px 0 8px; font-size: 20px; line-height: 24px; font-weight: 500; }
+    .article p, .article li { font-size: 16px; line-height: 20px; }
+    .article p { margin: 0 0 12px; }
+    .article ol { margin: 0 0 12px; padding-left: 20px; }
+    .article li { margin: 8px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; line-height: 16px; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 500; background: var(--bg); }
+    .checks { display: flex; flex-direction: column; }
+    .check {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line);
+      font-size: 16px; line-height: 20px;
+    }
+    .check small { display: block; color: var(--muted); font-size: 14px; line-height: 16px; margin-top: 4px; }
+    input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
+    .note {
+      margin-top: 16px; padding: 12px 16px; border-radius: 8px;
+      background: var(--violet-200); font-size: 14px; line-height: 16px;
+    }
+    .wdoc { display: flex; height: 100%; min-height: 100%; background: #fff; }
+    .wside { width: 280px; flex: 0 0 280px; border-right: 1px solid var(--line); display: flex; flex-direction: column; background: #fff; }
+    .wside-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; font-weight: 500; }
+    .wtree { padding: 0 8px 12px; overflow: auto; }
+    .wpage { display: block; width: 100%; text-align: left; border: 0; background: transparent; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 14px; line-height: 16px; }
+    .wpage.on { background: var(--primary-light); color: var(--primary); }
+    .wmain { flex: 1; min-width: 0; overflow: auto; padding: 12px 28px 48px; }
+    .wbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .wbadge { display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 100px; background: var(--primary-light); color: var(--primary); font-size: 12px; }
+    .wnodes { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; color: var(--muted); font-size: 14px; }
+    .wnodes select, .wsearch { height: 36px; border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; background: #fff; }
+    .wsearch { margin-left: auto; width: 220px; }
+    #wtools { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; background: var(--bg); }
+    #weditor { max-width: 820px; }
+    #weditor[contenteditable="true"] { outline: 2px solid var(--primary-light); border-radius: 8px; padding: 8px; }
+    #weditor h1 { font-size: 32px; line-height: 40px; margin: 0 0 12px; }
+    #weditor h2 { font-size: 24px; line-height: 28px; margin: 24px 0 8px; }
+    #weditor h3 { font-size: 20px; line-height: 24px; margin: 20px 0 8px; }
+    #weditor p, #weditor li { font-size: 16px; line-height: 20px; }
+    .winspector { margin-top: 24px; max-width: 820px; }
+    .winspector section { border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; margin-top: 12px; }
+    .winspector h2 { margin: 0 0 8px; font-size: 16px; line-height: 20px; }
+    .wdialog { position: fixed; inset: 0; background: rgba(5,8,25,.32); z-index: 30; display: grid; place-items: center; }
+    .wdialog form { width: min(420px, calc(100% - 32px)); background: #fff; border-radius: 8px; padding: 20px; }
+    .wdialog label { display: block; margin: 12px 0; font-size: 14px; }
+    .wdialog input, .wdialog select { width: 100%; height: 36px; margin-top: 4px; border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; }
+    .head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .board { padding: 20px 24px 32px; }
+    .board-top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .board-top h1 { font-size: 24px; line-height: 28px; }
+    .plus {
+      width: 28px; height: 28px; border-radius: 8px; border: 0;
+      background: var(--secondary); color: #fff; cursor: pointer; font-size: 18px; line-height: 28px;
+    }
+    .view-switch { margin-left: auto; display: flex; gap: 4px; }
+    .seg {
+      display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff;
+    }
+    .seg button {
+      flex: 1; min-height: 40px; border: 0; border-right: 1px solid var(--line);
+      background: #fff; color: var(--primary); cursor: pointer; font-size: 14px; font-weight: 500; padding: 8px 12px;
+    }
+    .seg button:last-child { border-right: 0; }
+    .seg button.on { background: var(--primary); color: #fff; }
+    .toolrow { display: flex; align-items: center; gap: 12px; margin: 16px 0 8px; }
+    .toolrow h2 { margin: 0; font-size: 16px; line-height: 20px; font-weight: 500; }
+    .count { color: var(--muted); font-weight: 400; }
+    .mini-search {
+      margin-left: auto; height: 36px; width: 240px; border: 1px solid var(--line); border-radius: 8px;
+      padding: 0 12px; background: #fff;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .card {
+      background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px;
+      min-height: 132px; cursor: pointer; display: flex; flex-direction: column; gap: 8px;
+    }
+    .card:hover { background: rgba(0,0,0,.04); }
+    .card.dim, tr.dim td { background: var(--bg); color: var(--muted); }
+    .card.dim h2, .card.dim p, .card.dim .foot { color: var(--muted); }
+    .card.dim .mark, tr.dim .mark { background: #EBEBEB; color: var(--muted); }
+    .card .card-top { justify-content: flex-start; align-items: center; }
+    .card .mark, td .mark { width: 32px; height: 32px; flex: 0 0 32px; }
+    .card-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .card h2 { margin: 0; font-size: 16px; line-height: 20px; font-weight: 500; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 16px; }
+    .card .foot { margin-top: auto; color: var(--muted); font-size: 12px; line-height: 14px; }
+    .st {
+      display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 100px;
+      font-size: 12px; line-height: 14px; white-space: nowrap; background: #EBEBEB; color: var(--text);
+    }
+    .st.go { background: var(--success-bg); color: var(--success); }
+    .st.warn { background: var(--warning-bg); color: var(--text); }
+    .st.info { background: var(--info-bg); color: var(--text); }
+    .st.hot { background: var(--secondary-light); color: var(--text); }
+    table.grid-table { width: 100%; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); }
+    table.grid-table th { background: var(--pastel-lav); color: var(--text); font-size: 14px; }
+    table.grid-table tr { cursor: pointer; }
+    table.grid-table tr:hover td { background: rgba(0,0,0,.04); }
+    .meet { padding: 16px 24px 40px; }
+    .crumbs { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+    .crumbs button { border: 0; background: transparent; color: var(--primary); cursor: pointer; font-weight: 500; }
+    .meet-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .meet-actions { display: flex; gap: 8px; align-items: center; }
+    .pill-draft {
+      display: inline-flex; height: 24px; align-items: center; padding: 0 8px; margin-left: 8px;
+      border-radius: 100px; background: #EBEBEB; font-size: 12px; font-weight: 400; vertical-align: middle;
+    }
+    .meet-card {
+      margin-top: 16px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px;
+      display: grid; grid-template-columns: 1fr auto; gap: 8px 16px;
+    }
+    .meet-card .meta { margin: 0; }
+    .who { color: var(--muted); font-size: 14px; }
+    .meet-block { margin-top: 16px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px 8px; }
+    .audio {
+      display: flex; align-items: center; gap: 12px; padding: 8px 0 16px;
+    }
+    .audio .bar { flex: 1; height: 4px; background: var(--line); border-radius: 4px; position: relative; }
+    .audio .bar i { display: block; height: 4px; width: 8%; background: var(--primary); border-radius: 4px; }
+    .audio.playing .bar i { width: 36%; }
+    .sum h3 { margin: 16px 0 8px; font-size: 16px; line-height: 20px; }
+    .sum p { font-size: 14px; line-height: 20px; color: var(--text); }
+    .who-cell { display: flex; align-items: center; gap: 8px; }
+    .who-cell .ava { width: 24px; height: 24px; font-size: 11px; }
+    .icon-btn.on { background: var(--primary-light); color: var(--primary); }
+    .ava {
+      width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light); color: var(--primary);
+      display: grid; place-items: center; font-size: 12px; font-weight: 600;
+    }
+    .tr-line { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .tr-line b { font-weight: 500; }
+    .tr-line small { color: var(--muted); font-weight: 400; margin-left: 8px; }
+    .tr-line p { margin: 4px 0 0; font-size: 14px; line-height: 20px; }
+    .task-btn.hot { background: var(--secondary); border-color: var(--secondary); color: #fff; }
+    .scrim { position: fixed; inset: 0; background: rgba(5,8,25,.32); z-index: 20; }
+    .side {
+      position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100%);
+      background: #fff; z-index: 21; box-shadow: -8px 0 24px rgba(52,58,126,.16);
+      display: flex; flex-direction: column;
+    }
+    .side header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+    .side header h2 { margin: 0; font-size: 20px; line-height: 24px; font-weight: 500; }
+    .side .body { padding: 16px 20px 24px; overflow: auto; }
+    .ver {
+      display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: #fff;
+      border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: pointer;
+    }
+    .ver.on { border-color: var(--primary); background: var(--primary-light); }
+    .side label { display: block; margin: 16px 0 8px; font-size: 14px; font-weight: 500; }
+    .side textarea {
+      width: 100%; min-height: 120px; border: 1px solid var(--line); border-radius: 8px; padding: 12px;
+      resize: vertical;
+    }
+    .side .actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail" aria-label="Меню BusinessPad">
+      <div class="logo">B</div>
+      <button type="button" title="Рабочее пространство" data-home="1">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5 10 3l7 5.5V17a1 1 0 0 1-1 1h-4v-5H8v5H4a1 1 0 0 1-1-1V8.5z"/></svg>
+      </button>
+      <button type="button" class="active" title="База знаний">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3.5h7.5A2.5 2.5 0 0 1 15 6v10.5H7A2 2 0 0 0 5 18.5V3.5z"/><path d="M5 3.5A2 2 0 0 0 3 5.5V17"/></svg>
+      </button>
+      <button type="button" title="Разделы">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>
+      </button>
+      <div class="spacer"></div>
+      <button type="button" title="Настройки">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.2"/><path d="M10 3.2v1.6M10 15.2v1.6M3.2 10h1.6M15.2 10h1.6M5.2 5.2l1.1 1.1M13.7 13.7l1.1 1.1M14.8 5.2l-1.1 1.1M6.3 13.7l-1.1 1.1"/></svg>
+      </button>
+    </aside>
+    <div class="main">
+      <header class="top">
+        <div class="section-name"><i>W</i> База знаний</div>
+        <input class="search" type="search" placeholder="Поиск по системе" aria-label="Поиск по системе" />
+        <button class="icon-btn" type="button" aria-label="Ещё">···</button>
+      </header>
+      <div class="stage" id="stage"></div>
+    </div>
+  </div>
+  <script>
+    var filters = [
+      { id: "all", label: "Все источники" },
+      { id: "help", label: "Справка" },
+      { id: "docs", label: "Документы" },
+      { id: "talk", label: "Общение" },
+      { id: "setup", label: "Настройка" }
+    ];
+    var sources = [
+      {
+        id: "help-bp",
+        title: "Help-центр BusinessPad",
+        text: "Инструкции продукта, копия из Wiki1. Пишет администратор BP, во всех тенантах одна версия.",
+        filters: ["all", "help"],
+        icon: "book", tone: "var(--pastel-blue)",
+        chips: [{ t: "копия из Wiki1", c: "green" }, { t: "админ BP", c: "" }, { t: "Help", c: "blue" }],
+        action: "Открыть",
+        space: "Справка продукта",
+        hint: "Только чтение в тенанте",
+        pages: [
+          { t: "Роли, права и группы", on: true },
+          { t: "Поиск по системе" },
+          { t: "Чипы хаба" }
+        ],
+        doc: {
+          title: "Роли, права и группы в Wiki",
+          meta: "Версия 1 · 24.09.2026, 06:10 · Администратор BP",
+          html: "<p>Справка продукта. В тенанте её нельзя править: текст приходит копией из Wiki1 и обновляется вместе с релизом.</p><h3>Из чего складывается доступ</h3><ol><li>Базовая роль пространства задаёт обычные возможности по всей базе.</li><li>Роль на ветке назначается человеку или группе и наследуется страницами ниже.</li><li>Группы собирают людей с одинаковым доступом.</li></ol><h3>Базовые роли</h3><table><thead><tr><th>Роль</th><th>Что разрешено</th><th>Типичное применение</th></tr></thead><tbody><tr><td>Без доступа</td><td>Нет общего доступа, только точечные назначения</td><td>Внешний специалист</td></tr><tr><td>Читатель</td><td>Просмотр опубликованных материалов</td><td>Сотрудник тенанта</td></tr><tr><td>Редактор</td><td>Черновики в своей ветке</td><td>Автор норм и help тенанта</td></tr></tbody></table><p class=\"note\">Кнопок правки в сессии тенанта нет. Пишет только администратор BP.</p>"
+        }
+      },
+      {
+        id: "help-client",
+        title: "Help-центр клиента",
+        text: "Свой help клиента для его пользователей. Пишет редактор тенанта.",
+        filters: ["all", "help"],
+        icon: "info", tone: "var(--pastel-green)",
+        chips: [{ t: "не настроен", c: "yellow" }, { t: "Help", c: "blue" }],
+        action: "Добавить",
+        space: "Help тенанта",
+        hint: "Редактор тенанта",
+        pages: [
+          { t: "Как провести сделку", on: true },
+          { t: "Как согласовать счёт" },
+          { t: "Куда нажать в отгрузке" }
+        ],
+        doc: {
+          title: "Как провести сделку",
+          meta: "Черновик · редактор тенанта",
+          html: "<p>Инструкция шага в процессе клиента. Статья связана с процессом, с нормой из проектной базы и с абзацем справки продукта.</p><h3>Что видит сотрудник</h3><ol><li>В задаче открывает help тенанта и читает шаг своими словами.</li><li>Рядом ссылка на норму «Комплектация» и на справку BusinessPad про то же поле.</li><li>Агент цитирует эту статью, только если источник включён в меню «Агенты».</li></ol>"
+        }
+      },
+      {
+        id: "project",
+        title: "Проектная база клиента",
+        text: "Нормы и проекты клиента: дерево, страницы и файлы, версии.",
+        filters: ["all", "docs"],
+        icon: "description", tone: "var(--pastel-lav)",
+        chips: [{ t: "пространство", c: "" }],
+        action: "Открыть",
+        space: "Склад 2026",
+        hint: "Пишет команда клиента",
+        pages: [
+          { g: "Отгрузка готовой продукции" },
+          { t: "Комплектация", on: true },
+          { t: "Упаковка", child: true },
+          { g: "Договор" },
+          { t: "Согласование условий", child: true }
+        ],
+        doc: {
+          title: "Комплектация",
+          meta: "Версия 8 · 13.10.2026 · Владелец знаний",
+          html: "<p>Норма склада. Опубликованная версия читается из задачи и цитируется агентом. Черновик следующей правки тенант не видит, пока автор её не опубликует.</p><h3>Как проходит шаг</h3><ol><li>Кладовщик берёт заказ в процессе «Отгрузка».</li><li>Норма открывается той же версией, что указана в задаче.</li><li>Агент отвечает только по этой версии и даёт ссылку на абзац.</li></ol><h3>Кто что может</h3><table><thead><tr><th>Роль</th><th>Что разрешено</th><th>Где применяется</th></tr></thead><tbody><tr><td>Читатель</td><td>Просмотр опубликованной версии</td><td>Сотрудник склада, агент</td></tr><tr><td>Автор</td><td>Черновик и публикация</td><td>Владелец нормы</td></tr><tr><td>Без доступа</td><td>Страница скрыта</td><td>Другая площадка</td></tr></tbody></table>"
+        }
+      },
+      {
+        id: "meetings",
+        kind: "meeting",
+        title: "Встречи: результаты и транскрибации",
+        text: "Карточка встречи остаётся системой записи. В wiki попадает опубликованный протокол: результат и транскрибация.",
+        filters: ["all", "talk"],
+        icon: "calendar", tone: "var(--pastel-yellow)",
+        chips: [{ t: "Magic Pad", c: "orange" }],
+        action: "Открыть",
+        space: "Протоколы",
+        hint: "Снимок из Meeting Platform",
+        pages: [
+          { g: "Октябрь 2026" },
+          { t: "12.10 · планирование OCR", on: true, child: true },
+          { t: "08.10 · архитектура", child: true }
+        ],
+        doc: {
+          title: "12.10 · планирование OCR",
+          meta: "Опубликованный протокол · транскрибация приложена",
+          html: "<p>В wiki лежит снимок, а не сама встреча. Пока протокол не опубликован, поиск и агент его не видят.</p><h3>Результат</h3><ol><li>Первая волна файлового индексера: разбор файла и OCR.</li><li>Авторизация wiki уходит на вторую волну.</li><li>Видеотрекер можно отдавать без страницы wiki.</li></ol><h3>Транскрибация</h3><p>Фрагмент записи хранится рядом с протоколом. Агент цитирует опубликованный текст, исходное видео остаётся в системе встреч.</p>"
+        }
+      },
+      {
+        id: "samples",
+        dim: true,
+        title: "Образцы документов",
+        text: "Эталоны и сверка входящих: несколько шаблонов одного типа, критерии, файлы из загрузки и API.",
+        filters: ["all", "docs"],
+        icon: "assignment", tone: "var(--pastel-lav)",
+        chips: [{ t: "не настроен", c: "yellow" }],
+        action: "Загрузить",
+        space: "Эталоны",
+        hint: "Сверка входящего с образцом",
+        pages: [
+          { t: "Договор", on: true },
+          { t: "Счёт" },
+          { t: "Заявка" }
+        ],
+        doc: {
+          title: "Договор поставки",
+          meta: "Эталон · критерии сверки",
+          html: "<p>Образец не является нормой из проектной базы. По нему сверяют входящий файл: что обязательно, что желательно, чего не должно быть.</p><h3>Критерии</h3><table><thead><tr><th>Проверка</th><th>Важность</th><th>Что считается совпадением</th></tr></thead><tbody><tr><td>Предмет и стороны</td><td>Обязательно</td><td>Те же поля, что в эталоне</td></tr><tr><td>Срок и сумма</td><td>Обязательно</td><td>Числа читаются из файла</td></tr><tr><td>Реквизиты</td><td>Желательно</td><td>Совпадают с карточкой контрагента</td></tr></tbody></table>"
+        }
+      },
+      {
+        id: "chats",
+        dim: true,
+        title: "История бесед",
+        text: "Опубликованные диалоги Magic Pad. Личная сессия в общее знание не попадает.",
+        filters: ["all", "talk"],
+        icon: "chat", tone: "var(--pastel-blue)",
+        chips: [{ t: "волна 2", c: "yellow" }, { t: "Magic Pad", c: "orange" }],
+        action: "Включить",
+        space: "Опубликованные диалоги",
+        hint: "Только явная публикация",
+        pages: [
+          { t: "Разбор договора №14", on: true },
+          { t: "Вопрос по отгрузке" }
+        ],
+        doc: {
+          title: "Разбор договора №14",
+          meta: "Опубликовал автор беседы · Magic Pad",
+          html: "<p>В хаб попадает диалог, который сотрудник сам опубликовал. Остальные сессии остаются личными и агентам других людей не отдаются.</p><h3>Что сохранено</h3><ol><li>Вопрос сотрудника и ответ Magic Pad.</li><li>Ссылки на эталон договора и на норму из проектной базы, если они были в ответе.</li><li>После публикации текст доступен поиску и тем агентам, которым источник разрешён.</li></ol>"
+        }
+      },
+      {
+        id: "connectors",
+        dim: true,
+        title: "Коннекторы внешних баз знаний",
+        text: "Внешняя база подключается как источник. Секрет хранится в секретнице, в индекс попадают согласованные страницы.",
+        filters: ["all", "setup"],
+        icon: "hub", tone: "var(--pastel-orange)",
+        chips: [{ t: "волна 2", c: "yellow" }],
+        action: "Подключить",
+        space: "Подключения",
+        hint: "Тенант подключает сам",
+        pages: [
+          { t: "Notion", on: true },
+          { t: "Confluence" }
+        ],
+        doc: {
+          title: "Notion",
+          meta: "Не подключено",
+          html: "<p>Внешняя база не заменяет проектную базу и help. Тенант сам выбирает, какие страницы забирать в поиск и отдавать агенту.</p><h3>Что задаётся при подключении</h3><table><thead><tr><th>Поле</th><th>Зачем</th></tr></thead><tbody><tr><td>Тип</td><td>Notion или Confluence, из справочника коннекторов</td></tr><tr><td>Секрет</td><td>Ключ лежит в секретнице, на экране его нет</td></tr><tr><td>Страницы</td><td>В индекс попадает только согласованный набор</td></tr></tbody></table>"
+        }
+      },
+      {
+        id: "agents",
+        dim: true,
+        title: "Меню «Агенты»",
+        text: "Включение агента и выбор, какие источники wiki ему можно читать. Чип Agents на хабе только запускает уже включённых.",
+        filters: ["all", "setup"],
+        icon: "portrait", tone: "var(--pastel-orange)",
+        chips: [{ t: "настройка", c: "" }],
+        action: "Открыть",
+        kind: "agents"
+      },
+    ];
+
+    var filter = "all";
+    var current = null;
+    var catalog = "list";
+    var boardMode = "cards";
+    var meetTab = "objects";
+    var objectsMode = "list";
+    var sideOpen = false;
+    var published = false;
+    var readyToPublish = false;
+    var tasksFromSummary = false;
+    var versionIndex = 0;
+    var trQuery = "";
+    var audioOn = false;
+    var picked = 0;
+    var wikiEditing = false;
+    var wikiVersion = 1;
+    var wikiPage = "roles";
+    var finished = [
+      { title: "Крупномасштабная встреча", when: "01.06.2026 17:00", org: "Алексей Иванов", people: 4, service: "BP Meet", script: "Готово", topic: "Обсудить навигацию и макеты календаря.", author: "Арина Максимова · 07.11.2024 в 11:30" },
+      { title: "Заседание отдела закупок", when: "01.06.2026 18:00", org: "Мария Петрова", people: 12, service: "Google Meet", script: "Обработка", topic: "Итоги закупок за май.", author: "Мария Петрова · 01.06.2026 в 18:00" },
+      { title: "Оптовый разбор поставок", when: "20.05.2026 16:30", org: "Павел Егоров", people: 6, service: "BP Meet", script: "Готово", topic: "Сверка отгрузок за прошлую неделю.", author: "Павел Егоров · 20.05.2026 в 16:30" },
+      { title: "Совещание по договору поставки", when: "14.05.2026 11:00", org: "Елена Кузнецова", people: 5, service: "Yandex Telemost", script: "Готово", topic: "Условия договора и срок оплаты.", author: "Елена Кузнецова · 14.05.2026 в 11:00" }
+    ];
+    var stage = document.getElementById("stage");
+    var versions = [
+      {
+        name: "Версия 1",
+        prompt: "Собери краткое резюме встречи по блокам: общее, бизнес-процессы, документы и данные. Только то, что прозвучало.",
+        html: "<h3>Общее резюме</h3><p>На встрече команда обсудила развитие ключевых сценариев ERP-платформы: работу с экземплярами бизнес-процессов, документами, задачами, финансовыми операциями и возможностями ИИ-помощника.</p><p>Основное внимание было уделено тому, как связать данные разных модулей в единый пользовательский сценарий. Сейчас часть информации доступна пользователю только внутри отдельных разделов системы, из-за чего для понимания состояния процесса приходится переходить между документами, задачами, финансами и карточкой экземпляра процесса.</p><p>Команда договорилась двигаться в сторону более связанной модели, в которой пользователь сможет видеть основные события и связанные сущности непосредственно в контексте текущего процесса.</p><h3>Бизнес-процессы</h3><p>Обсудили карточку экземпляра бизнес-процесса и состав информации, которую необходимо показывать пользователю.</p><p>В карточке должны быть доступны текущий этап процесса, ответственные сотрудники, связанные документы, задачи, финансовые операции и последние события.</p><p>Также предложено добавить единый журнал активности, чтобы пользователь мог быстро понять, что происходило с процессом за последнее время.</p><h3>Документы и данные</h3><p>Обсудили сценарий загрузки и обработки документов через ERP. После загрузки система должна определять его тип, извлекать основные данные и предлагать пользователю создать или обновить соответствующую сущность.</p><p>Поля с высокой уверенностью распознавания можно заполнять автоматически. Поля, где система не уверена в результате, должны попадать в отдельную группу для проверки пользователем.</p>"
+      }
+    ];
+    var tasks = [
+      { title: "Подготовить макеты календаря", who: "Алексей Иванов", st: "В работе", act: "Выполнить", hot: false },
+      { title: "Собрать требования к навигации встречи", who: "Мария Петрова", st: "Черновик", act: "Выполнить", hot: false },
+      { title: "Решить, что считать источником: запись или текст", who: "Леонид Сергеев", st: "Ждёт решения", act: "Решить", hot: true },
+      { title: "Показать фрагмент, из которого появилась задача", who: "Анна Дмитриева", st: "Черновик", act: "Выполнить", hot: false }
+    ];
+    var lines = [
+      { name: "Леонид Сергеев", date: "28 февраля 2026, 15:00", text: "Всем привет. Предлагаю сегодня пройтись по текущему состоянию ERP, отдельно обсудить встречи, транскрибацию и то, какие действия ИИ должен делать после завершения встречи." },
+      { name: "Юлия Олеговна", date: "28 февраля 2026, 15:00", text: "Да, плюс я бы ещё посмотрела, как мы связываем результаты встречи с экземплярами процессов, потому что сейчас это выглядит немного отдельно от основной системы." },
+      { name: "Алексей Игоревич", date: "28 февраля 2026, 15:00", text: "С технической стороны нам тоже нужно понять, что мы считаем источником истины: сама запись, транскрипция или уже структурированные данные после обработки ИИ." },
+      { name: "Леонид Сергеев", date: "28 февраля 2026, 15:06", text: "Я бы разделил. Запись это исходник, транскрипция текстовый источник, а дальше ИИ уже создаёт резюме, решения, задачи и связи с объектами ERP." },
+      { name: "Михаил Андреевич", date: "28 февраля 2026, 15:06", text: "Тогда важно, чтобы мы могли всегда понять, откуда конкретно появилась задача. Например, пользователь открывает задачу и видит, что она была создана на основании встречи." },
+      { name: "Анна Дмитриевна", date: "28 февраля 2026, 15:06", text: "И желательно не просто на основании встречи, а ещё показать конкретный момент или фрагмент транскрипции." }
+    ];
+
+    var icons = {
+      description: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>',
+      info: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>',
+      book: '<path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>',
+      hub: '<path d="M17 16l-4-4V8.82C14.16 8.4 15 7.3 15 6c0-1.66-1.34-3-3-3S9 4.34 9 6c0 1.3.84 2.4 2 2.82V12l-4 4H3v5h5v-3.05l4-4.2 4 4.2V21h5v-5h-4z"/>',
+      calendar: '<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>',
+      assignment: '<path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>',
+      chat: '<path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>',
+      portrait: '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>'
+    };
+
+    function iconSvg(name) {
+      return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (icons[name] || icons.description) + "</svg>";
+    }
+
+    function switchBtn() {
+      if (catalog === "list") return '<button type="button" class="btn" data-catalog="board">Вариант каталога</button>';
+      return '<button type="button" class="btn" data-catalog="list">Текущий список</button>';
+    }
+
+    function renderHub() {
+      current = null;
+      if (catalog === "board") { renderBoard(); return; }
+      var rows = sources.filter(function (s) { return s.filters.indexOf(filter) !== -1; });
+      stage.innerHTML =
+        '<div class="page"><div class="head-row"><div><h1>Источники</h1>' +
+        '<p class="sub">Состав Wiki2 в тенанте. Оболочка это BusinessPad, список лежит в разделе «База знаний», а не в отдельном окне wiki.</p></div>' +
+        switchBtn() + "</div>" +
+        '<div class="tabs">' + filters.map(function (f) {
+          return '<button type="button" data-filter="' + f.id + '"' + (f.id === filter ? ' class="on"' : "") + ">" + f.label + "</button>";
+        }).join("") + "</div>" +
+        '<div class="paper"><div class="paper-head">Источники тенанта и платформы<span>один модуль «База знаний»</span></div>' +
+        rows.map(function (s) {
+          return '<div class="row' + (s.dim ? " dim" : "") + '" data-open="' + s.id + '"><div class="mark">' + iconSvg(s.icon) + '</div><div><h2>' + s.title + "</h2><p>" + s.text + '</p></div><button class="btn" type="button" data-open="' + s.id + '">' + s.action + "</button></div>";
+        }).join("") +
+        "</div></div>";
+    }
+
+    function renderBoard() {
+      var rows = sources.filter(function (s) { return s.filters.indexOf(filter) !== -1; });
+      var body = boardMode === "table"
+        ? '<table class="grid-table"><thead><tr><th>Раздел</th><th>Описание</th><th></th></tr></thead><tbody>' +
+          rows.map(function (s) {
+            return '<tr class="' + (s.dim ? "dim" : "") + '" data-open="' + s.id + '"><td><div class="mark">' + iconSvg(s.icon) + "</div></td><td><b>" + s.title + "</b><br>" + s.text + '</td><td><button type="button" class="btn" data-open="' + s.id + '">' + s.action + "</button></td></tr>";
+          }).join("") + "</tbody></table>"
+        : '<div class="grid">' + rows.map(function (s) {
+            return '<article class="card' + (s.dim ? " dim" : "") + '" data-open="' + s.id + '"><div class="card-top"><div class="mark">' + iconSvg(s.icon) + "</div><h2>" + s.title + "</h2></div><p>" + s.text + '</p><div class="foot"><button type="button" class="btn" data-open="' + s.id + '">' + s.action + "</button></div></article>";
+          }).join("") + "</div>";
+      stage.innerHTML =
+        '<div class="board"><div class="board-top"><h1>База знаний</h1>' +
+        '<div class="view-switch">' + switchBtn() +
+        '<button type="button" class="icon-btn" data-board="table" title="Таблица">▤</button>' +
+        '<button type="button" class="icon-btn" data-board="cards" title="Карточки">▦</button></div></div>' +
+        '<div class="seg">' + filters.map(function (f) {
+          return '<button type="button" data-filter="' + f.id + '"' + (f.id === filter ? ' class="on"' : "") + ">" + f.label + "</button>";
+        }).join("") + "</div>" +
+        '<div class="toolrow"><h2>Источники тенанта и платформы <span class="count">' + rows.length + "</span></h2></div>" +
+        body + "</div>";
+    }
+
+    function treeHtml(s) {
+      return s.pages.map(function (p) {
+        if (p.g) return '<div class="group">' + p.g + "</div>";
+        return '<button type="button" class="page-link' + (p.child ? " child" : "") + (p.on ? " on" : "") + '">' + p.t + "</button>";
+      }).join("");
+    }
+
+    function renderDoc(s) {
+      stage.innerHTML =
+        '<div class="wiki"><aside class="tree"><button class="back" type="button" data-back="1">← Источники</button>' +
+        '<div class="space">' + s.space + "<small>" + s.hint + "</small></div>" +
+        treeHtml(s) +
+        '</aside><article class="article"><div class="article-in"><div class="meta">' + s.doc.meta + "</div><h1>" + s.doc.title + "</h1>" + s.doc.html + "</div></article></div>";
+    }
+
+    function renderAgents() {
+      var s = sources.filter(function (x) { return x.id === "agents"; })[0];
+      var matrix = [
+        ["Help-центр BusinessPad", "Копия из Wiki1, только чтение", true],
+        ["Help-центр клиента", "Инструкции тенанта", true],
+        ["Проектная база клиента", "Нормы и проекты", true],
+        ["Встречи", "Опубликованные протоколы", true],
+        ["Образцы документов", "Эталоны для сверки", true],
+        ["История бесед", "Опубликованные диалоги", false],
+        ["Коннекторы внешних баз знаний", "Подключённые страницы", false]
+      ];
+      stage.innerHTML =
+        '<div class="wiki"><aside class="tree"><button class="back" type="button" data-back="1">← Источники</button>' +
+        '<div class="space">Агенты<small>Включение и источники</small></div>' +
+        '<button type="button" class="page-link on">Норма отгрузки</button>' +
+        '<button type="button" class="page-link">Помощник по договору</button>' +
+        '<button type="button" class="page-link">Агент встреч</button>' +
+        '</aside><article class="article"><div class="article-in"><div class="meta">Меню «Агенты» · не путать с чипом Agents</div><h1>' + s.title + '</h1>' +
+        "<p>Агент включается здесь. Ниже отмечается, какие источники wiki ему можно читать. Чип Agents на хабе только запускает уже включённых и эту матрицу не заменяет.</p>" +
+        '<div class="checks">' + matrix.map(function (m) {
+          return '<label class="check"><span>' + m[0] + "<small>" + m[1] + '</small></span><input type="checkbox"' + (m[2] ? " checked" : "") + " /></label>";
+        }).join("") + "</div>" +
+        '<p class="note">Промпт и песочница живут на этом же агенте, отдельным экраном за пределами состава источников их не выносим.</p>' +
+        "</div></article></div>";
+    }
+
+    function stageMark(t) {
+      var label = t.done ? "Готово" : t.st;
+      var cls = t.done ? "go" : (t.st === "В работе" ? "info" : (t.hot ? "hot" : ""));
+      return '<span class="st ' + cls + '">' + label + "</span>";
+    }
+
+    function taskRows() {
+      return tasks.map(function (t, i) {
+        var act = t.done ? "Готово" : t.act;
+        return '<tr><td><input type="checkbox" data-task="' + i + '"' + (t.done ? " checked" : "") + " /></td><td>" + t.title + "</td><td>" + (t.type || "Задача") + "</td><td>" + t.who + "</td><td>" + stageMark(t) + '</td><td><button type="button" class="btn task-btn' + (t.hot && !t.done ? " hot" : "") + '" data-task="' + i + '">' + act + "</button></td></tr>";
+      }).join("");
+    }
+
+    function objectRows() {
+      return tasks.map(function (t) {
+        return "<tr><td>" + t.title + "</td><td>" + (t.type || "Задача") + '</td><td><div class="who-cell"><span class="ava">' + t.who.charAt(0) + "</span>" + t.who + "</div></td><td>" + stageMark(t) + '</td><td><button type="button" class="icon-btn" aria-label="Ещё">···</button></td></tr>';
+      }).join("");
+    }
+
+    function objectsSwitch() {
+      return '<button type="button" class="icon-btn' + (objectsMode === "list" ? " on" : "") + '" data-objects="list" title="Как сейчас">☑</button>' +
+        '<button type="button" class="icon-btn' + (objectsMode === "table" ? " on" : "") + '" data-objects="table" title="Таблица">▤</button>';
+    }
+
+    function summaryBlock() {
+      var v = versions[versionIndex];
+      var publishBtn = published
+        ? '<button type="button" class="btn" disabled>Опубликовано</button>'
+        : (readyToPublish
+          ? '<button type="button" class="btn primary" data-publish="1">Опубликовать</button>'
+          : '<button type="button" class="btn primary" disabled>Опубликовать</button>');
+      return '<div class="toolrow"><h2>Краткое резюме <button class="plus" type="button" data-side="1" aria-label="Новая версия">+</button></h2>' +
+        '<button type="button" class="btn" data-side="1">' + v.name + " ▾</button>" +
+        publishBtn +
+        '<input class="mini-search" type="search" placeholder="Поиск по резюме" aria-label="Поиск по резюме" /></div>' +
+        '<div class="sum">' + v.html + "</div>";
+    }
+
+    function transcriptBlock() {
+      var q = trQuery.toLowerCase();
+      var shown = lines.filter(function (l) {
+        return !q || (l.name + " " + l.text).toLowerCase().indexOf(q) !== -1;
+      });
+      return '<div class="toolrow"><h2>Транскрипция</h2><input id="tr-q" class="mini-search" data-tr="1" type="search" value="' + trQuery.replace(/"/g, "&quot;") + '" placeholder="Поиск по транскрипции" aria-label="Поиск по транскрипции" /></div>' +
+        shown.map(function (l) {
+          return '<div class="tr-line"><div class="ava">' + l.name.charAt(0) + "</div><div><b>" + l.name + "</b><small>" + l.date + "</small><p>" + l.text + "</p></div></div>";
+        }).join("") + (shown.length ? "" : '<p class="sub">Ничего не найдено.</p>');
+    }
+
+    function meetPane() {
+      if (meetTab === "audio") {
+        return '<h2>Аудиозапись встречи</h2><div class="audio' + (audioOn ? " playing" : "") + '"><button type="button" class="btn" data-play="1">' + (audioOn ? "Пауза" : "Слушать") + '</button><span>0:00 / 1:23</span><div class="bar"><i></i></div></div>';
+      }
+      if (meetTab === "summary") return summaryBlock();
+      if (meetTab === "transcript") return transcriptBlock();
+      var title = "Список объектов";
+      var table = objectsMode === "table"
+        ? '<table class="grid-table"><thead><tr><th>Объект</th><th>Тип</th><th>Ответственный</th><th>Этап</th><th></th></tr></thead><tbody>' + objectRows() + "</tbody></table>"
+        : '<table class="grid-table"><thead><tr><th></th><th>Объект</th><th>Тип</th><th>Кто</th><th>Этап</th><th></th></tr></thead><tbody>' + taskRows() + "</tbody></table>";
+      return '<div class="toolrow"><h2>' + title + ' <span class="count">' + tasks.length + "</span>" +
+        (objectsMode === "table" ? ' <button class="plus" type="button" data-add-task="1" aria-label="Добавить">+</button>' : "") +
+        "</h2>" + objectsSwitch() +
+        '<input class="mini-search" type="search" placeholder="Поиск по объектам" aria-label="Поиск" /></div>' +
+        (tasksFromSummary ? '<p class="note">Задачи поставлены исполнителям по опубликованной суммаризации.</p>' : "") +
+        table;
+    }
+
+    function sideHtml() {
+      if (!sideOpen) return "";
+      var list = versions.map(function (v, i) {
+        return '<button type="button" class="ver' + (i === versionIndex ? " on" : "") + '" data-version="' + i + '"><b>' + v.name + "</b></button>";
+      }).join("");
+      var prompt = versions[versionIndex].prompt.replace(/</g, "");
+      var publishBtn = readyToPublish
+        ? '<button type="button" class="btn primary" data-publish="1">Опубликовать</button>'
+        : '<button type="button" class="btn primary" disabled>Опубликовать</button>';
+      return '<div class="scrim" data-side-close="1"></div><aside class="side"><header><h2>Версии суммаризации</h2><button type="button" class="icon-btn" data-side-close="1" aria-label="Закрыть">×</button></header><div class="body">' +
+        list +
+        '<label for="prompt">Промпт</label><textarea id="prompt">' + prompt + "</textarea>" +
+        '<div class="actions"><button type="button" class="btn" data-new="1">Создать суммаризацию</button>' + publishBtn + "</div>" +
+        '<p class="note">Сначала создаётся суммаризация по промпту. После этого публикация отдаёт её в wiki и ставит задачи исполнителям.</p></div></aside>';
+    }
+
+    function renderMeetings() {
+      current = "meetings";
+      stage.innerHTML =
+        '<div class="board"><div class="crumbs"><button type="button" data-back="1">← Источники</button></div>' +
+        '<div class="board-top"><h1>Завершённые встречи</h1></div>' +
+        '<p class="sub">В wiki попадают только встречи, которые уже прошли. Предстоящие, текущие и отменённые остаются в календаре.</p>' +
+        '<div class="toolrow"><h2>Май и июнь 2026 <span class="count">' + finished.length + '</span></h2>' +
+        '<input class="mini-search" type="search" placeholder="Поиск по встречам" aria-label="Поиск по встречам" /></div>' +
+        '<table class="grid-table"><thead><tr><th>Название</th><th>Дата и время</th><th>Организатор</th><th>Участники</th><th>Сервис встреч</th><th>Статус</th><th>Транскрипция</th></tr></thead><tbody>' +
+        finished.map(function (m, i) {
+          var scriptCls = m.script === "Готово" ? "go" : "warn";
+          return '<tr data-pick="' + i + '"><td>' + m.title + "</td><td>" + m.when + '</td><td><div class="who-cell"><span class="ava">' + m.org.charAt(0) + "</span>" + m.org + '</div></td><td><span class="ava">+' + m.people + '</span></td><td>' + m.service + '</td><td><span class="st go">Завершена</span></td><td><span class="st ' + scriptCls + '">' + m.script + "</span></td></tr>";
+        }).join("") +
+        "</tbody></table></div>";
+    }
+
+    function renderMeeting() {
+      current = "meeting-open";
+      var tabs = [
+        ["objects", "Объекты"],
+        ["audio", "Аудио встречи"],
+        ["summary", "Краткое резюме"],
+        ["transcript", "Транскрипция"]
+      ];
+      var meet = finished[picked] || finished[0];
+      stage.innerHTML =
+        '<div class="meet"><div class="crumbs"><button type="button" data-back="1">← Назад</button><span>Завершённые встречи</span></div>' +
+        '<div class="meet-head"><h1>' + meet.title + ' <span class="pill-draft">Черновик</span></h1></div>' +
+        '<div class="meet-card"><div><div class="meta">Тип: Транскрипция встречи · ' + meet.when + " · Участников: " + meet.people + "</div><p>" + meet.topic + '</p><div class="who">' + meet.author + "</div></div><span class=\"st go\">Готово</span></div>" +
+        '<div class="meet-block"><div class="seg">' + tabs.map(function (t) {
+          return '<button type="button" data-meet="' + t[0] + '"' + (meetTab === t[0] ? ' class="on"' : "") + ">" + t[1] + "</button>";
+        }).join("") + "</div>" + meetPane() + "</div></div>" + sideHtml();
+    }
+
+    var wikiArticle = "<h1 id=\"heading-11fhiig\">Роли, права и группы в Wiki</h1><p>Система доступа сочетает базовую роль в пространстве, назначения на отдельные ветви и членство в группах. Проверка прав всегда выполняется на сервере; скрытие кнопок в интерфейсе служит только подсказкой.</p><h2 id=\"heading-1i005ur\">Из чего складывается доступ</h2><ol><li><p><strong>Базовая роль пространства</strong> определяет обычные возможности пользователя во всём пространстве.</p></li><li><p><strong>Роль на ветке</strong> назначается пользователю или группе на разделе и наследуется его страницами и подразделами.</p></li><li><p><strong>Группы</strong> объединяют пользователей, которым нужен одинаковый доступ.</p></li></ol><p>Если человеку применимы несколько назначений, их возможности объединяются. Например, пользователь может быть редактором в ветке разработки, комментатором в ветке аналитики и не видеть закрытую документацию другой команды.</p><h2 id=\"heading-18zu79g\">Базовые роли</h2><table><colgroup><col/><col/><col/></colgroup><tbody><tr><th><p>Роль</p></th><th><p>Что разрешено</p></th><th><p>Типичное применение</p></th></tr><tr><td><p>Без доступа</p><p>none</p></td><td><p>Нет общего доступа; работают только точечные назначения на ветви.</p></td><td><p>Внешние специалисты и сотрудники с доступом только к отдельным проектам.</p></td></tr><tr><td><p>Читатель</p><p>reader</p></td><td><p>Просмотр и экспорт опубликованных материалов.</p></td><td><p>Потребители документации.</p></td></tr><tr><td><p>Комментатор</p><p>commenter</p></td><td><p>Права читателя и комментарии к доступным публикациям.</p></td><td><p>Эксперты, заказчики и участники согласования.</p></td></tr><tr><td><p>Редактор</p><p>editor</p></td><td><p>Черновики, редактирование страниц, структура, изображения и импорт.</p></td><td><p>Авторы документации.</p></td></tr><tr><td><p>Публикатор</p><p>publisher</p></td><td><p>Права редактора, публикация, удаление и восстановление, назначение ответственных.</p></td><td><p>Владельцы контента и руководители направлений.</p></td></tr><tr><td><p>Администратор ветвей</p><p>branch_admin</p></td><td><p>Права публикатора и управление доступом своей ветви.</p></td><td><p>Администраторы отдельных проектов или разделов.</p></td></tr><tr><td><p>Администратор пространства</p><p>admin</p></td><td><p>Полное управление пространством, участниками, группами, аудитом и ACL.</p></td><td><p>Ответственные за пространство Wiki.</p></td></tr></tbody></table><h2 id=\"heading-m4iio\">Стандартные группы</h2><p>В каждом пространстве автоматически создаются пять пустых групп:</p><ul><li><p>Администраторы;</p></li><li><p>Аналитики;</p></li><li><p>Менеджеры;</p></li><li><p>Разработчики;</p></li><li><p>Тестировщики.</p></li></ul><p><strong>Название группы не выдаёт права автоматически.</strong> Даже группа «Администраторы» остаётся без доступа, пока ей явно не назначена роль на ветке. Полную роль администратора пространства следует назначать конкретному пользователю через список участников.</p><h3 id=\"heading-aloml0\">Рекомендуемые, но не автоматические назначения</h3><table><colgroup><col/><col/><col/></colgroup><tbody><tr><th><p>Группа</p></th><th><p>Часто назначаемая роль</p></th><th><p>Комментарий</p></th></tr><tr><td><p>Администраторы</p></td><td><p>Администратор ветвей</p></td><td><p>Для управления ACL отдельных разделов; администраторов пространства назначают персонально.</p></td></tr><tr><td><p>Аналитики</p></td><td><p>Редактор или комментатор</p></td><td><p>Зависит от того, создают ли аналитики документы или только согласуют их.</p></td></tr><tr><td><p>Менеджеры</p></td><td><p>Комментатор или публикатор</p></td><td><p>Публикатор подходит владельцам контента и процесса согласования.</p></td></tr><tr><td><p>Разработчики</p></td><td><p>Редактор</p></td><td><p>Для ведения технической документации без права публикации.</p></td></tr><tr><td><p>Тестировщики</p></td><td><p>Комментатор или редактор</p></td><td><p>Для обратной связи либо самостоятельного ведения тестовой документации.</p></td></tr></tbody></table><h2 id=\"heading-hzird5\">Наследование и закрытые ветви</h2><p>По умолчанию раздел наследует назначения предков. Режим <code>replace</code> обрывает унаследованные роли: после такой границы действуют только назначения закрытого раздела и его потомков. Это основной способ сделать ветку полностью закрытой.</p><p>Отдельных запретов поверх разрешений нет. Поэтому, если пользователь состоит в двух группах, права складываются. Для изоляции используйте <code>replace</code>, а затем явно назначайте нужные группы.</p><h2 id=\"heading-mek9jy\">Как настроить доступ</h2><ol><li><p>Откройте <strong>Настройки → Участники пространства</strong> и добавьте пользователя. Если общий доступ не нужен, выберите роль «Без доступа».</p></li><li><p>В разделе <strong>Группы доступа</strong> откройте «Состав» и добавьте пользователя в необходимые группы.</p></li><li><p>Перейдите к нужному разделу документации и выберите действие <strong>Доступ к ветке</strong>.</p></li><li><p>При необходимости включите режим замещения наследования.</p></li><li><p>Выберите группу или конкретного пользователя и назначьте роль для ветки.</p></li><li><p>Проверьте доступ под учётной записью соответствующей роли.</p></li></ol><h2 id=\"heading-7prgg5\">Практические правила</h2><ul><li><p>Выдавайте минимально достаточную роль.</p></li><li><p>Для командных прав используйте группы, а персональные назначения оставляйте для исключений.</p></li><li><p>Не используйте группу «Администраторы» как замену администраторам пространства.</p></li><li><p>При переводе сотрудника между командами меняйте состав групп, а не ACL каждой ветви.</p></li><li><p>При увольнении удалите пользователя из пространства: его прямые назначения и членство в группах также удалятся.</p></li><li><p>Регулярно проверяйте журнал действий и состав групп.</p></li></ul><h2 id=\"heading-1ot3bqh\">Пример</h2><p>Пользователь имеет базовую роль «Без доступа». В группе «Разработчики» ему назначен редакторский доступ к ветке продукта A, а через группу «Аналитики» — роль комментатора к ветке продукта B. Ветка продукта C использует <code>replace</code> и не содержит назначений этих групп. Результат: продукт A можно редактировать, продукт B — читать и комментировать, продукт C не отображается.</p>";
+    var wikiSpace = "help-bp";
+    var wikiSpaces = {
+      "help-bp": {
+        name: "Справка продукта",
+        author: "Администратор BP",
+        when: "24.09.2026, 06:10",
+        home: "roles",
+        pages: {
+          roles: { title: "Роли, права и группы в Wiki", html: wikiArticle },
+          search: { title: "Поиск по системе", html: "<h1>Поиск по системе</h1><p>Строка «Поиск по системе» в шапке BusinessPad ищет по опубликованным страницам справки, по названию процесса и по полям карточки. Черновик в выдачу не попадает, пока автор не сохранит версию и не опубликует её.</p><h2>Что попадает в результат</h2><ol><li><p>Страницы справки продукта, которые уже опубликованы.</p></li><li><p>Название раздела и заголовки внутри статьи.</p></li><li><p>Подпись к полю, если она есть в инструкции.</p></li></ol><h2>Чего в результате нет</h2><ul><li><p>Личных черновиков другого сотрудника.</p></li><li><p>Страниц, к которым у человека нет роли читателя.</p></li><li><p>Закрытой ветки, если на ней включено замещение наследования и группа человека не назначена.</p></li></ul><p>Из результата можно открыть статью на нужном заголовке. Агент цитирует тот же опубликованный абзац и даёт ссылку на него.</p>" },
+          members: { title: "Участники пространства", html: "<h1>Участники пространства</h1><p>Список людей справки продукта и их базовая роль. Точечный доступ к разделу задаётся отдельно, на ветке, и не заменяет роль пространства.</p><h2>Как добавить человека</h2><ol><li><p>Откройте Настройки, затем Участники пространства.</p></li><li><p>Найдите учётную запись. Если человеку не нужен доступ ко всей справке, выберите роль «Без доступа».</p></li><li><p>Добавьте его в группу, если права должны идти вместе с командой.</p></li><li><p>На нужном разделе выберите «Доступ к ветке» и назначьте роль.</p></li></ol><table><thead><tr><th>Роль</th><th>Что видит в справке</th><th>Кто обычно</th></tr></thead><tbody><tr><td>Читатель</td><td>Опубликованные статьи</td><td>Сотрудник тенанта</td></tr><tr><td>Редактор</td><td>Черновики своей ветки</td><td>Автор инструкции</td></tr><tr><td>Администратор пространства</td><td>Участники, группы и публикация</td><td>Администратор BP</td></tr></tbody></table>" }
+        }
+      },
+      "help-client": {
+        name: "Help компании",
+        author: "Марина Соколова",
+        when: "02.10.2026, 11:40",
+        home: "deal",
+        pages: {
+          deal: { title: "Как провести сделку", html: "<h1>Как провести сделку</h1><p>Инструкция менеджера оптовой компании. Процесс называется «Продажа». Карточка ведётся от заявки покупателя до передачи заказа на склад. Статья написана редактором компании и связана с нормой «Комплектация» в проектной базе.</p><h2>Что сделать в задаче</h2><ol><li><p>Откройте задачу «Новая заявка» и проверьте контрагента, склад отгрузки и желаемую дату.</p></li><li><p>Добавьте позиции из каталога. Количество не должно превышать остаток, который показывает карточка склада.</p></li><li><p>Отправьте счёт на согласование. Пока счёт в черновике, склад задачу отгрузки не видит.</p></li><li><p>После согласования счёта нажмите «Передать на комплектацию». Откроется норма склада той версии, которая указана в задаче.</p></li></ol><h2>Откуда берутся формулировки</h2><p>Шаг комплектации не пересказывайте своими словами, если норма уже опубликована. В задаче дайте ссылку на «Комплектация» и на справку BusinessPad про поле «Склад отгрузки».</p><table><thead><tr><th>Поле</th><th>Кто заполняет</th><th>Когда обязательно</th></tr></thead><tbody><tr><td>Контрагент</td><td>Менеджер</td><td>До счёта</td></tr><tr><td>Склад отгрузки</td><td>Менеджер</td><td>До комплектации</td></tr><tr><td>Позиции и количество</td><td>Менеджер</td><td>До согласования счёта</td></tr></tbody></table>" },
+          invoice: { title: "Как согласовать счёт", html: "<h1>Как согласовать счёт</h1><p>Счёт уходит финансовому контролёру, если сумма больше 500 000 ₽ или отсрочка длиннее 14 дней. Остальные счета менеджер отправляет сам, и они сразу получают статус «Согласован».</p><h2>Порядок</h2><ol><li><p>Проверьте реквизиты покупателя по карточке контрагента. Расхождение в ИНН блокирует отправку.</p></li><li><p>Приложите спецификацию, если в счёте больше десяти позиций.</p></li><li><p>Напишите в комментарии срок оплаты и склад. Контролёр не открывает проектную базу сам.</p></li><li><p>Дождитесь статуса «Согласован» или правки. Черновик правок клиенту не показывается.</p></li></ol><p>Агент может процитировать эту статью только если Help компании включён ему в меню «Агенты».</p>" },
+          ship: { title: "Куда нажать в отгрузке", html: "<h1>Куда нажать в отгрузке</h1><p>Кладовщик работает в процессе «Отгрузка готовой продукции». Инструкция говорит, какую кнопку нажать. Сама норма сборки лежит в проектной базе, в статье «Комплектация».</p><h2>Кнопки на шаге</h2><ol><li><p>«Взять в работу» закрепляет заказ за сменой. Повторно нажать её нельзя, пока заказ не вернут в очередь.</p></li><li><p>«Открыть норму» показывает опубликованную версию комплектации, ту же, что указана в задаче.</p></li><li><p>«Собрано» закрывает шаг и создаёт задачу упаковки. Если не хватает позиции, нажмите «Расхождение» и укажите код номенклатуры.</p></li></ol><p>Не ищите эти кнопки в справке продукта: там описаны общие поля, а не порядок склада вашей компании.</p>" }
+        }
+      },
+      project: {
+        name: "Склад 2026",
+        author: "Игорь Лебедев",
+        when: "13.10.2026, 09:15",
+        home: "pick",
+        pages: {
+          pick: { title: "Комплектация", html: "<h1>Комплектация</h1><p>Норма склада готовой продукции, версия 8. Её открывают из задачи процесса «Отгрузка готовой продукции». Пока автор не опубликует следующую правку, смена видит только эту версию. Агент цитирует абзац нормы и даёт на него ссылку.</p><h2>Как проходит шаг</h2><ol><li><p>Кладовщик берёт заказ. В задаче уже стоят контрагент, дата отгрузки и список позиций.</p></li><li><p>Норма открывается той версией, которая записана в задаче, а не последним черновиком автора.</p></li><li><p>Сборщик сверяет код номенклатуры, количество и тару. Расхождение фиксируется кнопкой «Расхождение», заказ не закрывается молча.</p></li><li><p>После «Собрано» заказ уходит на упаковку. Комплектация задним числом не правится: для правки публикуется версия 9.</p></li></ol><h2>Кто что может</h2><table><thead><tr><th>Роль</th><th>Что разрешено</th><th>Где применяется</th></tr></thead><tbody><tr><td>Читатель</td><td>Опубликованная версия</td><td>Смена склада, агент</td></tr><tr><td>Автор</td><td>Черновик и публикация</td><td>Владелец нормы, Игорь Лебедев</td></tr><tr><td>Без доступа</td><td>Страница скрыта</td><td>Площадка, которой эта норма не назначена</td></tr></tbody></table><h2>Что не входит в норму</h2><ul><li><p>Печать маркировки. Это статья «Упаковка».</p></li><li><p>Согласование цены и отсрочки. Это статья «Согласование условий» в ветке договора.</p></li></ul>" },
+          pack: { title: "Упаковка", html: "<h1>Упаковка</h1><p>Норма шага после комплектации. Заказ попадает сюда только со статусом «Собрано». Версия 3 опубликована 11.10.2026.</p><h2>Порядок</h2><ol><li><p>Проверьте, что число мест совпадает с комплектацией. Если нет, верните заказ, а не исправляйте норму на месте.</p></li><li><p>Для хрупких позиций используйте тару из перечня: короб 400×300, обрешётка, палета.</p></li><li><p>Наклейте лист отгрузки. На нём номер заказа, склад и дата, без цены.</p></li><li><p>Закройте шаг «Упаковано». Транспортная заявка создаётся сама.</p></li></ol><p>Черновик версии 4, где меняется размер короба, смена не видит.</p>" },
+          terms: { title: "Согласование условий", html: "<h1>Согласование условий</h1><p>Норма договорной ветки, не склада. Ею пользуются менеджер и финансовый контролёр до того, как заказ попадёт в отгрузку.</p><h2>Когда нужно отдельное согласование</h2><ul><li><p>Сумма спецификации больше 500 000 ₽.</p></li><li><p>Отсрочка длиннее 14 дней.</p></li><li><p>Отгрузка с площадки, которая не указана в карточке договора.</p></li></ul><h2>Что считается согласованным</h2><p>В карточке договора стоит статус «Условия приняты», есть дата и фамилия контролёра. Устное подтверждение в переписке норму не заменяет. Пока статуса нет, кнопка «Передать на комплектацию» в сделке неактивна.</p>" }
+        }
+      }
+    };
+
+    function renderWiki() {
+      current = "wiki";
+      var space = wikiSpaces[wikiSpace] || wikiSpaces["help-bp"];
+      var page = space.pages[wikiPage] || space.pages[space.home];
+      var pages = "";
+      Object.keys(space.pages).forEach(function (id) {
+        pages += '<button type="button" class="wpage' + (id === wikiPage ? " on" : "") + '" data-wpage="' + id + '">' + space.pages[id].title + "</button>";
+      });
+      stage.innerHTML =
+        '<div class="wdoc"><aside class="wside"><button class="back" type="button" data-back="1" style="color:var(--primary)">← Источники</button>' +
+        '<div class="wside-top"><span>' + space.name + '</span><button class="plus" type="button" data-wplus="1" aria-label="Создать">+</button></div>' +
+        '<nav class="wtree">' + pages + '</nav></aside><div class="wmain">' +
+        '<div class="wbar"><span class="wbadge">Рабочая копия</span>' +
+        '<button type="button" class="btn" data-wedit="1">' + (wikiEditing ? "Читать" : "Редактировать") + "</button>" +
+        '<button type="button" class="btn primary" data-wsave="1">Сохранить версию</button>' +
+        '<input class="wsearch" type="search" placeholder="Найти документ" aria-label="Найти документ" /></div>' +
+        '<div class="wnodes"><button type="button" class="btn" data-wloc="1">Название и расположение</button><button type="button" class="btn">В корзину</button>' +
+        '<label>Экспорт публикации <select aria-label="Экспорт публикации"><option>PDF</option><option>Word (.docx)</option><option>Markdown (.md / .zip)</option><option>Markdown с изображениями (.zip)</option></select></label>' +
+        '<button type="button" class="btn">Скачать</button></div>' +
+        '<div id="wtools"' + (wikiEditing ? "" : " hidden") + '><button type="button" class="btn">Ж</button><button type="button" class="btn">К</button><button type="button" class="btn">Список</button><button type="button" class="btn">Таблица</button><button type="button" class="btn">Изображение</button></div>' +
+        '<article id="weditor" contenteditable="' + (wikiEditing ? "true" : "false") + '">' + page.html + "</article>" +
+        '<details class="winspector" open><summary>Оглавление, история и изображения</summary>' +
+        '<section><h2>Состояние документа</h2><p id="wstatus">Черновик сохраняется автоматически. «Сохранить версию» добавляет запись в историю. Читатели увидят изменения после публикации.</p></section>' +
+        '<section><h2>История версий <span class="count">' + wikiVersion + '</span></h2><div id="wversions"><p>Версия ' + wikiVersion + " · " + space.when + " · " + space.author + "</p></div></section>" +
+        '<section><h2>Изображения</h2><p class="sub">PNG, JPEG, до 10 МБ. Можно вставить скриншот из буфера.</p></section>' +
+        '<section><h2>Экспорт</h2><p>Публикация в Markdown. Скачать JSON. Открыть исходник.</p></section>' +
+        "</details></div></div>";
+    }
+
+    function openSource(id) {
+      current = id;
+      var s = sources.filter(function (x) { return x.id === id; })[0];
+      if (!s) return;
+      if (s.kind === "agents") renderAgents();
+      else if (s.kind === "meeting") renderMeetings();
+      else if (s.id === "help-bp" || s.id === "help-client" || s.id === "project") {
+        wikiSpace = s.id;
+        wikiPage = wikiSpaces[s.id].home;
+        wikiEditing = false;
+        renderWiki();
+      }
+      else renderDoc(s);
+    }
+
+    stage.addEventListener("click", function (e) {
+      var back = e.target.closest("[data-back]");
+      if (back) {
+        sideOpen = false;
+        if (current === "meeting-open") renderMeetings();
+        else renderHub();
+        return;
+      }
+      if (e.target.closest("[data-wedit]")) {
+        wikiEditing = !wikiEditing;
+        renderWiki();
+        return;
+      }
+      if (e.target.closest("[data-wsave]")) {
+        wikiVersion += 1;
+        wikiEditing = false;
+        renderWiki();
+        var status = document.getElementById("wstatus");
+        if (status) status.textContent = "Версия " + wikiVersion + " записана в историю. Читатели увидят её после публикации.";
+        return;
+      }
+      var wpage = e.target.closest("[data-wpage]");
+      if (wpage) { wikiPage = wpage.getAttribute("data-wpage"); wikiEditing = false; renderWiki(); return; }
+      if (e.target.closest("[data-wplus]") || e.target.closest("[data-wloc]")) {
+        var box = document.createElement("div");
+        box.className = "wdialog";
+        box.innerHTML = '<form><h2>' + (e.target.closest("[data-wplus]") ? "Новая страница" : "Название и расположение") + '</h2><label>Название<input value="' + ((wikiSpaces[wikiSpace].pages[wikiPage] || {}).title || "") + '"></label><label>Раздел<select><option>' + wikiSpaces[wikiSpace].name + '</option></select></label><div class="actions"><button type="button" class="btn" data-wclose="1">Отмена</button><button type="button" class="btn primary" data-wclose="1">Сохранить</button></div></form>';
+        stage.appendChild(box);
+        return;
+      }
+      if (e.target.closest("[data-wclose]")) {
+        var dialog = e.target.closest(".wdialog");
+        if (dialog) dialog.remove();
+        return;
+      }
+      var pick = e.target.closest("[data-pick]");
+      if (pick) { picked = Number(pick.getAttribute("data-pick")); meetTab = "objects"; sideOpen = false; renderMeeting(); return; }
+      var catalogBtn = e.target.closest("[data-catalog]");
+      if (catalogBtn) { catalog = catalogBtn.getAttribute("data-catalog"); renderHub(); return; }
+      var boardBtn = e.target.closest("[data-board]");
+      if (boardBtn) { boardMode = boardBtn.getAttribute("data-board"); renderBoard(); return; }
+      var objectsBtn = e.target.closest("[data-objects]");
+      if (objectsBtn) { objectsMode = objectsBtn.getAttribute("data-objects"); meetTab = "objects"; renderMeeting(); return; }
+      if (e.target.closest("[data-add-task]")) {
+        tasks.push({ title: "Новая задача", who: "Не назначен", st: "Черновик", act: "Выполнить", hot: false, type: "Задача" });
+        renderMeeting();
+        return;
+      }
+      var meet = e.target.closest("[data-meet]");
+      if (meet) { meetTab = meet.getAttribute("data-meet"); renderMeeting(); return; }
+      if (e.target.closest("[data-side]")) { sideOpen = true; renderMeeting(); return; }
+      if (e.target.closest("[data-side-close]")) { sideOpen = false; renderMeeting(); return; }
+      var ver = e.target.closest("[data-version]");
+      if (ver) { versionIndex = Number(ver.getAttribute("data-version")); renderMeeting(); return; }
+      if (e.target.closest("[data-publish]")) {
+        if (!readyToPublish || published) return;
+        published = true;
+        if (!tasksFromSummary) {
+          tasksFromSummary = true;
+          tasks.push(
+            { title: "Связать итог встречи с карточкой процесса", who: "Юлия Олеговна", st: "Новая", act: "Выполнить", hot: false, type: "Задача" },
+            { title: "Зафиксировать, что запись остаётся исходником", who: "Алексей Игоревич", st: "Новая", act: "Выполнить", hot: false, type: "Задача" },
+            { title: "Показать исполнителю фрагмент, из которого поставлена задача", who: "Анна Дмитриевна", st: "Новая", act: "Решить", hot: true, type: "Задача" }
+          );
+        }
+        meetTab = "objects";
+        sideOpen = false;
+        renderMeeting();
+        return;
+      }
+      if (e.target.closest("[data-new]")) {
+        var area = document.getElementById("prompt");
+        var prompt = area ? area.value.trim() : "";
+        if (!prompt) prompt = "Собери краткое резюме встречи и выдели поручения.";
+        versions.push({
+          name: "Версия " + (versions.length + 1),
+          prompt: prompt,
+          html: "<h3>Суммаризация</h3><p>Резюме собрано по текущему промпту. На встрече договорились держать запись исходником, а текст отдельным источником. Из реплик выделены решения и поручения исполнителям.</p><p>Публикация этой версии поставит задачи тем, кого назвали на встрече.</p>"
+        });
+        versionIndex = versions.length - 1;
+        readyToPublish = true;
+        meetTab = "summary";
+        sideOpen = true;
+        renderMeeting();
+        return;
+      }
+      var task = e.target.closest("[data-task]");
+      if (task) {
+        var item = tasks[Number(task.getAttribute("data-task"))];
+        if (item) item.done = !item.done;
+        renderMeeting();
+        return;
+      }
+      if (e.target.closest("[data-play]")) { audioOn = !audioOn; renderMeeting(); return; }
+      var tab = e.target.closest("[data-filter]");
+      if (tab) { filter = tab.getAttribute("data-filter"); renderHub(); return; }
+      var open = e.target.closest("[data-open]");
+      if (open) openSource(open.getAttribute("data-open"));
+    });
+    stage.addEventListener("input", function (e) {
+      if (!e.target.getAttribute("data-tr")) return;
+      trQuery = e.target.value;
+      var box = e.target.closest(".meet-block");
+      if (!box) return;
+      var keep = e.target;
+      var start = keep.selectionStart;
+      meetTab = "transcript";
+      renderMeeting();
+      var again = document.getElementById("tr-q");
+      if (again) { again.focus(); again.selectionStart = again.selectionEnd = start; }
+    });
+    document.querySelector("[data-home]").addEventListener("click", function () {
+      filter = "all";
+      sideOpen = false;
+      renderHub();
+    });
+
+    renderHub();
+  <\/script>
+</body>
+</html>
+
+  </script>
+  <script>
+    (function () {
+      var raw = document.getElementById("bp-src").textContent;
+      raw = raw.split("<\\" + "/script>").join("</" + "script>");
+      document.getElementById("bp-frame").srcdoc = raw.trim();
+    })();
+  </script>
+</body>
+</html>

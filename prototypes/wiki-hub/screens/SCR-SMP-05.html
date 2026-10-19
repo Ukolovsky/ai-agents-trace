@@ -1,0 +1,148 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>SCR-SMP-05 Отчёт сверки</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Fira Sans',sans-serif;background:#EEF0F6;color:#1A1A2E;font-size:13px}
+.app{display:flex;min-height:100vh}
+.nav{width:220px;background:#fff;border-right:1px solid #E4E6EF;padding:16px 12px;flex-shrink:0}
+.logo{font-weight:700;color:#343A7E;font-size:15px;margin-bottom:18px;padding:0 8px}
+.n{padding:8px 10px;border-radius:8px;margin-bottom:4px;color:#4A4A68}
+.n.on{background:#EEF0FA;color:#343A7E;font-weight:600}
+.n.sub{padding-left:22px;font-size:12px}
+.adminnav{width:220px;background:#1E2347;color:#fff;padding:16px 12px;flex-shrink:0}
+.adminnav .logo{color:#fff}
+.adminnav .n{color:#C9CDE8}
+.adminnav .n.on{background:#343A7E;color:#fff}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{height:56px;background:#fff;border-bottom:1px solid #E4E6EF;display:flex;align-items:center;padding:0 20px;gap:10px}
+.h{font-size:18px;font-weight:600;color:#343A7E}
+.sp{flex:1}
+.chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:16px;background:#EEF0FA;color:#343A7E;font-size:12px;font-weight:500;white-space:nowrap}
+.chip.o{background:#FFE8E0;color:#FF5722}
+.chip.g{background:#E8F6EE;color:#1B6B3A}
+.chip.y{background:#FFF4D6;color:#8A6200}
+.chip.r{background:#FDE8E8;color:#B3261E}
+.chip.grey{background:#F0F1F6;color:#6B6B88}
+.btn{border:0;border-radius:8px;padding:8px 14px;font-family:inherit;font-weight:600;font-size:13px;cursor:default;white-space:nowrap}
+.btn.p{background:#FF5722;color:#fff}
+.btn.g{background:#fff;border:1px solid #D5D8E8;color:#343A7E}
+.btn.d{background:#F0F1F6;color:#A0A3B8}
+.btn.sm{padding:5px 10px;font-size:12px}
+.body{padding:20px;display:flex;gap:16px;align-items:flex-start}
+.body.colm{flex-direction:column}
+.col{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(26,26,46,.06)}
+.tree{width:260px;flex-shrink:0}
+.item{padding:7px 8px;border-radius:6px;margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.item.on{background:#EEF0FA;color:#343A7E;font-weight:600}
+.item.sub{padding-left:22px;color:#5A5A78}
+.item.sub2{padding-left:36px;color:#5A5A78}
+.fold{font-weight:600;color:#343A7E;margin:8px 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.art{flex:1;min-width:0}
+.art h1{font-size:22px;color:#343A7E;margin-bottom:8px}
+.art h2{font-size:15px;color:#343A7E;margin:14px 0 6px}
+.meta{color:#6B6B88;font-size:12px;margin-bottom:14px}
+.p{line-height:1.55;margin-bottom:10px;color:#2A2A40}
+.hl{background:#FFF3A3;border-radius:2px}
+.hl.cur{background:#FFD36B}
+.tb{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tb b{background:#F6F7FB;border:1px solid #E4E6EF;border-radius:6px;padding:4px 8px;font-weight:500;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:#6B6B88;font-weight:500;padding:8px;border-bottom:1px solid #E4E6EF;font-size:12px}
+td{padding:8px;border-bottom:1px solid #F0F1F6;vertical-align:middle}
+tr.on td{background:#F6F7FB}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%}
+.card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(26,26,46,.06)}
+.card h3{color:#343A7E;margin-bottom:6px;font-size:15px}
+.card .prev{height:110px;background:#F6F7FB;border:1px solid #E4E6EF;border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;color:#A0A3B8;font-size:11px}
+.drop{border:2px dashed #C5C9E0;border-radius:12px;padding:20px;text-align:center;color:#6B6B88;background:#FAFBFE;width:100%}
+.banner{background:#EEF0FA;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:#343A7E;line-height:1.45}
+.banner.warn{background:#FFF4E5;color:#8A4B08}
+.banner.ok{background:#E8F6EE;color:#1B6B3A}
+.banner.err{background:#FDE8E8;color:#B3261E}
+.search{display:flex;gap:8px;align-items:center;background:#F6F7FB;border-radius:8px;padding:6px 10px;margin-bottom:12px}
+.search span.q{flex:1;color:#1A1A2E}
+.search .ph{flex:1;color:#A0A3B8}
+.seg{display:inline-flex;border:1px solid #D5D8E8;border-radius:8px;overflow:hidden;font-size:12px}
+.seg span{padding:4px 10px;color:#6B6B88}
+.seg span.on{background:#343A7E;color:#fff}
+.av{width:32px;height:32px;border-radius:50%;background:#343A7E;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex-shrink:0}
+.row{display:flex;gap:12px;align-items:center}
+.row.rw{flex-wrap:wrap}
+.toggle{width:40px;height:22px;border-radius:11px;background:#343A7E;position:relative;flex-shrink:0}
+.toggle:after{content:'';width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px}
+.toggle.off{background:#C5C9E0}
+.toggle.off:after{right:auto;left:2px}
+.cb{width:16px;height:16px;border-radius:4px;border:1.5px solid #343A7E;display:inline-block;vertical-align:middle;position:relative;flex-shrink:0}
+.cb.on{background:#343A7E}
+.cb.on:after{content:'';position:absolute;left:4px;top:1px;width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.cb.lock{border-color:#A0A3B8;background:#E4E6EF}
+.cal{display:grid;grid-template-columns:60px repeat(7,1fr);gap:4px;width:100%}
+.cal .hd{font-size:12px;color:#6B6B88;text-align:center;padding:4px}
+.cal .d{padding:6px;border-radius:8px;background:#F6F7FB;min-height:90px;font-size:11px;color:#6B6B88}
+.cal .d.on{background:#EEF0FA;outline:2px solid #343A7E}
+.cal .t{font-size:11px;color:#6B6B88;padding:6px 4px;text-align:right}
+.ev{margin-top:4px;background:#FF5722;color:#fff;border-radius:4px;padding:3px 5px;font-size:10px;line-height:1.3}
+.ev.b{background:#343A7E}
+.ev.c{background:#B3261E}
+.side{width:300px;flex-shrink:0}
+label{display:block;font-size:12px;color:#6B6B88;margin:10px 0 4px}
+.inp{width:100%;border:1px solid #D5D8E8;border-radius:8px;padding:8px;font-family:inherit;background:#fff;color:#1A1A2E;min-height:34px}
+.inp.ph{color:#A0A3B8}
+.inp.ro{background:#F6F7FB;color:#6B6B88}
+.inp.ta{min-height:70px}
+.inp.err{border-color:#B3261E}
+.hint{font-size:11px;color:#6B6B88;margin-top:3px}
+.hint.err{color:#B3261E}
+.modal{background:#fff;border-radius:12px;padding:18px;box-shadow:0 8px 30px rgba(26,26,46,.18);width:440px;flex-shrink:0;border:1px solid #E4E6EF}
+.modal h3{color:#343A7E;font-size:15px;margin-bottom:10px}
+.modal .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.tabs{display:flex;gap:16px;border-bottom:1px solid #E4E6EF;margin-bottom:14px}
+.tabs span{padding:8px 2px;color:#6B6B88;font-size:13px}
+.tabs span.on{color:#343A7E;font-weight:600;border-bottom:2px solid #FF5722}
+.cite{border:1px solid #E4E6EF;border-radius:8px;padding:8px 10px;background:#FAFBFE;margin:6px 0;font-size:12px}
+.cite b{color:#343A7E}
+.msg{border-radius:10px;padding:10px 12px;margin-bottom:8px;max-width:88%;line-height:1.45}
+.msg.u{background:#EEF0FA;margin-left:auto}
+.msg.a{background:#fff;border:1px solid #E4E6EF}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;margin-bottom:12px}
+.kpi .k{background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 2px rgba(26,26,46,.06)}
+.kpi .k .v{font-size:22px;font-weight:600;color:#343A7E}
+.kpi .k .l{font-size:12px;color:#6B6B88}
+.kpi .k .dlt{font-size:12px;color:#1B6B3A}
+.kpi .k .dlt.bad{color:#B3261E}
+.prog{height:8px;background:#E4E6EF;border-radius:4px;overflow:hidden;width:100%}
+.prog i{display:block;height:100%;background:#343A7E;width:45%}
+.toast{position:absolute;right:24px;bottom:24px;background:#1E2347;color:#fff;padding:10px 14px;border-radius:8px;font-size:12px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:6px;font-size:12px;color:#6B6B88;margin-top:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#1B6B3A;display:inline-block}
+.dot.y{background:#D9A300}.dot.r{background:#B3261E}.dot.g{background:#A0A3B8}
+.pad{position:relative}
+.side-page{position:absolute;right:0;top:0;bottom:0;width:520px;background:#fff;border-left:1px solid #E4E6EF;box-shadow:-8px 0 30px rgba(26,26,46,.12);padding:18px}
+.dim{position:absolute;inset:0;background:rgba(26,26,46,.18)}
+.steps{display:flex;gap:6px;align-items:center;margin-bottom:12px;font-size:12px;color:#6B6B88}
+.steps b{background:#343A7E;color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+.steps b.off{background:#C5C9E0}
+.pre{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#F6F7FB;border-radius:8px;padding:10px;line-height:1.5;color:#2A2A40}
+.sum li{margin:0 0 6px 16px;line-height:1.45}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.ic{width:28px;height:28px;border-radius:6px;background:#F6F7FB;border:1px solid #E4E6EF;display:inline-flex;align-items:center;justify-content:center;color:#343A7E;font-size:13px}
+.muted{color:#6B6B88;font-size:12px}
+</style></head><body><div class="app">
+<aside class="nav"><div class="logo">BusinessPad · Швецъ</div><div class="n ">Главная</div><div class="n on">Источники</div><div class="n sub ">Help платформы</div><div class="n sub ">Help тенанта</div><div class="n sub ">Регламенты</div><div class="n sub ">Встречи</div><div class="n sub on">Образцы</div><div class="n sub ">История бесед</div><div class="n sub ">Внешние базы</div><div class="n ">Агенты</div><div class="n ">Процессы</div><div class="n ">Календарь</div><div class="n ">Задачи</div></aside>
+<div class="main"><div class="top"><div class="h">Сверка · Договор_импорт_Acme.pdf</div><div class="sp"></div><span class="chip">шаблон: импорт v5</span><button class="btn g">Открыть эталон</button></div>
+<div class="body colm">
+<div class="kpi">
+<div class="k"><div class="l">Критичных</div><div class="v" style="color:#B3261E">1</div></div>
+<div class="k"><div class="l">Важных</div><div class="v">1</div></div>
+<div class="k"><div class="l">Стандартных</div><div class="v">0</div></div>
+<div class="k"><div class="l">Совпало</div><div class="v">12</div></div></div>
+<div class="col" style="width:100%"><table>
+<tr><th>Критерий</th><th>Важность</th><th>Статус</th><th>В файле</th><th>Эталон</th></tr>
+<tr class="on"><td>Срок поставки</td><td><span class="chip r">Критичный</span></td><td>отличается</td><td>30 календарных дней</td><td>п. 4.2 · 10 рабочих дней</td></tr>
+<tr><td>Порядок рекламации</td><td><span class="chip o">Важный</span></td><td>отсутствует</td><td>-</td><td>п. 7.1</td></tr>
+<tr><td>Язык переписки</td><td><span class="chip">Стандартный пункт</span></td><td>найден</td><td>русский</td><td>п. 11.3</td></tr>
+</table></div>
+</div></div></div></body></html>
