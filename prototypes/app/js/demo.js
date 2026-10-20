@@ -15,8 +15,11 @@ const STEPS=[
   {k:'found',t:'Найти «ИнвестСтрой» в ИИ поиске',h:'#/search?q=ИнвестСтрой'}];
 const JUMPS=[['Процессы','#/processes'],['Платежи подрядчикам','#/payments'],['MagicPad: меню «/»','#/payments?mp=1&slash=1'],['Импорт: нечитаемый скан','#/import/start?file=file-scan'],
   ['ИИ поиск: СтройМонолит','#/search?q=СтройМонолит'],['Настройки системы','#/settings'],['Карточка БП: Платежи подрядчикам','#/settings/bp/proc-payments'],['Справочник: Товары','#/settings/dir/products'],['Чат','#/chat']];
-const SC2=[['Центр встреч (Task tracker)',[['meeting','Добавить встречу через «+»','#/meetings']]],
-  ['Настройщик: пресет процессов',[['cons-start','Открыть конструктор, «Описать бизнес»','#/constructor'],['cons-pick','Выбрать рекомендованный пресет',''],['cons-deploy','«Развернуть» черновики',''],['cons-pub','«Опубликовать все» → «Опубликовать»','']]]];
+const SC2=[['Центр встреч (Task tracker)',[['tt-people','«+» → «Добавить» участников → Сохранить','#/meetings'],['meeting','Материалы «+», «Добавить» встречу','']]],
+  ['Интегратор: импорт из базы данных',[['ig-start','MagicPad «/» → «Импорт данных» → «База данных»','#/payments?mp=1&slash=1'],['ig-conn','«Проверить подключение» → Далее, выбрать таблицу',''],['ig-map','Решить по каждой колонке (⋮)',''],['ig-pub','Предпросмотр → «Опубликовать»','']]],
+  ['Data flow: этап и ИИ-агент',[['df-stage','Кликнуть этап, изменить название, «Сохранить»','#/constructor?from=proc-priemka'],['df-agent','Роли → ИИ-агент → «+», 4 шага','#/constructor?tab=roles&r=ai&from=proc-priemka']]],
+  ['Точки входа: импорт в Wiki',[['wiki-start','MagicPad: найти «Импорт документа в Wiki»','#/processes?mp=1'],['wiki-imp','Отправить Договоры_подрядчика.docx → «Импортировать»',''],['fox','Показать уведомление Феликса','']]],
+  ['Настройщик: пресет процессов',[['cons-start','Открыть конструктор, «Описать бизнес»','#/constructor'],['cons-pick','Выбрать рекомендованный пресет',''],['cons-deploy','«Развернуть» черновики',''],['cons-upd','Написать Феликсу правку маршрута → «Подтвердить изменение»',''],['cons-pub','«Опубликовать все» → «Опубликовать»','']]]];
 const HINT={'mp-open':'Нажмите кнопку с искрой в шапке страницы.','slash':'В поле MagicPad введите «/» и выберите «Импорт из файла».','file':'Выберите «Товарная накладная ТН-0842.pdf» и отправьте.','proc':'Нажмите карточку «Входящие документы».','fields':'На шаге «Распознанные поля» исправьте «Грузополучателя» на ООО «ИнвестСтрой». Нажмите «+», добавьте «Номер транспортной накладной» без значения и выделите номер в документе.','created':'Нажмите «Создать» внизу мастера.','cp':'В ответе Феликса нажмите «Проверить и создать», отметьте контрагента и нажмите «Создать».','prod':'Нажмите «Создать товар», отметьте Арматуру и нажмите «Создать».','found':'Введите «ИнвестСтрой» в поиске по системе.'};
 const clean=new URLSearchParams(location.search).get('clean')==='1';
 const css=`#demo-trig{position:fixed;left:4px;bottom:52px;z-index:2147483000;width:40px;height:24px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:#1E1E24;color:#FFD27A;font:600 10px/22px ui-monospace,Menlo,monospace;letter-spacing:.08em;text-align:center;cursor:pointer;opacity:.55;padding:0;transition:opacity .2s}
@@ -38,6 +41,7 @@ function build(){
   if(!clean){ trig=document.createElement('button'); trig.id='demo-trig'; trig.title='Управление демо (Shift+D)'; trig.textContent='DEMO'; trig.onclick=toggle; document.body.appendChild(trig); }
   document.addEventListener('keydown',e=>{ if(e.shiftKey&&(e.code==='KeyD')&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){ e.preventDefault(); toggle(); } });
   panel.addEventListener('click',e=>{ const a=e.target.closest('[data-go]'); if(a){ e.preventDefault(); go(a.dataset.go); }
+    if(e.target.closest('[data-fox]')){ toggle(); TOCHKI.foxNote(); return; }
     if(e.target.closest('.x')) toggle();
     if(e.target.closest('.rst')){ APP.resetDemo(); refresh(); } });
   refresh();
@@ -49,7 +53,7 @@ function refresh(){
   <h4>Сценарий «Накладная от поставщика»</h4>${STEPS.map((s,i)=>`<div class="st ${pr[s.k]?'done':s===next?'next':''}"><i>${pr[s.k]?'✓':i+1+'.'}</i>${s.h&&!pr[s.k]?`<a href="${s.h}" data-go="${s.h}">${esc(s.t)}</a>`:`<span>${esc(s.t)}</span>`}</div>`).join('')}
   ${SC2.map(([t,l])=>`<h4>${esc(t)}</h4>`+l.map(([k,tt,h],i)=>`<div class="st ${pr[k]?'done':''}"><i>${pr[k]?'✓':i+1+'.'}</i>${h&&!pr[k]?`<a href="${h}" data-go="${h}">${esc(tt)}</a>`:`<span>${esc(tt)}</span>`}</div>`).join('')).join('')}<h4>Подсказка</h4><div style="color:#CFCFD6">${esc(HINT[(next||{}).k]||'Сценарий пройден. Сбросьте данные, чтобы начать заново.')}</div><h4>Быстрые действия</h4>${JUMPS.map(j=>`<a href="${j[1]}" data-go="${j[1]}">${esc(j[0])}</a>`).join('')}
   <h4>Материалы</h4><a href="${L.agents}" target="_blank" rel="noopener">ТЗ и спецификация (ver-2)</a><a href="${L.figma}" target="_blank" rel="noopener">Макеты Figma BP-CPQ-AI</a><a href="${L.portal}" target="_blank" rel="noopener">Портал картиночных прототипов</a>
-  <button class="rst">Сбросить демо-данные</button><div class="k" style="margin-top:6px">?clean=1 скрывает кнопку-триггер; меню остаётся по Shift+D</div>`;
+  <button class="l" data-fox="1">▶ Уведомление Феликса о просрочке</button><a href="#/integrator" data-go="#/integrator">Интегратор напрямую</a><a href="#/preset" data-go="#/preset">Процессы пресета</a><button class="rst">Сбросить демо-данные</button><div class="k" style="margin-top:6px">?clean=1 скрывает кнопку-триггер; меню остаётся по Shift+D</div>`;
 }
 window.DEMO={refresh,toggle,isOpen:()=>panel&&!panel.hidden};
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',build):build();

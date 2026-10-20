@@ -31,13 +31,14 @@ route(/^\/meetings$/, (_,q)=>{
   document.getElementById('madd').onclick=()=>side();
   const mq=document.getElementById('mq'); mq.oninput=()=>document.querySelectorAll('.uni tbody tr,.week .ev').forEach(r=>r.hidden=!BP.norm(r.textContent).includes(BP.norm(mq.value)));
   if(q.open) setTimeout(()=>side(S().meetings.find(m=>m.id===q.open)),0);
+  if(q.resume&&window._mdraft){ const d=window._mdraft; history.replaceState(null,'','#/meetings'); setTimeout(()=>side(d.m,{ro:d.ro}),0); }
 });
 /* view-switch карточки/таблица на этом экране = неделя/таблица */
 document.addEventListener('click',e=>{ const m=e.target.closest('[data-vsw-menu="mt"]'); if(m){ e.stopImmediatePropagation(); go('#/meetings?view='+(mode==='week'?'table':'week')); } },true);
 
-function side(m){
+function side(m,opt={}){
   document.querySelectorAll('.sp-back,.sidepage').forEach(x=>x.remove());
-  const ro=!!m; m=m||{name:'',desc:'',date:'19.08.2026',from:'14:00',to:'15:00',people:[],counterparty:''};
+  const ro=opt.ro!=null?opt.ro:!!m; m=m||{name:'',desc:'',date:'19.08.2026',from:'14:00',to:'15:00',people:[],counterparty:'',rep:'Не повторять',files:[]}; m.files=m.files||[]; m.rep=m.rep||'Не повторять';
   const back=document.createElement('div'); back.className='sp-back'; document.body.appendChild(back);
   const sp=document.createElement('div'); sp.className='sidepage wide'; sp.setAttribute('role','dialog'); sp.setAttribute('aria-label',ro?'Встреча':'Добавить встречу');
   const opts=[['','Выберите объект'],...S().counterparties.map(c=>['cp:'+c.id,c.name]),...S().documents.map(d=>['doc:'+d.id,d.name])];
@@ -51,30 +52,53 @@ function side(m){
     <div class="fld"><label>Дата</label><input class="inp" id="mdt" value="${m.date}"></div>
     <div class="row" style="align-items:flex-end;gap:12px"><div class="fld grow"><label>Время с</label><input class="inp" id="mf" value="${m.from}"></div><span style="padding-bottom:8px">-</span><div class="fld grow"><label>Время по</label><input class="inp" id="mt" value="${m.to}"></div></div>
     <div class="fld"><label>Часовой пояс</label><select class="sel"><option>(UTC+3) Москва</option></select></div>
-    <div class="fld"><label>Повторение</label><select class="sel"><option>не повторять</option><option>каждый день</option><option>каждую неделю</option></select></div>
+    <div class="fld"><label>Повторение</label><select class="sel" id="mrep">${reps(m.date).map(r=>`<option ${r===m.rep?'selected':''}>${r}</option>`).join('')}</select></div>
     <h3 class="h3">Дополнительная информация</h3>
     <div class="fld"><label>Участники</label><div class="pbox"><span>Участников: <b>${sel.size}</b></span><button class="btn pri out s" id="mpadd">${sel.size?'Изменить':'Добавить'}</button></div>
-      <div class="plist" id="plist" hidden>${S().employees.map(e=>`<label><input type="checkbox" class="chk" data-e="${e.id}" ${sel.has(e.id)?'checked':''}>${esc(e.name)}<span class="cap muted">${esc(e.pos)}</span></label>`).join('')}</div>
       ${sel.size?`<div class="cap muted">${[...sel].map(id=>esc(emp(id).name)).join(', ')}</div>`:''}</div>
     <div class="fld"><label>Связанный объект</label><select class="sel" id="mo">${opts.map(([v,t])=>`<option value="${v}" ${v==='cp:'+m.counterparty?'selected':''}>${esc(t)}</option>`).join('')}</select></div>
-    <div class="row" style="align-items:center;gap:12px"><h3 class="h3">Материалы</h3><button class="plus round" title="Добавить материал">${I('add','ic16')}</button></div>
+    <div class="row" style="align-items:center;gap:12px"><h3 class="h3">Материалы</h3><button class="plus round" id="mfile" title="Добавить материал">${I('add','ic16')}</button></div>
+    ${m.files.length?`<div class="col" style="gap:6px">${m.files.map((f,i)=>`<div class="srcbox"><span class="file-chip">${BP.PDF}${esc(f)}</span><button class="ibtn s" data-rmf="${i}" title="Удалить">${I('close','ic16')}</button></div>`).join('')}</div>`:''}
    </div><div class="spfoot"><button class="btn" id="msave">${ro?'Сохранить':'Добавить'}</button><button class="btn out" id="mclose" style="margin-left:auto">Закрыть</button></div>`;
     const q=s=>sp.querySelector(s);
     q('#mn').oninput=e=>{ m.name=e.target.value; q('#mnc').textContent=m.name.length+'/100'; q('#mn').classList.remove('err'); };
-    q('#mpadd').onclick=()=>{ q('#plist').hidden=!q('#plist').hidden; };
-    sp.querySelectorAll('[data-e]').forEach(c=>c.onchange=()=>{ c.checked?sel.add(c.dataset.e):sel.delete(c.dataset.e); keep(); draw(); q('#plist').hidden=false; });
+    q('#mpadd').onclick=()=>{ keep(); m.people=[...sel]; window._mdraft={m,ro}; close(true); go('#/meetings/participants'); };
+    q('#mfile').onclick=e=>{ e.stopPropagation(); keep(); APP.popMenu(q('#mfile'),S().demoFiles.map(f=>['doc',f.name,()=>{ if(!m.files.includes(f.name)) m.files.push(f.name); draw(); }])); };
+    sp.querySelectorAll('[data-rmf]').forEach(b=>b.onclick=()=>{ keep(); m.files.splice(+b.dataset.rmf,1); draw(); });
     q('.sp-x').onclick=q('#mclose').onclick=close;
     q('#msave').onclick=save;
   };
-  const keep=()=>{ const q=s=>sp.querySelector(s); m.name=q('#mn').value; m.desc=q('#md').value; m.date=q('#mdt').value; m.from=q('#mf').value; m.to=q('#mt').value; const o=q('#mo').value; m.counterparty=o.startsWith('cp:')?o.slice(3):''; m.obj=o; };
-  function close(){ back.remove(); sp.remove(); if(ro) history.replaceState(null,'','#/meetings'+(mode==='week'?'?view=week':'')); }
+  const keep=()=>{ const q=s=>sp.querySelector(s); m.name=q('#mn').value; m.desc=q('#md').value; m.date=q('#mdt').value; m.from=q('#mf').value; m.to=q('#mt').value; const o=q('#mo').value; m.counterparty=o.startsWith('cp:')?o.slice(3):''; m.obj=o; m.rep=q('#mrep').value; };
+  function close(keepDraft){ back.remove(); sp.remove(); if(keepDraft!==true) window._mdraft=null; if(ro&&keepDraft!==true) history.replaceState(null,'','#/meetings'+(mode==='week'?'?view=week':'')); }
   function save(){ keep(); if(!m.name.trim()){ sp.querySelector('#mn').classList.add('err'); notify('Заполните название встречи','error'); return; }
     m.people=[...sel];
-    if(!ro){ const nm={id:store.id('m'),name:m.name.trim(),desc:m.desc,date:m.date,from:m.from,to:m.to,org:'e-morozov',people:m.people.length?m.people:['e-morozov'],service:'Яндекс Телемост',status:'Предстоящая',tr:false,counterparty:m.counterparty||null,isNew:true};
+    if(!ro){ const nm={id:store.id('m'),name:m.name.trim(),desc:m.desc,rep:m.rep,files:m.files,date:m.date,from:m.from,to:m.to,org:'e-morozov',people:m.people.length?m.people:['e-morozov'],service:'Яндекс Телемост',status:'Предстоящая',tr:false,counterparty:m.counterparty||null,isNew:true};
       S().meetings.push(nm); if(nm.counterparty) S().events.unshift({date:S().today,who:'Центр встреч',text:`Назначена встреча «${nm.name}» на ${nm.date} ${nm.from}`,counterparty:nm.counterparty});
       store.save(); store.mark('meeting'); window.SEARCH&&SEARCH.reindex&&SEARCH.reindex(); close(); notify('Встреча добавлена'); BP.render(); }
-    else { const t=S().meetings.find(x=>x.id===m.id); Object.assign(t,{name:m.name,desc:m.desc,date:m.date,from:m.from,to:m.to,people:m.people,counterparty:m.counterparty||null}); store.save(); close(); notify('Изменения сохранены'); BP.render(); } }
+    else { const t=S().meetings.find(x=>x.id===m.id); Object.assign(t,{rep:m.rep,files:m.files,name:m.name,desc:m.desc,date:m.date,from:m.from,to:m.to,people:m.people,counterparty:m.counterparty||null}); store.save(); close(); notify('Изменения сохранены'); BP.render(); } }
   back.onclick=close; draw(); document.body.appendChild(sp); setTimeout(()=>{ const n=sp.querySelector('#mn'); n&&!ro&&n.focus(); },50);
 }
+const WD=['воскресеньям','понедельникам','вторникам','средам','четвергам','пятницам','субботам'], WD2=['воскресенье','понедельник','вторник','среду','четверг','пятницу','субботу'], N=['первый','второй','третий','четвёртый','последний'], MON=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+function reps(ds){ const d=parseD(ds); if(isNaN(d)) return ['Не повторять','Каждый день']; const w=d.getDay(), k=Math.min(4,Math.floor((d.getDate()-1)/7));
+  return ['Не повторять','Каждый день',`Еженедельно по ${WD[w]}`,`Ежемесячно в ${(w===0?['первое','второе','третье','четвёртое','последнее']:[3,5,6].includes(w)?['первую','вторую','третью','четвёртую','последнюю']:['первый','второй','третий','четвёртый','последний'])[k]} ${WD2[w]}`,`Ежегодно ${d.getDate()} ${MON[d.getMonth()]}`,'Каждый будний день (с понедельника по пятницу)']; }
+/* «Добавить участников» (2715-286083, 3100-199308): сегменты Все/Добавленные/Выбранные/Не выбранные, «Изменений», Сохранить/Отменить */
+route(/^\/meetings\/participants$/, (_,q)=>{
+  const d=window._mdraft; if(!d){ go('#/meetings'); return; }
+  A().setCrumbs([['Центр встреч','#/meetings'],['Добавить участников']],true);
+  d.pick=d.pick||new Set(d.m.people); const f=q.f||'all'; const orig=new Set(d.m.people);
+  const changes=[...d.pick].filter(x=>!orig.has(x)).length+[...orig].filter(x=>!d.pick.has(x)).length;
+  const all=S().employees; const list=all.filter(e=>f==='all'||(f==='added'?orig.has(e.id):f==='sel'?d.pick.has(e.id):!d.pick.has(e.id)));
+  const back=()=>{ d.pick=null; go('#/meetings?resume=1'); };
+  WP.wpage('Добавить участников',`<div class="paper col" style="flex:1;min-height:0">${STAND.seg([['all','Все'],['added','Добавленные'],['sel','Выбранные'],['not','Не выбранные']],f,'pseg')}
+   <div class="lh"><h2 class="h3">Список участников</h2><span class="cnt0">${d.pick.size?d.pick.size+' из '+all.length:all.length}</span><div class="search" style="width:240px;margin-left:auto">${I('search','ic16')}<input class="inp" id="pq" placeholder="Поиск по участникам"></div></div>
+   ${CARDS.uni([{t:'ФИО',f:r=>`<a>${esc(r.name)}</a>`},{t:'Должность',f:r=>esc(r.pos)},{t:'Состояние',w:'150px',f:r=>orig.has(r.id)?'<span class="chip grey">Добавлен</span>':'-'}],list,()=>'#/meetings/participants?f='+f,{cb:1})}</div>`,
+   `<span style="flex:1"></span><span class="cap muted">Изменений:</span><span class="counter">${changes}</span><button class="btn" id="psave" ${changes?'':'disabled'}>Сохранить</button><button class="btn out" id="pcancel">Отменить</button>`,{close:back});
+  document.querySelectorAll('tbody tr').forEach((tr,i)=>{ const e=list[i]; const cb=tr.querySelector('.chk'); cb.checked=d.pick.has(e.id); cb.dataset.e=e.id; tr.dataset.href='#/meetings/participants?f='+f;
+    const t=()=>{ d.pick.has(e.id)?d.pick.delete(e.id):d.pick.add(e.id); BP.render(); }; cb.onclick=ev=>{ ev.stopPropagation(); t(); }; tr.onclick=ev=>{ ev.stopPropagation(); t(); }; });
+  STAND.bindSeg('pseg',x=>go('#/meetings/participants?f='+x));
+  const pq=document.getElementById('pq'); pq.oninput=()=>document.querySelectorAll('tbody tr').forEach(r=>r.hidden=!BP.norm(r.textContent).includes(BP.norm(pq.value)));
+  document.getElementById('pcancel').onclick=back;
+  document.getElementById('psave').onclick=()=>{ d.m.people=[...d.pick]; d.pick=null; store.mark('tt-people'); notify('Участники добавлены'); go('#/meetings?resume=1'); };
+});
 window.MEET={side};
 })();

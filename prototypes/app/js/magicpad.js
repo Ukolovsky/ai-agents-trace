@@ -5,18 +5,19 @@ const CMDS=[
   {k:'create',t:'Создать объект',d:'Контрагент, товар, документ'},
   {k:'find',t:'Найти данные',d:'Поиск по всем данным компании'},
   {k:'import',t:'Импорт из файла',d:'Распознать документ и создать объекты'},
+  {k:'data',t:'Импорт данных',d:'База данных, приложение, ERP-система'},
   {k:'instance',t:'Создать экземпляр процесса',d:'Запустить процесс'},
   {k:'summary',t:'Сделать сводку',d:'По текущему разделу'},
   {k:'status',t:'Проверить статус',d:'Документа, сделки, задачи'}];
-let el, bk, full=false, attached=null, popKind=null, busy=false;
+let el, bk, tab='co', full=false, attached=null, popKind=null, busy=false;
 const isOpen=()=>el && !el.hidden;
 const S=()=>store.s;
 
-function mount(){ el=document.getElementById('mp'); document.body.appendChild(el); bk=document.createElement('div'); bk.id='mpback'; bk.hidden=true; bk.onclick=()=>close(); document.body.appendChild(bk); if(localStorage.getItem('bp-mp')==='1'){ el.hidden=false; bk.hidden=false; } draw(); }
+function mount(){ el=document.getElementById('mp'); document.body.appendChild(el); bk=document.createElement('div'); bk.id='mpback'; bk.hidden=true; bk.onclick=()=>close(); document.body.appendChild(bk); if(localStorage.getItem('bp-mp')==='1'){ el.hidden=false; bk.hidden=false; document.body.classList.add('mp-open'); } draw(); }
 function open(){ if(!el.hidden) return; el.hidden=false; bk.hidden=false; localStorage.setItem('bp-mp','1'); store.mark('mp-open'); draw(); sync(); setTimeout(()=>{const t=el.querySelector('textarea'); t&&t.focus();},50); }
 function close(){ el.hidden=true; bk.hidden=true; full=false; el.classList.remove('full'); localStorage.setItem('bp-mp','0'); sync(); }
 function toggle(){ isOpen()?close():open(); }
-function sync(){ document.querySelectorAll('[data-act="mp"]').forEach(b=>b.classList.toggle('on',isOpen())); APP.updateHint&&APP.updateHint(); }
+function sync(){ document.body.classList.toggle('mp-open',isOpen()); document.querySelectorAll('[data-act="mp"]').forEach(b=>b.classList.toggle('on',isOpen())); APP.updateHint&&APP.updateHint(); }
 function resetUi(){ attached=null; busy=false; draw(); }
 
 function draw(){
@@ -24,7 +25,8 @@ function draw(){
   el.innerHTML=`<button class="xbtn" id="mpx" title="Закрыть">${I('close','ic16')}</button><div class="mp-h"><span class="t">MagicPad</span><span style="margin-left:auto"></span>
     ${chat.length?`<button class="ibtn" id="mpnew" title="Новый диалог">${I('add')}</button>`:''}
     <button class="ibtn" id="mpfull" title="${full?'Свернуть':'Развернуть'}">${I(full?'collapse':'expand')}</button></div>
-  <div class="mp-body" id="mpbody">${chat.length?chat.map(msgHtml).join(''):welcome()}</div>
+  ${onPay()?`<div class="mptabs"><button class="${tab==='co'?'on':''}" data-mtab="co">Копилот</button><button class="${tab==='mp'?'on':''}" data-mtab="mp">MagicPad</button></div>`:''}
+  <div class="mp-body" id="mpbody">${chat.length?chat.map(msgHtml).join(''):full&&!(onPay()&&tab==='co')?hero():onPay()&&tab==='co'?copilot():welcome()}</div>
   <div class="mp-in">${attached?`<div class="attached"><span class="file-chip">${PDF}${esc(attached.name)}</span><button class="ibtn s" id="mpdetach" title="Убрать файл">${I('close','ic16')}</button></div>`:''}
     <textarea id="mpt" placeholder="Напишите сообщение" aria-label="Сообщение Феликсу"></textarea>
     <div class="tools"><button class="ibtn" id="mpatt" title="Прикрепить файл">${I('add','ic16')}</button><button class="ibtn" title="Эмодзи">${I('emoji','ic16')}</button><button class="ibtn" id="mpslash" title="Команды">/</button>
@@ -34,6 +36,9 @@ function draw(){
   t.oninput=()=>{ el.querySelector('#mpsend').classList.toggle('ready',!!(t.value.trim()||attached)); if(t.value.startsWith('/')) showCmds(t.value.slice(1)); else if(popKind==='cmd') hidePop(); };
   t.onkeydown=e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); const m=el.querySelector('.mp-pop .mi.act')||(popKind&&el.querySelector('.mp-pop .mi')); if(m&&popKind){ m.dispatchEvent(new MouseEvent('mousedown',{bubbles:true})); return; } send(); } if(e.key==='Escape'&&popKind){ hidePop(); e.stopPropagation(); } };
   el.querySelector('#mpsend').onclick=send;
+  el.querySelectorAll('[data-mtab]').forEach(b=>b.onclick=()=>{ tab=b.dataset.mtab; draw(); });
+  const fq=el.querySelector('#mpfq'); fq&&(fq.oninput=()=>{ const r=el.querySelector('#mpfr'); const v=norm(fq.value); r.innerHTML=v?FUNCS.filter(f=>norm(f[0]).includes(v)||norm(f[1]).includes(v)).map(f=>`<button class="mp-act" data-fa="${esc(f[2])}"><b>${esc(f[0])}</b><span class="cap muted">${esc(f[1])}</span></button>`).join('')||'<span class="cap muted">Ничего не найдено</span>':''; r.previousElementSibling.hidden=!v;
+    r.querySelectorAll('[data-fa]').forEach(b=>b.onclick=()=>action(b.dataset.fa)); });
   el.querySelector('#mpx').onclick=close;
   el.querySelector('#mpfull').onclick=()=>{ full=!full; draw(); };
   el.querySelector('#mpatt').onclick=()=>showFiles();
@@ -43,8 +48,24 @@ function draw(){
   el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ const a=b.dataset.a; if(a.startsWith('flow:')){ const mi=[...el.querySelectorAll('.msg')].indexOf(b.closest('.msg')); const welcomeOff=0; const m=S().chat[mi]; if(m){ m.used=1; store.save(); } } action(a, b); });
   const body=el.querySelector('#mpbody'); body.scrollTop=body.scrollHeight;
 }
+const onPay=()=>/^\/payments/.test(BP.parseHash().path);
+const FUNCS=[['Импорт документа в Wiki','Загрузите файл, Феликс распознает и импортирует в Wiki','ext:wiki:start'],['Импорт из базы данных','Подключение внешней БД PostgreSQL','ext:integ:src'],['Импорт из файла','Распознать документ и создать объекты','cmd:import'],['Подобрать пресет процессов','Конструктор процесса','go:#/constructor'],['Добавить встречу','Центр встреч','go:#/meetings']];
+function copilot(){ const f=S().finops; const late=f.filter(x=>x.status==='Просрочен');
+  return `<div class="mp-banner co"><div class="tx"><b>MagicPad помогает вести платежи подрядчиков</b><span class="cap">Контекст: ${f.length} платежей, ${BP.money(f.reduce((a,x)=>a+x.amount,0))}; просрочено: ${late.length}. Учитываю статусы, этапы и сроки.</span><span class="chip neutral" style="align-self:flex-start">Все платежи</span></div></div>
+  <div class="mp-sec">Рекомендации</div>
+  <button class="mp-act ica" data-a="say:Найди На согласовании">${I('doc','ic16')}<span><b>Согласовать на согласовании</b><span class="cap muted">Платежи, ожидающие решения</span></span></button>
+  <button class="mp-act ica" data-a="say:Сделай сводку по платежам">${I('table','ic16')}<span><b>Сводка по платежам</b><span class="cap muted">Суммы по статусам и этапам</span></span></button>
+  <button class="mp-act ica" data-a="say:Найди Просрочен">${I('warn','ic16')}<span><b>Найти просроченные</b><span class="cap muted">Что нужно оплатить в первую очередь</span></span></button>
+  <div class="mp-sec">Создание и планирование</div>
+  <button class="mp-act ica" data-a="cmd:create">${I('add','ic16')}<span><b>Добавить платёж</b><span class="cap muted">Новый платёж подрядчику</span></span></button>
+  <button class="mp-act ica" data-a="ext:wiki:start">${I('attach','ic16')}<span><b>Загрузить реестр платежей</b><span class="cap muted">Из файла Excel, CSV, DOCX или PDF</span></span></button>
+  <button class="mp-act ica" data-a="cmd:import">${I('finance','ic16')}<span><b>Создать платёж из счёта</b><span class="cap muted">Распознать счёт и заполнить платёж</span></span></button>
+  <button class="mp-act ica" data-a="say:Найди На утверждении">${I('task','ic16')}<span><b>Платежи на утверждении</b><span class="cap muted">Ждут финального решения</span></span></button>`; }
+function hero(){ return `<div class="mphero"><div class="av" style="background-image:url(assets/felix.png)"></div><h2 class="h2">Чем я могу помочь?</h2>
+  <div class="tiles">${[['doc','Создать документ','cmd:create'],['box','Проверить остатки','say:Найди Цемент'],['table','Отчёт','say:Сделай сводку по платежам'],['search','Найти данные','cmd:find']].map(([i,t,a])=>`<button class="mp-act ica" data-a="${a}">${I(i,'ic16')}<b>${t}</b></button>`).join('')}</div></div>`; }
 function welcome(){
   return `<div class="mp-banner"><div class="tx"><b>Я Феликс. Знаю BusinessPad наизусть</b><span class="cap">Найду документ, открою нужный экран, соберу черновик договора</span></div><img src="assets/fox.png" alt=""></div>
+  <div class="search" style="margin:4px 0">${I('search','ic16')}<input class="inp" id="mpfq" placeholder="Спросите о функциях платформы" autocomplete="off"></div><div class="mp-sec" hidden>Результаты поиска</div><div class="col" id="mpfr" style="gap:6px"></div>
   <div class="mp-sec">Расставьте приоритеты на сегодня</div>
   <button class="mp-act" data-a="say:Сделай сводку по компании">Сводка по компании</button>
   <button class="mp-act" data-a="say:Проверь статус документов">Что требует внимания</button>
@@ -107,6 +128,7 @@ function action(a){
 function command(k){
   const t=el.querySelector('#mpt'); t.value='';
   if(k==='import'){ store.mark('slash'); showFiles(); }
+  else if(k==='data'){ push({who:'me',text:'/ Импорт данных'}); MPX.integ('src'); }
   else if(k==='find'){ t.value='Найди '; t.focus(); }
   else if(k==='summary') say('Сделай сводку по платежам');
   else if(k==='status') say('Проверь статус документов');
@@ -122,6 +144,7 @@ async function send(){
 }
 async function fileFlow(f){
   await typing(['Проверка безопасности файла','Извлечение текста и структуры','Сопоставление с процессами компании']);
+  if(f.wiki){ MPX.wiki('recognized'); return; }
   if(!f.readable){ bot(`<span>Не удалось распознать «${esc(f.name)}»: изображение слишком размытое, текст не читается. Загрузите скан лучшего качества (от 300 dpi) или PDF.</span>`,[{t:'Выбрать другой файл',a:'cmd:import'}]); return; }
   bot(`<span>Файл проверен: товарная накладная ТОРГ-12 № ТН-0842. Выберите процесс, по которому хотите создать экземпляры.</span><span>Ниже — наиболее подходящие варианты. Перед подтверждением данные можно проверить и исправить</span>`,[
     {t:'Входящие документы',r:'100%',d:'Тип: Документ',a:'proc:proc-in-docs:'+f.id},
@@ -151,5 +174,5 @@ async function say(text){
       imp.length?[{t:'Открыть документ',a:'go:#/document/'+imp[imp.length-1].id}]:[{t:'Сделка №1258',a:'go:#/instance/in-deal-1258'}]); }
   else bot('<span>Могу найти данные, сделать сводку, проверить статус или импортировать документ из файла. Введите «/», чтобы увидеть команды.</span>',[{t:'Импорт из файла',a:'cmd:import'}]);
 }
-window.MP={me:t=>push({who:'me',text:t}),typing,useAll:()=>{ S().chat.forEach(m=>m.used=1); store.save(); },attachSend:fid=>{ open(); attached=S().demoFiles.find(f=>f.id===fid); draw(); send(); },mount,open,close,toggle,isOpen,say,bot,slash:()=>{ const t=el.querySelector('#mpt'); t.value='/'; t.focus(); showCmds(''); },resetUi};
+window.MP={redraw:()=>{ if(el){ if(!/^\/payments/.test(BP.parseHash().path)) tab='co'; draw(); } },me:t=>push({who:'me',text:t}),typing,useAll:()=>{ S().chat.forEach(m=>m.used=1); store.save(); },attachSend:fid=>{ open(); attached=S().demoFiles.find(f=>f.id===fid); draw(); send(); },mount,open,close,toggle,isOpen,say,bot,slash:()=>{ const t=el.querySelector('#mpt'); t.value='/'; t.focus(); showCmds(''); },resetUi};
 })();

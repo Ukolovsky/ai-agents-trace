@@ -84,7 +84,7 @@ function content(html){ const c=document.getElementById('content'); c.innerHTML=
 
 window.APP = {
   start(){ drawer(); appbar(); window.MP&&MP.mount(); render(); },
-  afterRender(path){ window.DEMO&&DEMO.refresh(); if(/^\/(import|drafts)\//.test(path)&&window.MP&&MP.isOpen()) MP.close(); if(!/^\/(import|drafts)\//.test(path)){ document.getElementById('overlay').innerHTML=''; document.querySelectorAll('.sp-back,.sidepage').forEach(x=>x.remove()); } document.querySelectorAll('.selpop').forEach(x=>x.remove()); markNav(); setCrumbs(crumbs, crumbs._back); },
+  afterRender(path){ if(BP.parseHash().query.mp&&window.MP&&!MP.isOpen()) setTimeout(()=>MP.open(),0); document.body.classList.toggle('mp-dock',/^\/integrator/.test(path)); window.DEMO&&DEMO.refresh(); window.MP&&MP.redraw&&MP.redraw(); if(/^\/(import|drafts)\//.test(path)&&window.MP&&MP.isOpen()) MP.close(); if(!/^\/(import|drafts)\//.test(path)){ document.getElementById('overlay').innerHTML=''; document.querySelectorAll('.sp-back,.sidepage').forEach(x=>x.remove()); } document.querySelectorAll('.selpop').forEach(x=>x.remove()); markNav(); setCrumbs(crumbs, crumbs._back); },
   setCrumbs, ph, viewSw, wsSelect, content, popMenu, updateHint:()=>window.DEMO&&DEMO.refresh(), resetDemo
 };
 })();

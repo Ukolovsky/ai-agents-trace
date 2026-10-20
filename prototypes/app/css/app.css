@@ -492,3 +492,51 @@ table.uni td a{color:var(--primary)}
 .week .now{position:absolute;left:0;right:0;height:2px;background:var(--secondary)}
 .snacks{left:var(--drawer);z-index:120}
 .overlay{top:var(--hdr)}
+/* ===================== v6: Интегратор, Data flow, Точки входа ИИ, ветки Настройщика и Центра встреч ===================== */
+.wpage{display:flex;flex-direction:column;height:100%;gap:0}
+.wpage .wbody{flex:1;min-height:0;display:flex;flex-direction:column}
+.wfoot{display:flex;align-items:center;gap:10px;height:48px;flex:none;margin:0 -16px -16px;padding:0 16px;background:#fff;border-top:1px solid var(--g300)}
+.cpage{height:100%}
+.cpage .wfoot{margin-top:-12px}
+body.mp-dock #mpback{display:none!important}
+body.mp-dock.mp-open .content{padding-right:549px}
+body.mp-dock .mp{box-shadow:none;border-left:1px solid var(--g300)}
+body.mp-dock .mp #mpx{left:12px;top:16px}body.mp-dock .mp-h{padding-left:40px}
+.stepper .step{font-size:12px}
+table.uni tr.grp td{background:var(--v200);font-weight:500}
+.wdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--warning);margin-left:6px;vertical-align:middle}
+.tgl{display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer}
+.tgl input{display:none}.tgl i{width:28px;height:16px;border-radius:8px;background:var(--g300);position:relative;transition:background var(--t)}
+.tgl i:after{content:'';position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:left var(--t)}
+.tgl input:checked+i{background:var(--primary)}.tgl input:checked+i:after{left:14px}
+/* панель этапа */
+.canvas .stg{cursor:pointer}.canvas .stg.sel{border-color:var(--primary);box-shadow:0 0 0 2px var(--v400)}
+.stpanel{position:sticky;float:right;top:8px;margin:8px 8px 0 0;width:270px;z-index:3;display:flex;flex-direction:column;gap:6px;max-height:calc(100% - 16px);overflow:auto}
+.stpanel .sth{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #9e9e9e;border-radius:6px;height:40px;padding:0 8px}
+.stpanel .sth label{display:flex;gap:6px;align-items:center;font-weight:500;margin:0 auto}
+.stpanel .acc{background:#fff;border:1px solid #9e9e9e;border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.stpanel .acc>b{color:var(--primary);font-weight:500;cursor:pointer}.stpanel .acc.open>b{color:var(--text)}
+.stpanel .inp,.stpanel .ta{font-size:12px}
+.warnbox{display:flex;gap:8px;background:var(--warning-l);border-radius:6px;padding:8px;font-size:12px}.warnbox .ic{color:var(--warning)}
+/* MagicPad: вкладки Копилот / MagicPad, поиск функций, полноэкранный режим */
+.mptabs{display:flex;background:#fff;border-radius:8px 8px 0 0;border-bottom:1px solid var(--g300)}
+.mptabs button{flex:1;height:32px;border:0;background:none;cursor:pointer;font-weight:500;color:var(--text2)}
+.mptabs button.on{color:var(--text);box-shadow:inset 0 -2px 0 var(--primary)}
+.mptabs+.mp-body{border-radius:0}
+.mp-banner.co{background:var(--magic-paper);color:var(--text);min-height:0}
+.mp-act.ica{display:flex;gap:10px;align-items:flex-start;border:0;padding:6px 4px}.mp-act.ica>span{display:flex;flex-direction:column;gap:2px}.mp-act.ica .ic{color:var(--primary);margin-top:2px}
+.mphero{margin:auto;display:flex;flex-direction:column;align-items:center;gap:16px;max-width:560px;width:100%}
+.mphero .av{width:56px;height:56px;border-radius:50%;background:center/cover}
+.mphero .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}.mphero .tiles .mp-act{flex-direction:column;align-items:flex-start;border:1px solid var(--g300)}
+.wdoc{border:1px solid var(--g300);border-radius:8px;background:#fff;padding:8px;display:flex;flex-direction:column;gap:6px}
+.wdoc .pg{border:1px solid var(--g300);border-radius:4px;padding:8px;display:flex;flex-direction:column;gap:4px;text-align:center}
+.wdoc .r{display:flex;gap:10px;flex-wrap:wrap}
+.foxnote{position:fixed;right:24px;bottom:24px;z-index:110;display:flex;align-items:flex-end}
+.foxnote img{width:140px;margin-right:-24px;position:relative;z-index:1}
+.foxnote .card{background:#fff;border-radius:8px;box-shadow:var(--sh-popper);padding:12px 12px 12px 30px;width:300px;display:flex;flex-direction:column;gap:6px;position:relative}
+.foxnote .x{position:absolute;right:6px;top:6px}
+.rf .fld label{display:flex;gap:6px;align-items:center}
+body.mp-dock .wfoot{position:fixed;left:var(--drawer);right:0;bottom:0;margin:0;z-index:41}
+body.mp-dock .mp{bottom:48px;border-radius:0}
+body.mp-dock .wpage{padding-bottom:40px}
+#pop,.vmenu,.upop{z-index:130}

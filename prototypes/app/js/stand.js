@@ -61,7 +61,7 @@ route(/^\/settings\/bps$/, ()=>{
 function canvas(stages, lanes, o={}){
   const W=230, H=150, x0=190; const lanesN=lanes.length;
   const pos=stages.map((s,i)=>({x:x0+i*W, y:Math.max(0,lanes.indexOf(s[2]||lanes[0]))*H+49, s}));
-  const boxes=pos.map(p=>`<div class="stg" style="left:${p.x}px;top:${p.y}px"><i></i><div><b>${esc(p.s[0])}</b><span class="cap muted">${esc(p.s[1]||'')}</span></div>${I('more','ic16')}</div>`).join('');
+  const boxes=pos.map((p,i)=>`<div class="stg ${o.sel===i?'sel':''}" data-stg="${i}" style="left:${p.x}px;top:${p.y}px"><i></i><div><b>${esc(p.s[0])}</b><span class="cap muted">${esc(p.s[1]||'')}</span></div>${I('more','ic16')}</div>`).join('');
   const endX=x0+stages.length*W+(stages.length?0:120);
   const lines=[]; let px=136, py=75; pos.forEach(p=>{ lines.push(`<path d="M${px} ${py} H${(px+p.x)/2} V${p.y+26} H${p.x}"/>`); px=p.x+180; py=p.y+26; });
   lines.push(`<path d="M${px} ${py} H${endX}"/>`);
@@ -69,7 +69,7 @@ function canvas(stages, lanes, o={}){
   ${lanes.map((l,i)=>`<div class="lane" style="top:${i*H}px;height:${H}px"><span>${esc(l)}</span></div>`).join('')}
   <svg class="links" width="${endX+80}" height="${lanesN*H}"><defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 8 4 0 8z" fill="#85868A"/></marker></defs><g stroke="#85868A" fill="none" marker-end="url(#ar)">${lines.join('')}</g></svg>
   <span class="ev start" style="left:100px;top:57px"></span>${boxes}<span class="ev end" style="left:${endX}px;top:${py-18}px"></span>
-  <div class="cpanel"><button class="ibtn s">${I('chev','ic16')}</button><div>Панель управления</div></div>
+  ${o.panel||`<div class="cpanel"><button class="ibtn s" id="cpopen">${I('chev','ic16')}</button><div>Панель управления</div></div>`}
   <div class="zoom"><span class="zb">${I('add','ic16')}<b>100 %</b><span>—</span>${I('fit','ic16')}</span><span class="zb">${I('down','ic16')}${I('up','ic16')}</span></div>
   <div class="ctool"><label><input type="checkbox" class="chk">Процессы ${I('drop','ic16')}</label><span>${I('diamond','ic16')}Шлюзы ${I('drop','ic16')}</span><span>${I('loop','ic16')}Циклы ${I('drop','ic16')}</span><span>${I('cards','ic16')}Еще ${I('drop','ic16')}</span></div></div>`;
 }
