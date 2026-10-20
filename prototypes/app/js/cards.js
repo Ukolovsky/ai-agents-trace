@@ -8,9 +8,9 @@ const cpLink = id => id&&store.cp(id) ? `<a href="#/counterparty/${id}">${esc(cp
 /* ---------- UniTable ---------- */
 function uni(cols, rows, href, o={}){
   if(!rows.length) return `<div class="empty"><b>Ничего не найдено</b>Попробуйте изменить запрос</div>`;
-  return `<div class="tblwrap"><table class="uni"><colgroup>${cols.map(c=>`<col style="width:${c.w||'auto'}">`).join('')}<col style="width:32px"></colgroup>
-  <thead><tr>${cols.map(c=>`<th title="${esc(c.t)}">${esc(c.t)}</th>`).join('')}<th class="act"></th></tr></thead>
-  <tbody>${rows.map(r=>`<tr class="click ${r.imported||r.isNew?'new':''}" data-href="${href(r)}">${cols.map(c=>`<td title="${esc(c.tt?c.tt(r):'')}">${c.f(r)}</td>`).join('')}<td class="act"><button class="ibtn s" tabindex="-1">${I('more','ic16')}</button></td></tr>`).join('')}</tbody></table></div>`;
+  return `<div class="tblwrap"><table class="uni"><colgroup>${o.cb?'<col style="width:32px">':''}${cols.map(c=>`<col style="width:${c.w||'auto'}">`).join('')}<col style="width:32px"></colgroup>
+  <thead><tr>${o.cb?'<th class="cb"><input type="checkbox" class="chk" aria-label="Выбрать все"></th>':''}${cols.map(c=>`<th title="${esc(c.t)}">${esc(c.t)}</th>`).join('')}<th class="act"></th></tr></thead>
+  <tbody>${rows.map(r=>`<tr class="click" data-href="${href(r)}">${o.cb?'<td class="cb"><input type="checkbox" class="chk" onclick="event.stopPropagation()"></td>':''}${cols.map(c=>`<td title="${esc(c.tt?c.tt(r):'')}">${c.f(r)}</td>`).join('')}<td class="act"><button class="ibtn s" tabindex="-1">${I('more','ic16')}</button></td></tr>`).join('')}</tbody></table></div>`;
 }
 document.addEventListener('click',e=>{ const tr=e.target.closest('tr[data-href]'); if(tr && !e.target.closest('a')) go(tr.dataset.href); });
 
@@ -21,20 +21,20 @@ function listPage(title, crumbsTitle, cols, rows, href, plusTitle){
 
 /* ---------- Платежи подрядчикам: хост-раздел для MagicPad (по макетам Точек входа) ---------- */
 route(/^\/payments$/, (_,q)=>{
-  A().setCrumbs([['Финансы','#/payments'],['Платежи подрядчикам']]);
+  A().setCrumbs([['Финансы','#/payments'],['Платежи подрядчикам']], true);
   const rows=store.s.finops;
-  const sum=s=>rows.filter(r=>r.status===s).reduce((a,r)=>a+r.amount,0);
-  A().content(`<div class="page">${A().ph('Платежи подрядчикам',{counter:rows.length, plus:'Создать платёж', filters:1})}
-  <div class="grid4">${['На согласовании','На утверждении','Запланирован','Оплачен'].map(s=>`<div class="kpi" style="background:#fff"><span class="muted">${s}</span><span class="v">${money(sum(s))}</span></div>`).join('')}</div>
-  <div class="paper flat">${uni([
-    {t:'Контрагент',w:'180px',f:r=>esc(cpName(r.counterparty)),tt:r=>cpName(r.counterparty)},
+  A().content(`<div class="page">${A().ph('Платежи подрядчикам',{filters:1, extra:`<span class="tabs" style="width:72px"><button class="on" title="Таблица">${I('table','ic16')}</button><button title="Вид">${I('drop','ic16')}</button></span>`})}
+  <div class="paper col" style="flex:1"><div class="row" style="align-items:center;gap:12px"><h2 class="h3">Список платежей</h2><span class="counter">${rows.length}</span><button class="plus" data-act="plus" title="Создать платёж">${I('add')}</button>
+   <div class="search" style="margin-left:auto;width:188px">${I('search')}<input class="inp" placeholder="Поиск по платежам" aria-label="Поиск по платежам"></div></div>
+  ${uni([
+    {t:'Контрагенты',w:'180px',f:r=>esc(cpName(r.counterparty)),tt:r=>cpName(r.counterparty)},
     {t:'Название',f:r=>esc(r.name),tt:r=>r.name},
-    {t:'Вид операции',w:'190px',f:r=>esc(r.op),tt:r=>r.op},
+    {t:'Тип операции',w:'190px',f:r=>esc(r.op),tt:r=>r.op},
     {t:'Статус',w:'140px',f:r=>chip(r.status)},
     {t:'Этап',w:'150px',f:r=>esc(r.stage)},
     {t:'Дата',w:'100px',f:r=>r.date},
-    {t:'Сумма',w:'120px',f:r=>money(r.amount)}], rows, r=>'#/finop/'+r.id)}</div></div>`);
-  if(q.mp) MP.open();
+    {t:'Сумма',w:'120px',f:r=>money(r.amount)}], rows, r=>'#/finop/'+r.id, {cb:1})}</div></div>`);
+  if(q.mp) MP.open(); if(q.slash) setTimeout(()=>MP.slash(),100);
   if(q.say) setTimeout(()=>MP.say(q.say),300);
 });
 
@@ -58,19 +58,14 @@ let tab='main';
 function card(o){
   A().setCrumbs(o.crumbs, true);
   const tabs=[['main','Общие сведения'],['rel','Связанные объекты',o.rel.length],['hist','История',o.hist.length]];
-  A().content(`<div class="page">${A().ph(o.title,{extra:(o.status?chip(o.status):'')+(o.imported?'<span class="chip special">создано через импорт</span>':'')})}
+  A().content(`<div class="page">${A().ph(o.title,{extra:(o.status?chip(o.status):'')})}
   <div class="tabs soft" style="max-width:560px">${tabs.map(t=>`<button class="${tab===t[0]?'on':''}" data-tab="${t[0]}">${t[1]}${t[2]!=null?` <span class="counter">${t[2]}</span>`:''}</button>`).join('')}</div>
   <div class="row" style="align-items:flex-start">
    <div class="paper" style="flex:1;min-width:0">${tab==='main'?`<dl class="dl">${o.fields.map(f=>`<dt>${esc(f[0])}</dt><dd>${f[1]}</dd>`).join('')}</dl>${o.extra||''}`:
      tab==='rel'?(o.rel.length?`<div class="col" style="gap:8px">${o.rel.map(r=>`<a class="acard" href="${r.h}"><span class="cap muted">${esc(r.k)}</span><b class="sub1">${esc(r.t)}</b>${r.s?`<span>${chip(r.s)}</span>`:''}</a>`).join('')}</div>`:'<div class="empty"><b>Нет связанных объектов</b></div>'):
      (o.hist.length?`<div class="tl">${o.hist.map(h=>`<div><span>${esc(h.text)}</span><span class="cap muted">${h.date} · ${esc(h.who)}</span></div>`).join('')}</div>`:'<div class="empty"><b>Нет событий</b></div>')}</div>
-   <div class="paper magic col" style="width:320px;flex:none"><div class="row" style="gap:8px;align-items:center">${I('shine')}<b class="sub1">Феликс по объекту</b></div>
-     <span class="cap">${esc(o.ai||'Спросите Феликса об этом объекте: сводка, статус, связанные документы.')}</span>
-     <button class="btn pri out s" data-ask="${esc('Сделай сводку по '+o.title)}">Сделать сводку</button>
-     <button class="btn pri out s" data-ask="${esc('Проверь статус '+o.title)}">Проверить статус</button></div>
   </div></div>`);
   document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab; BP.render();});
-  document.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>{ MP.open(); MP.say(b.dataset.ask); });
 }
 let lastCard=''; function resetTab(id){ if(id!==lastCard){tab='main'; lastCard=id;} }
 const evFor = (id, extra=[]) => extra.concat(store.s.events.filter(e=>e.counterparty===id||e.object===id));
@@ -135,7 +130,7 @@ route(/^\/(report|setting|wiki)\/([\w-]+)$/, ([k,id])=>{
   const coll={report:'reports',setting:'settings',wiki:'wiki'}[k]; const t=store.s[coll].find(x=>x.id===id); if(!t) return notFound(); resetTab(id);
   card({title:t.name, crumbs:[[{report:'Отчёты',setting:'Настройки',wiki:'Wiki'}[k],'#/search?cat='+coll],[t.name]], fields:[['Обновлён',t.updated],['Ключевые слова',esc(t.text)]], rel:[], hist:[]});
 });
-function notFound(){ A().setCrumbs([['Не найдено']],true); A().content(`<div class="page">${A().ph('Объект не найден')}<div class="paper empty"><b>Возможно, демо было сброшено</b><a href="#/">К демо-сценариям</a></div></div>`); }
+function notFound(){ A().setCrumbs([['Не найдено']],true); A().content(`<div class="page">${A().ph('Объект не найден')}<div class="paper empty"><b>Объект удалён или недоступен</b><a href="#/payments">К списку платежей</a></div></div>`); }
 
 window.CARDS={uni, cpName};
 })();

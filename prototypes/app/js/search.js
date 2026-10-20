@@ -86,7 +86,7 @@ route(/^\/search$/, (_,qs)=>{
   document.querySelectorAll('.cats button').forEach(b=>b.onclick=()=>go(b.dataset.href));
   if(q) remember(q);
 });
-function row(e,q){ return `<a class="acard" href="${e.href}" style="flex-direction:row;align-items:center;gap:12px;text-decoration:none;color:inherit">${e.cat==='documents'?PDF:''}<div class="col" style="gap:2px;min-width:0;flex:1"><span class="sub1" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${hl(e.title,q)}</span><span class="cap muted">${esc(e.sub)}</span></div>${e.imported?'<span class="chip special">новое</span>':''}${e.status?chip(e.status):''}${e.amount?`<span>${money(e.amount)}</span>`:''}</a>`; }
+function row(e,q){ return `<a class="acard" href="${e.href}" style="flex-direction:row;align-items:center;gap:12px;text-decoration:none;color:inherit">${e.cat==='documents'?PDF:''}<div class="col" style="gap:2px;min-width:0;flex:1"><span class="sub1" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${hl(e.title,q)}</span><span class="cap muted">${esc(e.sub)}</span></div>${e.status?chip(e.status):''}${e.amount?`<span>${money(e.amount)}</span>`:''}</a>`; }
 /* Сводка по контрагенту (макет 973-9302): KPI, тепловая карта, связанные объекты, лента событий */
 function summary(c,q){
   const s=store.s, id=c.id;
@@ -96,7 +96,7 @@ function summary(c,q){
   let seed=[...id].reduce((a,ch)=>a+ch.charCodeAt(0),0);
   const rnd=()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
   const cells=Array.from({length:364},(_,i)=>{ const r=rnd(); const recent=i>300; return r>(recent?.45:.8)?(r>.93?4:r>.85?3:r>.7?2:1):0; });
-  return `<div class="paper col"><div class="row" style="align-items:center;gap:8px"><a class="h3" href="#/counterparty/${id}">${hl(c.name,q)}</a>${chip(c.status)}${c.imported?'<span class="chip special">создан через импорт</span>':''}<span class="muted" style="margin-left:auto">ИНН ${c.inn}</span></div>
+  return `<div class="paper col"><div class="row" style="align-items:center;gap:8px"><a class="h3" href="#/counterparty/${id}">${hl(c.name,q)}</a>${chip(c.status)}<span class="muted" style="margin-left:auto">ИНН ${c.inn}</span></div>
    <div class="grid4"><div class="kpi"><span class="muted">Документы</span><span class="v">${docs.length}</span></div><div class="kpi"><span class="muted">Экземпляры процессов</span><span class="v">${inst.length}</span></div><div class="kpi"><span class="muted">Оплачено</span><span class="v">${money(paid)}</span></div><div class="kpi"><span class="muted">Открытые задачи</span><span class="v">${tasks.length}</span></div></div>
    <div class="col" style="gap:8px"><span class="sub1">Активность за год</span><div class="heat" style="grid-auto-flow:column;grid-template-rows:repeat(7,auto);grid-template-columns:none;grid-auto-columns:1fr">${cells.map(l=>`<i class="${l?'l'+l:''}"></i>`).join('')}</div></div>
    ${ev.length?`<div class="col" style="gap:8px"><span class="sub1">Последняя активность</span><div class="tl">${ev.slice(0,4).map(e=>`<div><span>${esc(e.text)}</span><span class="cap muted">${e.date} · ${esc(e.who)}</span></div>`).join('')}</div></div>`:''}</div>`;

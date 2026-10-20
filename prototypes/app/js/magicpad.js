@@ -16,19 +16,18 @@ function mount(){ el=document.getElementById('mp'); if(localStorage.getItem('bp-
 function open(){ if(!el.hidden) return; el.hidden=false; localStorage.setItem('bp-mp','1'); store.mark('mp-open'); draw(); sync(); setTimeout(()=>{const t=el.querySelector('textarea'); t&&t.focus();},50); }
 function close(){ el.hidden=true; full=false; el.classList.remove('full'); localStorage.setItem('bp-mp','0'); sync(); }
 function toggle(){ isOpen()?close():open(); }
-function sync(){ document.querySelectorAll('[data-act="mp"]').forEach(b=>b.classList.toggle('on',isOpen())); APP.updateHint(); }
+function sync(){ document.querySelectorAll('[data-act="mp"]').forEach(b=>b.classList.toggle('on',isOpen())); APP.updateHint&&APP.updateHint(); }
 function resetUi(){ attached=null; busy=false; draw(); }
 
 function draw(){
   const chat=S().chat;
-  el.innerHTML=`<div class="mp-h"><span class="t">MagicPad</span><span style="margin-left:auto"></span>
-    ${chat.length?`<button class="ibtn" id="mpnew" title="Новый диалог">${I('reset')}</button>`:''}
-    <button class="ibtn" id="mpfull" title="${full?'Свернуть':'Развернуть'}">${I(full?'collapse':'expand')}</button>
-    <button class="ibtn" id="mpx" title="Закрыть">${I('close')}</button></div>
+  el.innerHTML=`<div class="mp-h"><button class="ibtn out" id="mpx" title="Закрыть" style="border-color:var(--g300)">${I('close')}</button><span class="t">MagicPad</span><span style="margin-left:auto"></span>
+    ${chat.length?`<button class="ibtn" id="mpnew" title="Новый диалог">${I('add')}</button>`:''}
+    <button class="ibtn" id="mpfull" title="${full?'Свернуть':'Развернуть'}">${I(full?'collapse':'expand')}</button></div>
   <div class="mp-body" id="mpbody">${chat.length?chat.map(msgHtml).join(''):welcome()}</div>
   <div class="mp-in">${attached?`<div class="attached"><span class="file-chip">${PDF}${esc(attached.name)}</span><button class="ibtn s" id="mpdetach" title="Убрать файл">${I('close','ic16')}</button></div>`:''}
-    <textarea id="mpt" placeholder="${attached?'Что сделать с файлом? Можно просто отправить':'Спросите Феликса или введите «/» для команд'}" aria-label="Сообщение Феликсу"></textarea>
-    <div class="tools"><button class="ibtn" id="mpatt" title="Прикрепить файл">${I('attach','ic16')}</button><button class="ibtn" id="mpslash" title="Команды">/</button>
+    <textarea id="mpt" placeholder="Напишите сообщение" aria-label="Сообщение Феликсу"></textarea>
+    <div class="tools"><button class="ibtn" id="mpatt" title="Прикрепить файл">${I('add','ic16')}</button><button class="ibtn" title="Эмодзи">${I('emoji','ic16')}</button><button class="ibtn" id="mpslash" title="Команды">/</button>
       <button class="ibtn send ${attached?'ready':''}" id="mpsend" title="Отправить">${I('send','ic16')}</button></div></div>`;
   el.classList.toggle('full',full);
   const t=el.querySelector('#mpt');
@@ -45,14 +44,15 @@ function draw(){
   const body=el.querySelector('#mpbody'); body.scrollTop=body.scrollHeight;
 }
 function welcome(){
-  const s=S(); const pend=s.finops.filter(f=>f.status==='На согласовании');
-  return `<div class="mp-banner"><div class="tx"><b>Я Феликс, ваш ИИ-помощник</b><span class="cap">Помогу найти данные, разобрать документ из файла и подготовить сводку.</span></div><img src="assets/fox.png" alt=""></div>
-  <div class="mp-sec">Приоритеты на сегодня</div>
-  <button class="mp-act" data-a="say:Сделай сводку по платежам">${pend.length} платежа ждут согласования на ${money(pend.reduce((a,f)=>a+f.amount,0))}</button>
-  <button class="mp-act" data-a="go:#/task/t-check-docs">Проверить документы от СтройМонолит, срок сегодня</button>
-  <div class="mp-sec">Быстрые действия</div>
-  <button class="mp-act" data-a="cmd:import">${I('attach','ic16')} Импорт из файла</button>
-  <button class="mp-act" data-a="say:Найди СтройМонолит">${I('search','ic16')} Найти данные по контрагенту</button>`;
+  return `<div class="mp-banner"><div class="tx"><b>Я Феликс. Знаю BusinessPad наизусть</b><span class="cap">Найду документ, открою нужный экран, соберу черновик договора</span></div><img src="assets/fox.png" alt=""></div>
+  <div class="mp-sec">Расставьте приоритеты на сегодня</div>
+  <button class="mp-act" data-a="say:Сделай сводку по компании">Сводка по компании</button>
+  <button class="mp-act" data-a="say:Проверь статус документов">Что требует внимания</button>
+  <button class="mp-act" data-a="say:Сделай сводку за день">Главное за день</button>
+  <div class="mp-sec">Финансы и платежи</div>
+  <button class="mp-act" data-a="say:Сделай сводку по платежам">Денежный поток</button>
+  <button class="mp-act" data-a="say:Найди На согласовании">Платежи на согласование</button>
+  <button class="mp-act" data-a="say:Найди Просрочен">Просроченная задолженность</button>`;
 }
 function msgHtml(m){
   if(m.who==='me') return `<div class="msg me"><div class="bub">${m.file?`<span class="file-chip">${PDF}${esc(m.file)}</span>`:''}${m.text?`<span>${esc(m.text)}</span>`:''}<span class="tm">${m.time}</span></div></div>`;
@@ -81,8 +81,8 @@ function showCmds(f){
   pop('cmd', `<div class="ph2">Команды</div>`+list.map((c,i)=>`<div class="mi ${i===0?'act':''}" data-a="cmd:${c.k}" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="sub1">/ ${esc(c.t)}</span><span class="cap muted">${esc(c.d)}</span></div>`).join(''));
 }
 function showFiles(){
-  pop('file', `<div class="ph2">Демо-файлы (вместо загрузки с компьютера)</div>`+S().demoFiles.map(f=>`<div class="mi" data-a="attach:${f.id}">${PDF}<span style="flex:1">${esc(f.name)}</span><span class="cap muted">${f.size}</span></div>`).join('')+
-    `<div class="mi" style="color:var(--text-dis);cursor:default">${I('attach','ic16')}Загрузить с компьютера (в пилоте отключено)</div>`);
+  pop('file', `<div class="ph2">Недавние файлы</div>`+S().demoFiles.map(f=>`<div class="mi" data-a="attach:${f.id}">${PDF}<span style="flex:1">${esc(f.name)}</span><span class="cap muted">${f.size}</span></div>`).join('')+
+    `<div class="mi" style="color:var(--text-dis);cursor:default">${I('attach','ic16')}Загрузить с компьютера</div>`);
 }
 
 /* ---------- Действия ---------- */
@@ -140,7 +140,7 @@ async function say(text){
   else if(n.includes('статус')){ const imp=S().documents.filter(d=>d.imported);
     bot(imp.length?`<span>Последний импортированный документ «${esc(imp[imp.length-1].name)}» в статусе <b>${esc(imp[imp.length-1].status)}</b>, этап «Регистрация». Следующий шаг: проверка бухгалтерией.</span>`:'<span>Сделка №1258 на этапе «Согласование КД», Сделка №1251 на «Подписании». Счёт № 1251 на согласовании.</span>',
       imp.length?[{t:'Открыть документ',a:'go:#/document/'+imp[imp.length-1].id}]:[{t:'Сделка №1258',a:'go:#/instance/in-deal-1258'}]); }
-  else bot('<span>В пилоте я понимаю команды из меню «/», а также запросы «Найди …», «Сделай сводку», «Проверь статус». Попробуйте импорт из файла.</span>',[{t:'Импорт из файла',a:'cmd:import'}]);
+  else bot('<span>Могу найти данные, сделать сводку, проверить статус или импортировать документ из файла. Введите «/», чтобы увидеть команды.</span>',[{t:'Импорт из файла',a:'cmd:import'}]);
 }
 window.MP={attachSend:fid=>{ open(); attached=S().demoFiles.find(f=>f.id===fid); draw(); send(); },mount,open,close,toggle,isOpen,say,bot,slash:()=>{ const t=el.querySelector('#mpt'); t.value='/'; t.focus(); showCmds(''); },resetUi};
 })();
