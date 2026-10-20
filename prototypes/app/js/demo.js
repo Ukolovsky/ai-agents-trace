@@ -13,11 +13,13 @@ const STEPS=[
   {k:'cp',t:'«Проверить и создать» контрагента',h:''},
   {k:'prod',t:'«Создать товар» (Арматура)',h:''},
   {k:'found',t:'Найти «ИнвестСтрой» в ИИ поиске',h:'#/search?q=ИнвестСтрой'}];
-const JUMPS=[['Платежи подрядчикам','#/payments'],['MagicPad: меню «/»','#/payments?mp=1&slash=1'],['Импорт: нечитаемый скан','#/import/start?file=file-scan'],
-  ['ИИ поиск: СтройМонолит','#/search?q=СтройМонолит'],['Контрагенты','#/counterparties'],['Документы','#/documents']];
+const JUMPS=[['Процессы','#/processes'],['Платежи подрядчикам','#/payments'],['MagicPad: меню «/»','#/payments?mp=1&slash=1'],['Импорт: нечитаемый скан','#/import/start?file=file-scan'],
+  ['ИИ поиск: СтройМонолит','#/search?q=СтройМонолит'],['Настройки системы','#/settings'],['Карточка БП: Платежи подрядчикам','#/settings/bp/proc-payments'],['Справочник: Товары','#/settings/dir/products'],['Чат','#/chat']];
+const SC2=[['Центр встреч (Task tracker)',[['meeting','Добавить встречу через «+»','#/meetings']]],
+  ['Настройщик: пресет процессов',[['cons-start','Открыть конструктор, «Описать бизнес»','#/constructor'],['cons-pick','Выбрать рекомендованный пресет',''],['cons-deploy','«Развернуть» черновики',''],['cons-pub','«Опубликовать все» → «Опубликовать»','']]]];
 const HINT={'mp-open':'Нажмите кнопку с искрой в шапке страницы.','slash':'В поле MagicPad введите «/» и выберите «Импорт из файла».','file':'Выберите «Товарная накладная ТН-0842.pdf» и отправьте.','proc':'Нажмите карточку «Входящие документы».','fields':'На шаге «Распознанные поля» исправьте «Грузополучателя» на ООО «ИнвестСтрой». Нажмите «+», добавьте «Номер транспортной накладной» без значения и выделите номер в документе.','created':'Нажмите «Создать» внизу мастера.','cp':'В ответе Феликса нажмите «Проверить и создать», отметьте контрагента и нажмите «Создать».','prod':'Нажмите «Создать товар», отметьте Арматуру и нажмите «Создать».','found':'Введите «ИнвестСтрой» в поиске по системе.'};
 const clean=new URLSearchParams(location.search).get('clean')==='1';
-const css=`#demo-trig{position:fixed;left:16px;bottom:52px;z-index:2147483000;width:40px;height:24px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:#1E1E24;color:#FFD27A;font:600 10px/22px ui-monospace,Menlo,monospace;letter-spacing:.08em;text-align:center;cursor:pointer;opacity:.55;padding:0;transition:opacity .2s}
+const css=`#demo-trig{position:fixed;left:4px;bottom:52px;z-index:2147483000;width:40px;height:24px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:#1E1E24;color:#FFD27A;font:600 10px/22px ui-monospace,Menlo,monospace;letter-spacing:.08em;text-align:center;cursor:pointer;opacity:.55;padding:0;transition:opacity .2s}
 #demo-trig:hover,#demo-trig.on{opacity:1}
 #demo-panel{position:fixed;left:56px;bottom:16px;z-index:2147483001;width:320px;max-height:calc(100vh - 32px);overflow:auto;background:#1E1E24;color:#EDEDED;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.45);font:13px/18px ui-monospace,Menlo,Consolas,monospace;padding:12px 14px}
 #demo-panel[hidden]{display:none}#demo-panel h4{margin:12px 0 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#9A9AA6}
@@ -45,7 +47,7 @@ function refresh(){
   if(!panel||panel.hidden) return; const pr=store.s.progress; const next=STEPS.find(s=>!pr[s.k]);
   panel.innerHTML=`<div class="hd"><b>Демо · ${esc(store.s.company.name)}</b><span class="k">Shift+D</span><button class="x" title="Закрыть">×</button></div>
   <h4>Сценарий «Накладная от поставщика»</h4>${STEPS.map((s,i)=>`<div class="st ${pr[s.k]?'done':s===next?'next':''}"><i>${pr[s.k]?'✓':i+1+'.'}</i>${s.h&&!pr[s.k]?`<a href="${s.h}" data-go="${s.h}">${esc(s.t)}</a>`:`<span>${esc(s.t)}</span>`}</div>`).join('')}
-  <h4>Подсказка</h4><div style="color:#CFCFD6">${esc(HINT[(next||{}).k]||'Сценарий пройден. Сбросьте данные, чтобы начать заново.')}</div><h4>Быстрые действия</h4>${JUMPS.map(j=>`<a href="${j[1]}" data-go="${j[1]}">${esc(j[0])}</a>`).join('')}
+  ${SC2.map(([t,l])=>`<h4>${esc(t)}</h4>`+l.map(([k,tt,h],i)=>`<div class="st ${pr[k]?'done':''}"><i>${pr[k]?'✓':i+1+'.'}</i>${h&&!pr[k]?`<a href="${h}" data-go="${h}">${esc(tt)}</a>`:`<span>${esc(tt)}</span>`}</div>`).join('')).join('')}<h4>Подсказка</h4><div style="color:#CFCFD6">${esc(HINT[(next||{}).k]||'Сценарий пройден. Сбросьте данные, чтобы начать заново.')}</div><h4>Быстрые действия</h4>${JUMPS.map(j=>`<a href="${j[1]}" data-go="${j[1]}">${esc(j[0])}</a>`).join('')}
   <h4>Материалы</h4><a href="${L.agents}" target="_blank" rel="noopener">ТЗ и спецификация (ver-2)</a><a href="${L.figma}" target="_blank" rel="noopener">Макеты Figma BP-CPQ-AI</a><a href="${L.portal}" target="_blank" rel="noopener">Портал картиночных прототипов</a>
   <button class="rst">Сбросить демо-данные</button><div class="k" style="margin-top:6px">?clean=1 скрывает кнопку-триггер; меню остаётся по Shift+D</div>`;
 }

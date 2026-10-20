@@ -13,7 +13,7 @@ function index(){
   s.instances.forEach(d=>add('instances',d,d.name,`${store.proc(d.process).name} · ${d.stage}`,'#/instance/'+d.id,cpn(d.counterparty),d.status,d.updated,d.amount));
   s.processes.forEach(d=>add('processes',d,d.name,`${d.type} · владелец ${d.owner}`,'#/process/'+d.id,d.description+' '+d.stages.join(' ')));
   s.tasks.forEach(d=>add('tasks',d,d.name,`Задача · ${d.assignee} · до ${d.due}`,'#/task/'+d.id,cpn(d.counterparty),d.status,d.due));
-  s.meetings.forEach(d=>add('tasks',d,d.name,`Встреча · ${d.date} ${d.time}`,'#/task/'+d.id,cpn(d.counterparty),d.status,d.date));
+  s.meetings.forEach(d=>add('tasks',d,d.name,`Встреча · ${d.date} ${d.from} - ${d.to}`,'#/meetings?open='+d.id,cpn(d.counterparty),d.status,d.date));
   s.counterparties.forEach(d=>add('counterparties',d,d.name,`ИНН ${d.inn} · ${d.role}`,'#/counterparty/'+d.id,[d.inn,d.kpp,d.address,d.manager].join(' '),d.status,d.since));
   s.products.forEach(d=>add('products',d,d.name,`${d.article} · ${d.group}`,'#/product/'+d.id,cpn(d.supplier)+' '+d.unit,null,null,d.price));
   s.finops.forEach(d=>add('finops',d,d.name,`${cpn(d.counterparty)} · ${d.op}`,'#/finop/'+d.id,'',d.status,d.date,d.amount));

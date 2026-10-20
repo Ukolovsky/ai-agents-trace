@@ -8,20 +8,20 @@ const CMDS=[
   {k:'instance',t:'Создать экземпляр процесса',d:'Запустить процесс'},
   {k:'summary',t:'Сделать сводку',d:'По текущему разделу'},
   {k:'status',t:'Проверить статус',d:'Документа, сделки, задачи'}];
-let el, full=false, attached=null, popKind=null, busy=false;
+let el, bk, full=false, attached=null, popKind=null, busy=false;
 const isOpen=()=>el && !el.hidden;
 const S=()=>store.s;
 
-function mount(){ el=document.getElementById('mp'); if(localStorage.getItem('bp-mp')==='1') el.hidden=false; draw(); }
-function open(){ if(!el.hidden) return; el.hidden=false; localStorage.setItem('bp-mp','1'); store.mark('mp-open'); draw(); sync(); setTimeout(()=>{const t=el.querySelector('textarea'); t&&t.focus();},50); }
-function close(){ el.hidden=true; full=false; el.classList.remove('full'); localStorage.setItem('bp-mp','0'); sync(); }
+function mount(){ el=document.getElementById('mp'); document.body.appendChild(el); bk=document.createElement('div'); bk.id='mpback'; bk.hidden=true; bk.onclick=()=>close(); document.body.appendChild(bk); if(localStorage.getItem('bp-mp')==='1'){ el.hidden=false; bk.hidden=false; } draw(); }
+function open(){ if(!el.hidden) return; el.hidden=false; bk.hidden=false; localStorage.setItem('bp-mp','1'); store.mark('mp-open'); draw(); sync(); setTimeout(()=>{const t=el.querySelector('textarea'); t&&t.focus();},50); }
+function close(){ el.hidden=true; bk.hidden=true; full=false; el.classList.remove('full'); localStorage.setItem('bp-mp','0'); sync(); }
 function toggle(){ isOpen()?close():open(); }
 function sync(){ document.querySelectorAll('[data-act="mp"]').forEach(b=>b.classList.toggle('on',isOpen())); APP.updateHint&&APP.updateHint(); }
 function resetUi(){ attached=null; busy=false; draw(); }
 
 function draw(){
   const chat=S().chat;
-  el.innerHTML=`<div class="mp-h"><button class="ibtn out" id="mpx" title="Закрыть" style="border-color:var(--g300)">${I('close')}</button><span class="t">MagicPad</span><span style="margin-left:auto"></span>
+  el.innerHTML=`<button class="xbtn" id="mpx" title="Закрыть">${I('close','ic16')}</button><div class="mp-h"><span class="t">MagicPad</span><span style="margin-left:auto"></span>
     ${chat.length?`<button class="ibtn" id="mpnew" title="Новый диалог">${I('add')}</button>`:''}
     <button class="ibtn" id="mpfull" title="${full?'Свернуть':'Развернуть'}">${I(full?'collapse':'expand')}</button></div>
   <div class="mp-body" id="mpbody">${chat.length?chat.map(msgHtml).join(''):welcome()}</div>
@@ -101,6 +101,7 @@ function action(a){
   else if(k==='cmd') command(v);
   else if(k==='proc') chooseProcess(v);
   else if(k==='flow'){ const lbl={cp:'Проверить и создать',link:'Связать и запустить',prod:'Создать товар'}[v]; push({who:'me',text:lbl}); IMPORT.flow(v); }
+  else if(k==='ext'){ const [n,...r]=v.split(':'); window.MPX&&MPX[n]&&MPX[n](r.join(':')); }
   else if(k==='newinst') { const p=store.proc(v); const id=store.id('in'); S().instances.unshift({id,name:`${p.name} #${String(Date.now()).slice(-4)}`,process:v,counterparty:null,stage:p.stages[0],status:'Новый',updated:S().today,amount:0,isNew:true}); store.save(); notify(`Экземпляр процесса «${esc(p.name)}» создан`); bot(`Создал экземпляр процесса «${esc(p.name)}» на этапе «${esc(p.stages[0])}».`,[{t:'Открыть экземпляр',a:'go:#/instance/'+id}]); }
 }
 function command(k){
@@ -137,6 +138,7 @@ function chooseProcess(v){
 }
 async function say(text){
   if(!isOpen()) open();
+  if(window.MPX&&MPX.onText&&MPX.onText(text)) return;
   push({who:'me',text}); const n=norm(text);
   await typing();
   if(/^(найд|найт|поиск|покаж)/.test(n)){ const q=text.replace(/^\S+\s*/,''); const r=SEARCH.find(q).slice(0,5);
@@ -149,5 +151,5 @@ async function say(text){
       imp.length?[{t:'Открыть документ',a:'go:#/document/'+imp[imp.length-1].id}]:[{t:'Сделка №1258',a:'go:#/instance/in-deal-1258'}]); }
   else bot('<span>Могу найти данные, сделать сводку, проверить статус или импортировать документ из файла. Введите «/», чтобы увидеть команды.</span>',[{t:'Импорт из файла',a:'cmd:import'}]);
 }
-window.MP={attachSend:fid=>{ open(); attached=S().demoFiles.find(f=>f.id===fid); draw(); send(); },mount,open,close,toggle,isOpen,say,bot,slash:()=>{ const t=el.querySelector('#mpt'); t.value='/'; t.focus(); showCmds(''); },resetUi};
+window.MP={me:t=>push({who:'me',text:t}),typing,useAll:()=>{ S().chat.forEach(m=>m.used=1); store.save(); },attachSend:fid=>{ open(); attached=S().demoFiles.find(f=>f.id===fid); draw(); send(); },mount,open,close,toggle,isOpen,say,bot,slash:()=>{ const t=el.querySelector('#mpt'); t.value='/'; t.focus(); showCmds(''); },resetUi};
 })();

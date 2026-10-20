@@ -3,53 +3,57 @@
 const {I,BPLOGO,esc,store,notify,route,go,render} = BP;
 
 const NAV = [
-  {h:'#/payments', ic:'finance', t:'Платежи подрядчикам'},
-  {h:'#/search', ic:'search', t:'ИИ поиск'},
-  {h:'#/documents', ic:'doc', t:'Документы'},
-  {h:'#/counterparties', ic:'people', t:'Контрагенты'},
-  {h:'#/products', ic:'box', t:'Товары'},
+  {h:'#/processes', ic:'bag', t:'Процессы', m:/^#\/(processes|process|payments|finop|instance|meetings|task)/},
+  {h:'#/settings', ic:'settings', t:'Настройки', m:/^#\/(settings|constructor|counterpart|product|document)/},
   {sep:1},
-  {h:'#/section/tasks', ic:'task', t:'Задачи'},
-  {h:'#/section/processes', ic:'stage', t:'Настройщик процессов'},
-  {h:'#/section/integrations', ic:'link', t:'Интегратор'},
-  {h:'#/section/data-flow', ic:'flow', t:'Data flow'},
-  {h:'#/section/wiki', ic:'table', t:'Wiki Hub'}
+  {h:'#/chat', ic:'chat', t:'Чат', m:/^#\/chat/}
 ];
-/* ---------- Drawer ---------- */
+/* ---------- Сайдбар как на стенде: 48 px свёрнут, 158 px развёрнут, стрелка внизу ---------- */
 function drawer(){
   const d=document.getElementById('drawer'); const open=localStorage.getItem('bp-drawer')==='1';
   d.classList.toggle('open',open);
-  d.innerHTML = `<div class="logo"><img src="assets/logo.png" alt=""><span>BusinessPad</span></div>
-  <div class="nav">${NAV.map(n=>n.sep?'<div class="sep"></div>':`<a href="${n.h}" data-h="${n.h}" title="${esc(n.t)}">${I(n.ic)}<span class="lbl">${esc(n.t)}</span></a>`).join('')}</div>
-  <button class="toggle" id="dtoggle" aria-label="Развернуть меню">${I(open?'back':'menu')}</button>`;
+  d.innerHTML = `<a class="logo" href="#/" title="BusinessPad"><img src="assets/logo.png" alt=""><span>BusinessPad</span></a>
+  <div class="nav">${NAV.map(n=>n.sep?'<div class="sep"></div>':`<a href="${n.h}" data-h="${n.h}" data-tip="${esc(n.t)}">${I(n.ic,'ic16')}<span class="lbl">${esc(n.t)}</span></a>`).join('')}
+  <button class="toggle" id="dtoggle" aria-label="${open?'Свернуть меню':'Развернуть меню'}" data-tip="${open?'Свернуть':'Развернуть'}">${I(open?'back':'exit','ic16')}</button></div>`;
   d.querySelector('#dtoggle').onclick=()=>{ localStorage.setItem('bp-drawer', d.classList.contains('open')?'0':'1'); drawer(); markNav(); };
 }
 function markNav(){
   const p='#'+BP.parseHash().path;
-  document.querySelectorAll('.nav a').forEach(a=>{ const h=a.dataset.h; a.classList.toggle('on', h==='#/'?p==='#/':p.startsWith(h.split('?')[0])); });
+  document.querySelectorAll('.nav a').forEach(a=>{ const n=NAV.find(x=>x.h===a.dataset.h); a.classList.toggle('on', !!(n&&n.m.test(p))); });
 }
 
-/* ---------- AppHeader: крошки + глобальный поиск + аватар ---------- */
+/* ---------- Шапка стенда: «← Назад» на вложенных страницах, поиск, иконка пользователя с поповером ---------- */
 let crumbs=[];
 function setCrumbs(list, back){ if(back!==undefined) list._back=back; crumbs=list; const el=document.getElementById('crumbs'); if(!el) return;
-  el.innerHTML = (back?`<button class="back" onclick="history.length>1?history.back():BP.go('#/')">${I('back','ic16')}Назад</button>`:'') +
-    list.map((c,i)=> i===list.length-1?`<span class="cur body1">${esc(c[0])}</span>`:`<a href="${c[1]||'#/'}">${esc(c[0])}</a><span class="muted">/</span>`).join(' ');
+  const parent=list.length>1?list[list.length-2]:null;
+  el.innerHTML = back?`<button class="back" id="hback">${I('back','ic16')}Назад</button>${parent?`<span class="cur">${esc(parent[0])}</span>`:''}`:'';
+  const b=el.querySelector('#hback'); b&&(b.onclick=()=>{ parent&&parent[1]?go(parent[1]):(history.length>1?history.back():go('#/')); });
 }
 function appbar(){
   document.getElementById('appbar').innerHTML = `<div class="crumbs" id="crumbs"></div><div class="sp"></div>
-    <div class="gsearch search" id="gsearch">${I('search')}<input class="inp" id="gq" placeholder="Поиск по системе" autocomplete="off" aria-label="Глобальный поиск"></div>
-    <div class="avatar" style="background-image:url(assets/user.png)" title="${esc(store.s.company.user)}"></div>`;
+    <div class="gsearch search" id="gsearch">${I('search','ic16')}<input class="inp" id="gq" placeholder="Введите поисковый запрос..." autocomplete="off" aria-label="Глобальный поиск"></div>
+    <button class="ubtn" id="ubtn" title="Профиль" aria-label="Профиль">${I('abox','ic16')}</button>`;
   window.SEARCH && SEARCH.bindHeader(document.getElementById('gq'));
+  document.getElementById('ubtn').onclick=e=>{ e.stopPropagation(); if(document.getElementById('upop')){ closeUpop(); return; }
+    const p=document.createElement('div'); p.className='popper upop'; p.id='upop';
+    p.innerHTML=`<div class="uhead">${I('abox')}<div><b>${esc(store.s.company.user)}</b><span class="cap muted">${esc(store.s.company.role)}</span></div></div>
+      <div class="mi" data-u="profile">${I('person','ic16')}Настроить профиль</div><div class="mi" data-u="exit">${I('exit','ic16')}Выйти</div>`;
+    p.onclick=ev=>{ const m=ev.target.closest('[data-u]'); if(!m) return; closeUpop(); if(m.dataset.u==='profile') go('#/settings/profile'); else notify('Демо-режим: выход отключён','info'); };
+    document.body.appendChild(p); setTimeout(()=>document.addEventListener('click',closeUpopOut),0); };
 }
+function closeUpopOut(e){ if(e && e.target.closest && e.target.closest('#upop')) return; closeUpop(); }
+function closeUpop(){ const p=document.getElementById('upop'); p&&p.remove(); document.removeEventListener('click',closeUpopOut); }
 
 /* ---------- PageHeader по capsule-паттернам: Title + plus, справа Фильтры, BP help, magic, ⋮ ---------- */
 function ph(title, o={}){
-  return `<div class="ph"><div class="title"><h1 class="h1">${esc(title)}</h1>${o.counter!=null?`<span class="counter">${o.counter}</span>`:''}${o.plus?`<button class="plus" title="${esc(o.plus)}" data-act="plus">${I('add')}</button>`:''}</div>
-  <div class="acts">${o.extra||''}${o.filters?`<button class="btn pri out">${I('filter')}Фильтры</button>`:''}
-  <button class="ibtn" title="Справка BusinessPad">${BPLOGO}</button>
-  <button class="ibtn magic ${MP_open()?'on':''}" data-act="mp" title="MagicPad: ИИ-помощник Феликс">${I('shine')}</button>
-  <button class="ibtn" data-act="dots" title="Ещё">${I('more')}</button></div></div>`;
+  return `<div class="ph"><div class="title">${o.icon?`<span class="tic">${I(o.icon,'ic24')}</span>`:''}<h1 class="h1">${esc(title)}</h1>${o.after||''}${o.counter!=null?`<span class="counter">${o.counter}</span>`:''}${o.plus?`<button class="plus fill" title="${esc(o.plus)}" data-act="${o.plusAct||'plus'}">${I('add','ic16')}</button>`:''}</div>
+  <div class="acts">${o.extra||''}${o.filters?`<button class="btn pri out">${I('filter','ic16')}Фильтры</button>`:''}
+  ${o.nomp?'':`<button class="ibtn magic ${MP_open()?'on':''}" data-act="mp" title="MagicPad">${I('shine','ic16')}</button>`}
+  ${o.dots?`<button class="ibtn" data-act="dots" title="Ещё">${I('more')}</button>`:''}</div></div>`;
 }
+/* Переключатель вида как на стенде: кнопка-иконка + стрелка с меню Карточки/Таблица */
+function viewSw(cur, key){ return `<span class="vsw"><button class="vi" data-vsw="${key}" title="${cur==='table'?'Таблица':'Карточки'}">${I(cur==='table'?'table':'cards','ic16')}</button><button class="vd" data-vsw-menu="${key}" title="Вид">${I('drop','ic16')}</button></span>`; }
+function wsSelect(){ return `<label class="ssel"><select aria-label="Рабочая среда"><option>Рабочая среда</option><option>Все процессы</option></select></label>`; }
 const MP_open = () => window.MP && MP.isOpen();
 /* делегирование кнопок PageHeader */
 document.addEventListener('click', e=>{
@@ -67,27 +71,27 @@ function popMenu(anchor, items){
   document.body.appendChild(p); setTimeout(()=>document.addEventListener('click',closePop,{once:true}),0);
 }
 function closePop(){ const p=document.getElementById('pop'); p&&p.remove(); }
-function resetDemo(){ store.reset(); window.MP&&MP.resetUi(); go('#/payments'); render(); }
+function resetDemo(){ store.reset(); window.MP&&MP.resetUi(); go('#/processes'); render(); }
 /* Стартовый экран продукта: «Платежи подрядчикам» (макет 2943-387267) */
-route(/^\/$/, ()=>{ location.replace('#/payments'); });
+route(/^\/$/, ()=>{ setCrumbs([]); content(`<div class="home"><img src="assets/logo.png" alt=""><b>business pad</b></div>`); });
 /* Разделы без живой реализации: пустое состояние в стиле продукта, без прототипных пояснений */
 const SECT={tasks:'Задачи',processes:'Настройщик процессов',integrations:'Интегратор','data-flow':'Data flow',wiki:'Wiki Hub'};
 route(/^\/section\/([\w-]+)$/, ([k])=>{ const t=SECT[k]||k; setCrumbs([[t]]);
   content(`<div class="page">${ph(t)}<div class="paper empty"><b>Нет данных</b>Здесь появятся записи раздела</div></div>`); });
-route(/^\/soon\/([\w-]+)$/, ()=>location.replace('#/payments'));
+route(/^\/soon\/([\w-]+)$/, ()=>location.replace('#/processes'));
 
 function content(html){ const c=document.getElementById('content'); c.innerHTML=html; c.scrollTop=0; }
 
 window.APP = {
   start(){ drawer(); appbar(); window.MP&&MP.mount(); render(); },
-  afterRender(path){ window.DEMO&&DEMO.refresh(); if(!/^\/(import|drafts)\//.test(path)){ document.getElementById('overlay').innerHTML=''; document.querySelectorAll('.sp-back,.sidepage').forEach(x=>x.remove()); } document.querySelectorAll('.selpop').forEach(x=>x.remove()); markNav(); setCrumbs(crumbs, crumbs._back); },
-  setCrumbs, ph, content, popMenu, updateHint:()=>window.DEMO&&DEMO.refresh(), resetDemo
+  afterRender(path){ window.DEMO&&DEMO.refresh(); if(/^\/(import|drafts)\//.test(path)&&window.MP&&MP.isOpen()) MP.close(); if(!/^\/(import|drafts)\//.test(path)){ document.getElementById('overlay').innerHTML=''; document.querySelectorAll('.sp-back,.sidepage').forEach(x=>x.remove()); } document.querySelectorAll('.selpop').forEach(x=>x.remove()); markNav(); setCrumbs(crumbs, crumbs._back); },
+  setCrumbs, ph, viewSw, wsSelect, content, popMenu, updateHint:()=>window.DEMO&&DEMO.refresh(), resetDemo
 };
 })();
 /* Esc закрывает верхний слой: меню → side page → демо-окно → развёрнутый/обычный MagicPad */
 document.addEventListener('keydown', e=>{
   if(e.key!=='Escape') return;
-  const pop=document.getElementById('pop'); if(pop){ pop.remove(); return; }
+  const pop=document.getElementById('pop')||document.getElementById('upop')||document.querySelector('.vmenu'); if(pop){ pop.remove(); return; }
   const mpPop=document.querySelector('.mp-pop'); if(mpPop){ mpPop.remove(); return; }
   const sp=document.querySelector('.sidepage .sp-x'); if(sp){ sp.click(); return; }
   if(window.DEMO&&DEMO.isOpen()){ DEMO.toggle(); return; }

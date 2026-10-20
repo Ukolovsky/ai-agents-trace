@@ -21,9 +21,9 @@ function listPage(title, crumbsTitle, cols, rows, href, plusTitle){
 
 /* ---------- Платежи подрядчикам: хост-раздел для MagicPad (по макетам Точек входа) ---------- */
 route(/^\/payments$/, (_,q)=>{
-  A().setCrumbs([['Финансы','#/payments'],['Платежи подрядчикам']], true);
+  A().setCrumbs([['Процессы','#/processes'],['Платежи подрядчикам']], true);
   const rows=store.s.finops;
-  A().content(`<div class="page">${A().ph('Платежи подрядчикам',{filters:1, extra:`<span class="tabs" style="width:72px"><button class="on" title="Таблица">${I('table','ic16')}</button><button title="Вид">${I('drop','ic16')}</button></span>`})}
+  A().content(`<div class="page">${A().ph('Платежи подрядчикам',{icon:'finance',filters:1,dots:1, extra:A().viewSw('table','pay')})}
   <div class="paper col" style="flex:1"><div class="row" style="align-items:center;gap:12px"><h2 class="h3">Список платежей</h2><span class="counter">${rows.length}</span><button class="plus" data-act="plus" title="Создать платёж">${I('add')}</button>
    <div class="search" style="margin-left:auto;width:188px">${I('search')}<input class="inp" placeholder="Поиск по платежам" aria-label="Поиск по платежам"></div></div>
   ${uni([
@@ -38,27 +38,12 @@ route(/^\/payments$/, (_,q)=>{
   if(q.say) setTimeout(()=>MP.say(q.say),300);
 });
 
-/* ---------- Списки ---------- */
-route(/^\/documents$/, ()=> listPage('Документы',null,[
-  {t:'Название',f:r=>`<span style="display:inline-flex;gap:6px;align-items:center">${PDF}${esc(r.name)}</span>`,tt:r=>r.name},
-  {t:'Тип',w:'140px',f:r=>esc(r.type)},{t:'Контрагент',w:'200px',f:r=>esc(cpName(r.counterparty))},
-  {t:'Статус',w:'140px',f:r=>chip(r.status)},{t:'Дата',w:'100px',f:r=>r.date},{t:'Сумма',w:'130px',f:r=>r.amount?money(r.amount):'—'}],
-  store.s.documents.slice().reverse(), r=>'#/document/'+r.id, 'Импорт из файла'));
-route(/^\/counterparties$/, ()=> listPage('Контрагенты',null,[
-  {t:'Название',f:r=>esc(r.name),tt:r=>r.name},{t:'ИНН',w:'120px',f:r=>r.inn},{t:'Роль',w:'140px',f:r=>esc(r.role)},
-  {t:'Статус',w:'130px',f:r=>chip(r.status)},{t:'Ответственный',w:'170px',f:r=>esc(r.manager)},{t:'С нами с',w:'110px',f:r=>r.since}],
-  store.s.counterparties.slice().reverse(), r=>'#/counterparty/'+r.id, 'Создать контрагента'));
-route(/^\/products$/, ()=> listPage('Товары',null,[
-  {t:'Наименование',f:r=>esc(r.name),tt:r=>r.name},{t:'Артикул',w:'130px',f:r=>esc(r.article)},{t:'Группа',w:'170px',f:r=>esc(r.group)},
-  {t:'Ед.',w:'70px',f:r=>esc(r.unit)},{t:'Цена',w:'110px',f:r=>money(r.price)},{t:'Остаток',w:'90px',f:r=>r.stock}],
-  store.s.products.slice().reverse(), r=>'#/product/'+r.id, 'Создать товар'));
-
 /* ---------- Общая карточка ---------- */
 let tab='main';
 function card(o){
   A().setCrumbs(o.crumbs, true);
   const tabs=[['main','Общие сведения'],['rel','Связанные объекты',o.rel.length],['hist','История',o.hist.length]];
-  A().content(`<div class="page">${A().ph(o.title,{extra:(o.status?chip(o.status):'')})}
+  A().content(`<div class="page">${A().ph(o.title,{after:(o.status?chip(o.status):''),dots:1})}
   <div class="tabs soft" style="max-width:560px">${tabs.map(t=>`<button class="${tab===t[0]?'on':''}" data-tab="${t[0]}">${t[1]}${t[2]!=null?` <span class="counter">${t[2]}</span>`:''}</button>`).join('')}</div>
   <div class="row" style="align-items:flex-start">
    <div class="paper" style="flex:1;min-width:0">${tab==='main'?`<dl class="dl">${o.fields.map(f=>`<dt>${esc(f[0])}</dt><dd>${f[1]}</dd>`).join('')}</dl>${o.extra||''}`:
@@ -76,7 +61,7 @@ route(/^\/counterparty\/([\w-]+)$/, ([id])=>{
     ...store.s.instances.filter(d=>d.counterparty===id).map(d=>({k:'Экземпляр процесса',t:d.name,s:d.status,h:'#/instance/'+d.id})),
     ...store.s.tasks.filter(d=>d.counterparty===id).map(d=>({k:'Задача',t:d.name,s:d.status,h:'#/task/'+d.id})),
     ...store.s.products.filter(d=>d.supplier===id).map(d=>({k:'Товар',t:d.name,h:'#/product/'+d.id}))];
-  card({title:c.name, status:c.status, imported:c.imported, crumbs:[['Контрагенты','#/counterparties'],[c.name]],
+  card({title:c.name, status:c.status, imported:c.imported, crumbs:[['Справочник: Контрагенты','#/settings/dir/counterparties'],[c.name]],
     fields:[['ИНН',c.inn],['КПП',c.kpp||'—'],['Роль',esc(c.role)],['Адрес',esc(c.address)],['Ответственный',esc(c.manager)],['Телефон',esc(c.phone||'—')],['Почта',esc(c.email||'—')],['С нами с',c.since],
       ...(c.source?[['Источник',`<a href="#/document/${c.source}">${esc((store.doc(c.source)||{}).name||'')}</a>`]]:[])],
     rel, hist:evFor(id), ai:`Связанных объектов: ${rel.length}. Последнее событие: ${(evFor(id)[0]||{}).text||'нет'}.`});
@@ -90,34 +75,34 @@ route(/^\/document\/([\w-]+)$/, ([id])=>{
     ...(d.items||[]).filter(i=>i.product).map(i=>({k:'Товар',t:(store.prod(i.product)||{}).name||i.name,h:'#/product/'+i.product}))];
   const items = d.items ? `<h3 class="h4" style="margin:24px 0 8px">Товары</h3>${uni([{t:'№',w:'48px',f:r=>r.n},{t:'Наименование',f:r=>esc(r.name),tt:r=>r.name},{t:'Ед.',w:'70px',f:r=>esc(r.unit)},{t:'Кол-во',w:'90px',f:r=>r.qty},{t:'Цена',w:'100px',f:r=>money(r.price)},{t:'Сумма',w:'120px',f:r=>money(r.sum)}], d.items, r=>r.product?'#/product/'+r.product:'#/document/'+id)}`:'';
   const ff = d.fields ? `<h3 class="h4" style="margin:24px 0 8px">Распознанные реквизиты</h3><dl class="dl">${d.fields.filter(f=>f.value).map(f=>`<dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd>`).join('')}</dl>`:'';
-  card({title:d.name, status:d.status, imported:d.imported, crumbs:[['Документы','#/documents'],[d.name]],
+  card({title:d.name, status:d.status, imported:d.imported, crumbs:[['Справочник: Документы','#/settings/dir/documents'],[d.name]],
     fields:[['Тип',esc(d.type)],['Контрагент',cpLink(d.counterparty)],['Дата',d.date],['Сумма',d.amount?money(d.amount):'—'],['Процесс',p?`<a href="#/process/${p.id}">${esc(p.name)}</a>`:'—'],['Этап',esc(d.stage||(p&&p.stages[0])||'—')],['Файл',`<span class="file-chip">${PDF}${esc(d.file)}</span>`],['Изменён',d.updated]],
     extra: items+ff, rel, hist:evFor(id), ai: d.imported?'Документ создан из файла, все обязательные поля подтверждены пользователем.':''});
 });
 route(/^\/product\/([\w-]+)$/, ([id])=>{
   const p=store.prod(id); if(!p) return notFound(); resetTab(id);
   const docs=store.s.documents.filter(d=>(d.items||[]).some(i=>i.product===id));
-  card({title:p.name, status:p.imported?'Новый':'В каталоге', imported:p.imported, crumbs:[['Товары','#/products'],[p.name]],
+  card({title:p.name, status:p.imported?'Новый':'В каталоге', imported:p.imported, crumbs:[['Справочник: Товары','#/settings/dir/products'],[p.name]],
     fields:[['Артикул',esc(p.article)],['Группа',esc(p.group)],['Единица',esc(p.unit)],['Цена',money(p.price)],['Поставщик',cpLink(p.supplier)],['Остаток',p.stock]],
     rel:[...(p.supplier?[{k:'Поставщик',t:cpName(p.supplier),h:'#/counterparty/'+p.supplier}]:[]),...docs.map(d=>({k:'Документ',t:d.name,s:d.status,h:'#/document/'+d.id}))], hist:evFor(id)});
 });
 route(/^\/process\/([\w-]+)$/, ([id])=>{
   const p=store.proc(id); if(!p) return notFound(); resetTab(id);
   const inst=store.s.instances.filter(i=>i.process===id), docs=store.s.documents.filter(d=>d.process===id);
-  card({title:p.name, crumbs:[['Процессы','#/search?cat=processes'],[p.name]],
+  card({title:p.name, crumbs:[['Процессы','#/processes'],[p.name]],
     fields:[['Тип',esc(p.type)],['Владелец',esc(p.owner)],['Этапы',p.stages.map(s=>`<span class="chip lav">${esc(s)}</span>`).join(' ')],['Описание',esc(p.description)]],
     rel:[...inst.map(i=>({k:'Экземпляр',t:i.name,s:i.status,h:'#/instance/'+i.id})),...docs.map(d=>({k:'Документ',t:d.name,s:d.status,h:'#/document/'+d.id}))], hist:[]});
 });
 route(/^\/instance\/([\w-]+)$/, ([id])=>{
   const p=store.inst(id); if(!p) return notFound(); resetTab(id);
-  card({title:p.name, status:p.status, crumbs:[['Экземпляры процессов','#/search?cat=instances'],[p.name]],
+  card({title:p.name, status:p.status, crumbs:[[store.proc(p.process).name,'#/process/'+p.process],[p.name]],
     fields:[['Процесс',`<a href="#/process/${p.process}">${esc(store.proc(p.process).name)}</a>`],['Контрагент',cpLink(p.counterparty)],['Этап',esc(p.stage)],['Сумма',p.amount?money(p.amount):'—'],['Изменён',p.updated]],
     rel:p.counterparty?[{k:'Контрагент',t:cpName(p.counterparty),h:'#/counterparty/'+p.counterparty}]:[], hist:evFor(id)});
 });
 route(/^\/task\/([\w-]+)$/, ([id])=>{
   const t=store.task(id)||store.s.meetings.find(m=>m.id===id); if(!t) return notFound(); resetTab(id);
   card({title:t.name, status:t.status, crumbs:[['Задачи','#/search?cat=tasks'],[t.name]],
-    fields:t.due?[['Исполнитель',esc(t.assignee)],['Срок',t.due],['Приоритет',chip(t.priority)],['Контрагент',cpLink(t.counterparty)]]:[['Дата',t.date],['Время',t.time],['Участники',t.participants],['Контрагент',cpLink(t.counterparty)]],
+    fields:t.due?[['Исполнитель',esc(t.assignee)],['Срок',t.due],['Приоритет',chip(t.priority)],['Контрагент',cpLink(t.counterparty)]]:[['Дата',t.date],['Время',t.from+' - '+t.to],['Участники',(t.people||[]).length],['Контрагент',cpLink(t.counterparty)]],
     rel:t.counterparty?[{k:'Контрагент',t:cpName(t.counterparty),h:'#/counterparty/'+t.counterparty}]:[], hist:[]});
 });
 route(/^\/finop\/([\w-]+)$/, ([id])=>{
@@ -130,7 +115,7 @@ route(/^\/(report|setting|wiki)\/([\w-]+)$/, ([k,id])=>{
   const coll={report:'reports',setting:'settings',wiki:'wiki'}[k]; const t=store.s[coll].find(x=>x.id===id); if(!t) return notFound(); resetTab(id);
   card({title:t.name, crumbs:[[{report:'Отчёты',setting:'Настройки',wiki:'Wiki'}[k],'#/search?cat='+coll],[t.name]], fields:[['Обновлён',t.updated],['Ключевые слова',esc(t.text)]], rel:[], hist:[]});
 });
-function notFound(){ A().setCrumbs([['Не найдено']],true); A().content(`<div class="page">${A().ph('Объект не найден')}<div class="paper empty"><b>Объект удалён или недоступен</b><a href="#/payments">К списку платежей</a></div></div>`); }
+function notFound(){ A().setCrumbs([['Не найдено']],true); A().content(`<div class="page">${A().ph('Объект не найден')}<div class="paper empty"><b>Объект удалён или недоступен</b><a href="#/processes">К списку процессов</a></div></div>`); }
 
 window.CARDS={uni, cpName};
 })();
