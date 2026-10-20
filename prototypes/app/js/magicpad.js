@@ -32,7 +32,7 @@ function draw(){
   el.classList.toggle('full',full);
   const t=el.querySelector('#mpt');
   t.oninput=()=>{ el.querySelector('#mpsend').classList.toggle('ready',!!(t.value.trim()||attached)); if(t.value.startsWith('/')) showCmds(t.value.slice(1)); else if(popKind==='cmd') hidePop(); };
-  t.onkeydown=e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); const m=el.querySelector('.mp-pop .mi.act')||(popKind&&el.querySelector('.mp-pop .mi')); if(m&&popKind){ m.dispatchEvent(new MouseEvent('mousedown',{bubbles:true})); return; } send(); } if(e.key==='Escape') hidePop(); };
+  t.onkeydown=e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); const m=el.querySelector('.mp-pop .mi.act')||(popKind&&el.querySelector('.mp-pop .mi')); if(m&&popKind){ m.dispatchEvent(new MouseEvent('mousedown',{bubbles:true})); return; } send(); } if(e.key==='Escape'&&popKind){ hidePop(); e.stopPropagation(); } };
   el.querySelector('#mpsend').onclick=send;
   el.querySelector('#mpx').onclick=close;
   el.querySelector('#mpfull').onclick=()=>{ full=!full; draw(); };
@@ -129,7 +129,7 @@ async function fileFlow(f){
 }
 function chooseProcess(v){
   const [pid,fid]=v.split(':'); const p=store.proc(pid);
-  const last=S().chat[S().chat.length-1]; S().chat.forEach(m=>{ if(m.opts&&m.opts.some(o=>o.a.startsWith('proc:'))) m.used=1; });
+  const last=S().chat[S().chat.length-1]; S().chat.forEach(m=>{ if(m.opts&&m.opts.some(o=>o.a&&o.a.startsWith('proc:'))) m.used=1; });
   push({who:'me',text:p.name});
   store.mark('proc');
   const id=store.id('imp'); S().drafts[id]={file:fid,process:pid,step:0}; store.save();

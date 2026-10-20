@@ -325,3 +325,5 @@ table.uni tr.new td{background:var(--success-l)}
 .snack.success{color:var(--success)}.snack .ic{width:16px;height:16px}
 .snack.warning .ic{color:var(--warning)}.snack.error .ic{color:var(--error)}.snack.info .ic{color:var(--info)}
 @keyframes snk{from{transform:translateY(-100%)}}
+/* Багфикс: display у .mp/.overlay перебивал атрибут hidden, панель не скрывалась */
+[hidden]{display:none!important}

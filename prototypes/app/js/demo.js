@@ -34,7 +34,7 @@ function build(){
   panel=document.createElement('div'); panel.id='demo-panel'; panel.hidden=true; panel.setAttribute('role','dialog'); panel.setAttribute('aria-label','Управление демо');
   document.body.appendChild(panel);
   if(!clean){ trig=document.createElement('button'); trig.id='demo-trig'; trig.title='Управление демо (Shift+D)'; trig.textContent='DEMO'; trig.onclick=toggle; document.body.appendChild(trig); }
-  document.addEventListener('keydown',e=>{ if(e.shiftKey&&(e.code==='KeyD')&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){ e.preventDefault(); toggle(); } if(e.key==='Escape'&&!panel.hidden) toggle(); });
+  document.addEventListener('keydown',e=>{ if(e.shiftKey&&(e.code==='KeyD')&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){ e.preventDefault(); toggle(); } });
   panel.addEventListener('click',e=>{ const a=e.target.closest('[data-go]'); if(a){ e.preventDefault(); go(a.dataset.go); }
     if(e.target.closest('.x')) toggle();
     if(e.target.closest('.rst')){ APP.resetDemo(); refresh(); } });

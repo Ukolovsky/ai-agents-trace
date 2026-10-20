@@ -84,3 +84,12 @@ window.APP = {
   setCrumbs, ph, content, popMenu, updateHint:()=>window.DEMO&&DEMO.refresh(), resetDemo
 };
 })();
+/* Esc закрывает верхний слой: меню → side page → демо-окно → развёрнутый/обычный MagicPad */
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return;
+  const pop=document.getElementById('pop'); if(pop){ pop.remove(); return; }
+  const mpPop=document.querySelector('.mp-pop'); if(mpPop){ mpPop.remove(); return; }
+  const sp=document.querySelector('.sidepage .sp-x'); if(sp){ sp.click(); return; }
+  if(window.DEMO&&DEMO.isOpen()){ DEMO.toggle(); return; }
+  if(window.MP&&MP.isOpen()){ MP.close(); return; }
+});
