@@ -292,3 +292,36 @@ table.uni tr.new td{background:var(--success-l)}
 .doclist a{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--g300)}
 @media (max-width:1280px){:root{--mp-w:340px}.rf{width:360px}.grid4{grid-template-columns:repeat(2,1fr)}}
 .tabs.soft button.on .counter{background:#fff;color:var(--text)}
+/* ===== v3: мастер импорта по Figma, side page справа, тосты без перекрытия шапки ===== */
+.overlay{top:56px}
+.overlay.wz .ovbody{padding-top:0}
+.wz-h{padding:0 24px;min-height:56px;flex:none}
+.wz-h .h1{font-size:24px;line-height:28px}
+.overlay .bottombar{background:var(--bg);box-shadow:none}
+.overlay .docview{padding:56px 48px}
+.torg .kv{grid-template-columns:150px 1fr;border-bottom:1px solid var(--g300);padding:6px 0}
+[data-f].hl{background:var(--secondary-light);box-shadow:0 0 0 2px var(--secondary-light)}
+.rf{width:390px}
+.rfi{grid-template-columns:1fr 32px;align-items:center;padding:4px 0;border:0}
+.rfi.on{background:none}.rfi.on .inp{border-color:var(--primary)}
+.rfi .src{font-size:10px;padding-left:8px}
+.ring{width:32px;height:32px}.ring span{font-size:8px}
+.dotinfo{width:8px;height:8px;border-radius:50%;background:var(--primary);border:0;padding:0;cursor:pointer;box-shadow:0 0 0 3px var(--v400)}
+.informer{position:absolute;right:0;top:calc(100% + 6px);width:260px;background:#fff;box-shadow:var(--sh-popper);border-radius:8px;padding:8px 8px 8px 12px;display:flex;gap:8px;font-size:12px;line-height:14px;z-index:5}
+.loader{width:64px;height:64px;border-radius:50%;border:3px dotted var(--sky);display:flex;align-items:center;justify-content:center;animation:sp 3s linear infinite;margin-bottom:8px}
+.loader img{width:32px;height:32px;animation:sp 3s linear infinite reverse}
+.sp-back{position:fixed;inset:0;left:var(--drawer);top:56px;background:rgba(245,245,245,.55);backdrop-filter:blur(2px);z-index:60}
+.sidepage{position:fixed;top:40px;right:0;bottom:0;width:520px;max-width:calc(100vw - var(--drawer) - 64px);background:var(--bg);z-index:61;display:flex;flex-direction:column;gap:12px;padding:12px;box-shadow:var(--sh-popper);animation:spin-r var(--t)}
+@keyframes spin-r{from{transform:translateX(40px);opacity:0}}
+.sidepage .sp-x{position:absolute;left:-44px;top:20px}
+.sidepage .paper{padding:12px;gap:12px}
+.srcbox{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--g300);border-radius:8px;padding:6px 6px 6px 8px}
+.snacks{top:auto;bottom:72px;flex-direction:column-reverse}
+.mp-btn{align-items:center;font-weight:500;color:var(--primary);border-color:var(--primary);padding:6px 10px}
+.opt.launch{cursor:default;gap:8px}.opt.launch .btn{height:28px}
+/* Тосты как в Figma: полоса во всю ширину сверху, авто-скрытие 4 с и кнопка закрытия справа */
+.snacks{top:0;bottom:auto;left:var(--drawer);right:0;flex-direction:column;gap:0}
+.snack{min-width:0;max-width:none;width:100%;border-radius:0;box-shadow:none;align-items:center;min-height:32px;padding:6px 16px;font-weight:500;animation:snk var(--t)}
+.snack.success{color:var(--success)}.snack .ic{width:16px;height:16px}
+.snack.warning .ic{color:var(--warning)}.snack.error .ic{color:var(--error)}.snack.info .ic{color:var(--info)}
+@keyframes snk{from{transform:translateY(-100%)}}

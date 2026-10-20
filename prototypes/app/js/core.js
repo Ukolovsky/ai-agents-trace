@@ -60,13 +60,13 @@ function notify(text, kind='success', ms=4000){
   const el=document.createElement('div'); el.className='snack '+kind; el.setAttribute('role','status');
   el.innerHTML=`${I(kind==='success'?'ok':kind==='error'?'warn':'info')}<div>${text}</div><span class="x">${I('close','ic16')}</span>`;
   el.querySelector('.x').onclick=()=>el.remove();
-  box.prepend(el); while(box.children.length>3) box.lastChild.remove();
+  box.prepend(el); while(box.children.length>1) box.lastChild.remove();
   if(ms) setTimeout(()=>el.remove(), ms);
 }
 
 /* ---------- Статусы → цвета чипов (пастельные токены, разные статусы разными цветами) ---------- */
 const CHIP = {'На согласовании':'yellow','Оплачен':'green','На утверждении':'blue','Запланирован':'orange','Просрочен':'grey','Согласован':'lav',
-  'Действующий':'green','На проверке':'yellow','Новый':'blue','Черновик':'grey','В работе':'blue','Завершён':'green','Новая':'lav','Действует':'green','Архив':'grey','Подписан':'green','Сохранён':'green','Предстоящая':'yellow','Высокий':'orange','Средний':'lav','В каталоге':'green'};
+  'Действующий':'green','На проверке':'yellow','Новый':'blue','Черновик':'yellow','В работе':'blue','Завершён':'green','Новая':'lav','Действует':'green','Архив':'grey','Подписан':'green','Сохранён':'green','Предстоящая':'yellow','Высокий':'orange','Средний':'lav','В каталоге':'green'};
 const chip = s => `<span class="chip ${CHIP[s]||'grey'}">${esc(s)}</span>`;
 const hl = (text,q) => { const t=esc(text); if(!q) return t; const qs=norm(q).split(' ').filter(x=>x.length>1); let out=t;
   qs.forEach(w=>{ const re=new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/е/g,'[её]')+')','ig'); out=out.replace(re,'<mark>$1</mark>'); }); return out; };

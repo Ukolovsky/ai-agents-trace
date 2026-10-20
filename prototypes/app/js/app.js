@@ -80,7 +80,7 @@ function content(html){ const c=document.getElementById('content'); c.innerHTML=
 
 window.APP = {
   start(){ drawer(); appbar(); window.MP&&MP.mount(); render(); },
-  afterRender(path){ window.DEMO&&DEMO.refresh(); if(!path.startsWith('/import/')) document.getElementById('overlay').innerHTML=''; document.querySelectorAll('.selpop').forEach(x=>x.remove()); markNav(); setCrumbs(crumbs, crumbs._back); },
+  afterRender(path){ window.DEMO&&DEMO.refresh(); if(!/^\/(import|drafts)\//.test(path)){ document.getElementById('overlay').innerHTML=''; document.querySelectorAll('.sp-back,.sidepage').forEach(x=>x.remove()); } document.querySelectorAll('.selpop').forEach(x=>x.remove()); markNav(); setCrumbs(crumbs, crumbs._back); },
   setCrumbs, ph, content, popMenu, updateHint:()=>window.DEMO&&DEMO.refresh(), resetDemo
 };
 })();

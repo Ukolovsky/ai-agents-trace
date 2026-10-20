@@ -40,7 +40,7 @@ function draw(){
   el.querySelector('#mpslash').onclick=()=>{ t.value='/'; t.focus(); showCmds(''); };
   const nw=el.querySelector('#mpnew'); nw&&(nw.onclick=()=>{ S().chat=[]; store.save(); attached=null; draw(); });
   const dt=el.querySelector('#mpdetach'); dt&&(dt.onclick=()=>{ attached=null; draw(); });
-  el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>action(b.dataset.a, b));
+  el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ const a=b.dataset.a; if(a.startsWith('flow:')){ const mi=[...el.querySelectorAll('.msg')].indexOf(b.closest('.msg')); const welcomeOff=0; const m=S().chat[mi]; if(m){ m.used=1; store.save(); } } action(a, b); });
   const body=el.querySelector('#mpbody'); body.scrollTop=body.scrollHeight;
 }
 function welcome(){
@@ -57,7 +57,14 @@ function welcome(){
 function msgHtml(m){
   if(m.who==='me') return `<div class="msg me"><div class="bub">${m.file?`<span class="file-chip">${PDF}${esc(m.file)}</span>`:''}${m.text?`<span>${esc(m.text)}</span>`:''}<span class="tm">${m.time}</span></div></div>`;
   return `<div class="msg"><div class="av" style="background-image:url(assets/felix.png)"></div><div class="bub"><span class="who">Феликс</span>${m.html}
-   ${m.opts?`<div class="opts">${m.opts.map(o=>`<button class="opt ${m.used&&o.a.startsWith('proc:')?'dis':''}" data-a="${esc(o.a)}"><span class="r"><span>${esc(o.t)}</span>${o.r?`<span class="chip green">${esc(o.r)}</span>`:''}</span>${o.d?`<span class="cap">${esc(o.d)}</span>`:''}</button>`).join('')}</div>`:''}<span class="tm">${m.time}</span></div></div>`;
+   ${m.opts?`<div class="opts">${m.opts.map(o=>optHtml(o,m)).join('')}</div>`:''}<span class="tm">${m.time}</span></div></div>`;
+}
+function optHtml(o,m){
+  const dis=m.used&&o.k!=='card'?'dis':'';
+  if(o.k==='text') return `<span>${esc(o.t)}</span>`;
+  if(o.k==='btn') return `<button class="opt mp-btn ${dis}" data-a="${esc(o.a)}">${esc(o.t)}</button>`;
+  if(o.k==='launch') return `<div class="opt launch ${dis}"><b class="sub1">${esc(o.t)}</b><span class="cap">${esc(o.d)}</span><button class="btn pri" data-a="${esc(o.a)}">${esc(o.b)}</button></div>`;
+  return `<button class="opt ${o.k==='card'?'':dis} ${m.used&&o.a&&o.a.startsWith('proc:')?'dis':''}" data-a="${esc(o.a)}"><span class="r"><span>${esc(o.t)}</span>${o.r?`<span class="cap">${esc(o.r)}</span>`:''}</span>${o.d?`<span class="cap">${esc(o.d)}</span>`:''}</button>`;
 }
 function push(m){ m.time=nowTime(); S().chat.push(m); store.save(); draw(); }
 function bot(html,opts){ push({who:'bot',html,opts}); }
@@ -93,6 +100,7 @@ function action(a){
   else if(k==='attach'){ attached=S().demoFiles.find(f=>f.id===v); draw(); el.querySelector('#mpt').focus(); }
   else if(k==='cmd') command(v);
   else if(k==='proc') chooseProcess(v);
+  else if(k==='flow'){ const lbl={cp:'Проверить и создать',link:'Связать и запустить',prod:'Создать товар'}[v]; push({who:'me',text:lbl}); IMPORT.flow(v); }
   else if(k==='newinst') { const p=store.proc(v); const id=store.id('in'); S().instances.unshift({id,name:`${p.name} #${String(Date.now()).slice(-4)}`,process:v,counterparty:null,stage:p.stages[0],status:'Новый',updated:S().today,amount:0,isNew:true}); store.save(); notify(`Экземпляр процесса «${esc(p.name)}» создан`); bot(`Создал экземпляр процесса «${esc(p.name)}» на этапе «${esc(p.stages[0])}».`,[{t:'Открыть экземпляр',a:'go:#/instance/'+id}]); }
 }
 function command(k){
@@ -114,10 +122,10 @@ async function send(){
 async function fileFlow(f){
   await typing(['Проверка безопасности файла','Извлечение текста и структуры','Сопоставление с процессами компании']);
   if(!f.readable){ bot(`<span>Не удалось распознать «${esc(f.name)}»: изображение слишком размытое, текст не читается. Загрузите скан лучшего качества (от 300 dpi) или PDF.</span>`,[{t:'Выбрать другой файл',a:'cmd:import'}]); return; }
-  bot(`<span>Файл проверен, это <b>товарная накладная ТОРГ-12 № ТН-0842</b> от ООО «СтройМонолит». Подходящие процессы:</span>`,[
-    {t:'Входящие документы',r:'100%',d:'Регистрация документа, товары и контрагенты из накладной',a:'proc:proc-in-docs:'+f.id},
-    {t:'Приёмка товара',r:'100%',d:'Оприходование 3 позиций на склад объекта',a:'proc:proc-priemka:'+f.id},
-    {t:'Стройматериалы',r:'100%',d:'Пополнение справочника материалов',a:'proc:proc-materials:'+f.id}]);
+  bot(`<span>Файл проверен: товарная накладная ТОРГ-12 № ТН-0842. Выберите процесс, по которому хотите создать экземпляры.</span><span>Ниже — наиболее подходящие варианты. Перед подтверждением данные можно проверить и исправить</span>`,[
+    {t:'Входящие документы',r:'100%',d:'Тип: Документ',a:'proc:proc-in-docs:'+f.id},
+    {t:'Приёмка товара',r:'100%',d:'Тип: Материальный поток',a:'proc:proc-priemka:'+f.id},
+    {t:'Стройка контрагенты',r:'100%',d:'Тип: Контрагенты',a:'proc:proc-kontragenty:'+f.id}]);
 }
 function chooseProcess(v){
   const [pid,fid]=v.split(':'); const p=store.proc(pid);
@@ -125,8 +133,7 @@ function chooseProcess(v){
   push({who:'me',text:p.name});
   store.mark('proc');
   const id=store.id('imp'); S().drafts[id]={file:fid,process:pid,step:0}; store.save();
-  bot(`Открываю мастер импорта в процесс «${esc(p.name)}». Проверьте поля, отмеченные значком внимания.`,[{t:'Вернуться к мастеру',a:'go:#/import/'+id}]);
-  go('#/import/'+id);
+    go('#/import/'+id);
 }
 async function say(text){
   if(!isOpen()) open();
