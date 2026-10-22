@@ -12,7 +12,7 @@ function uni(cols, rows, href, o={}){
   <thead><tr>${o.cb?'<th class="cb"><input type="checkbox" class="chk" aria-label="Выбрать все"></th>':''}${cols.map(c=>`<th title="${esc(c.t)}">${esc(c.t)}</th>`).join('')}<th class="act"></th></tr></thead>
   <tbody>${rows.map(r=>`<tr class="click" data-href="${href(r)}">${o.cb?'<td class="cb"><input type="checkbox" class="chk" onclick="event.stopPropagation()"></td>':''}${cols.map(c=>`<td title="${esc(c.tt?c.tt(r):'')}">${c.f(r)}</td>`).join('')}<td class="act"><button class="ibtn s" tabindex="-1">${I('more','ic16')}</button></td></tr>`).join('')}</tbody></table></div>`;
 }
-document.addEventListener('click',e=>{ const tr=e.target.closest('tr[data-href]'); if(tr && !e.target.closest('a')) go(tr.dataset.href); });
+document.addEventListener('click',e=>{ const tr=e.target.closest('tr[data-href]'); if(tr && !e.target.closest('a[href],button,input,select,label')){ if(tr.dataset.href===location.hash){ const n=(tr.querySelector('a')||tr.cells[0]||tr).innerText.trim(); BP.notify(`«${n}»: карточка на стенде открывается только для просмотра, в макетах её нет`,'info'); } else go(tr.dataset.href); } });
 
 function listPage(title, crumbsTitle, cols, rows, href, plusTitle){
   A().setCrumbs([[crumbsTitle||title]]);
@@ -97,7 +97,7 @@ route(/^\/instance\/([\w-]+)$/, ([id])=>{
   const p=store.inst(id); if(!p) return notFound(); resetTab(id);
   card({title:p.name, status:p.status, crumbs:[[store.proc(p.process).name,'#/process/'+p.process],[p.name]],
     fields:[['Процесс',`<a href="#/process/${p.process}">${esc(store.proc(p.process).name)}</a>`],['Контрагент',cpLink(p.counterparty)],['Этап',esc(p.stage)],['Сумма',p.amount?money(p.amount):'—'],['Изменён',p.updated]],
-    rel:p.counterparty?[{k:'Контрагент',t:cpName(p.counterparty),h:'#/counterparty/'+p.counterparty}]:[], hist:evFor(id)});
+    rel:[...(p.counterparty?[{k:'Контрагент',t:cpName(p.counterparty),h:'#/counterparty/'+p.counterparty}]:[]),...(id==='in-deal-5695'?[{k:'Документы сделки',t:'Документы сделки № 5695',h:'#/deal/in-deal-5695/docs'}]:[])], hist:evFor(id)});
 });
 route(/^\/task\/([\w-]+)$/, ([id])=>{
   const t=store.task(id)||store.s.meetings.find(m=>m.id===id); if(!t) return notFound(); resetTab(id);

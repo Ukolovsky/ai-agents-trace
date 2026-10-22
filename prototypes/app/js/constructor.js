@@ -50,7 +50,7 @@ route(/^\/constructor$/, (_,q)=>{
   const qs=k=>'#/constructor?'+new URLSearchParams(Object.assign({},from?{from:from.id}:{},k)).toString();
   STAND.bindSeg('ctab',t=>go(qs({tab:t})));
   document.querySelectorAll('.canvas [data-stg]').forEach(b=>b.onclick=()=>go(qs({stage:b.dataset.stg})));
-  const cpo=document.getElementById('cpopen'); cpo&&p&&(cpo.onclick=()=>go(qs({stage:0})));
+  const cpo=document.getElementById('cpopen'); cpo&&(cpo.onclick=()=>p?go(qs({stage:0})):BP.notify('Выберите этап на схеме','info')); document.querySelectorAll('.split-btn button').forEach((b,i)=>i&&(b.onclick=ev=>{ev.stopPropagation();A().popMenu(b,[['doc','Выгрузить CFF',()=>BP.notify('Схема CFF выгружена','info')],['doc','Выгрузить BPMN',()=>BP.notify('Схема BPMN выгружена','info')]]);}));
   const $=id=>document.getElementById(id);
   if(sel!=null&&tab==='canvas'){
     $('stclose').onclick=()=>{ go(qs({})); };

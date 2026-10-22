@@ -20,10 +20,10 @@ route(/^\/meetings$/, (_,q)=>{
     {t:'Название',f:r=>`<a>${esc(r.name)}</a>`,tt:r=>r.name},{t:'Дата и время',w:'150px',f:r=>`${r.date} ${r.from}`},
     {t:'Организатор',w:'190px',f:r=>`<span class="org">${I('person','ic16')}${esc(emp(r.org).name)}</span>`},{t:'Участники',w:'130px',f:people},
     {t:'Сервис встречи',w:'170px',f:r=>`<span class="cap">${esc(r.service)}</span>`},{t:'Статус',w:'130px',f:r=>chip(r.status)},{t:'Транскрипция',w:'130px',f:r=>r.tr?'Готова':'—'}],
-    rows, r=>'#/meetings?open='+r.id);
+    rows, r=>'#/meetings/'+r.id);
   const week=`<div class="week"><div class="wh"><span>Время</span>${WEEK.map((d,i)=>`<span>${DN[i]}, ${+d.slice(0,2)}</span>`).join('')}</div><div class="wb">
     <div class="wt">${Array.from({length:H1-H0},(_,i)=>`<span style="height:${PX}px">${String(H0+i).padStart(2,'0')}:00</span>`).join('')}</div>
-    ${WEEK.map(d=>`<div class="wd" style="height:${(H1-H0)*PX}px">${rows.filter(m=>m.date===d).map(m=>`<a class="ev ${m.status==='Завершена'?'past':''}" href="#/meetings?view=week&open=${m.id}" style="top:${(tmin(m.from)-H0*60)/60*PX}px;height:${Math.max(22,(tmin(m.to)-tmin(m.from))/60*PX-2)}px"><b>${esc(m.name)}</b><span>${m.from} - ${m.to}, ${esc(m.service)}</span></a>`).join('')}${d===S().today?`<i class="now" style="top:${(10.5-H0)*PX}px"></i>`:''}</div>`).join('')}</div></div>`;
+    ${WEEK.map(d=>`<div class="wd" style="height:${(H1-H0)*PX}px">${rows.filter(m=>m.date===d).map(m=>`<a class="ev ${m.status==='Завершена'?'past':''}" href="#/meetings/${m.id}" style="top:${(tmin(m.from)-H0*60)/60*PX}px;height:${Math.max(22,(tmin(m.to)-tmin(m.from))/60*PX-2)}px"><b>${esc(m.name)}</b><span>${m.from} - ${m.to}, ${esc(m.service)}</span></a>`).join('')}${d===S().today?`<i class="now" style="top:${(10.5-H0)*PX}px"></i>`:''}</div>`).join('')}</div></div>`;
   A().content(`<div class="page">${A().ph('Центр встреч',{icon:'cal',filters:mode==='table',dots:1,extra:A().viewSw(mode==='week'?'cards':'table','mt')})}<div class="paper col fill">${top}${mode==='week'?week:table}</div></div>`);
   const sw=()=>go('#/meetings?view='+(mode==='week'?'table':'week'));
   document.getElementById('mmode').onclick=document.getElementById('mmode2').onclick=sw;

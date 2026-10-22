@@ -52,7 +52,7 @@ D.employees.push(
  {id:'e-egorova',name:'Анна Егорова',pos:'Кладовщик',email:'a.egorova@stroyka.ru',status:'Работает'},
  {id:'e-fedorov',name:'Максим Фёдоров',pos:'Инженер по охране труда',email:'m.fedorov@stroyka.ru',status:'Работает'},
  {id:'e-romanova',name:'Татьяна Романова',pos:'Бухгалтер',email:'t.romanova@stroyka.ru',status:'Работает'});
-D.demoFiles.push({id:'file-dogovory',name:'Договоры_подрядчика.docx',size:'87 КБ',kind:'docx',readable:true,wiki:true});
+D.demoFiles.push({id:'file-dogovory',name:'Договоры_подрядчики.docx',size:'87 КБ',kind:'docx',rows:27,readable:true,wiki:true});
 D.integ={conn:{name:'1С: Кадры ГК «Стройка»',host:'1c-db.stroyka.local',port:'5432',db:'stroyka_hr',login:'bp_readonly',pass:'',sync:'Раз в неделю'},
  groups:[['Сотрудники',[['hr.employees_main',214,21],['hr.employees_regional',46,19]]],['Контрагенты',[['crm.counterparties',642,14],['crm.counterparty_contacts',66,9]]],['Документы',[['docs.invoices',8214,18],['docs.acts',3902,16],['docs.attachments',304,7]]]],
  cols:[['manager_name','Белов Сергей…','Текст','Руководитель','Текст',68],['department','Участок №2','Справочник','Подразделение','Справочник',68],
@@ -66,3 +66,5 @@ D.agents={};
 D.wikiDoc={title:'ДОГОВОР ПОДРЯДА № А-12',city:'г. Смоленск',date:'30 мая 2026 г.',
  vars:[['Название','ДОГОВОР ПОДРЯДА № А-12'],['Город','г. Смоленск'],['Дата','30 мая 2026 г.'],['Раздел 1','ПРЕДМЕТ ДОГОВОРА'],['Раздел 2','СТОИМОСТЬ РАБОТ И ПОРЯДОК РАСЧЁТОВ'],['Раздел 3','СРОКИ ВЫПОЛНЕНИЯ РАБОТ'],['Сумма','128 000 ₽'],['Подрядчик','ООО «Тау»']]};
 })(window.DEMO_DATA);
+/* v7: сделка для «Помощника с договорами» */
+(function(D){ D.instances.unshift({id:'in-deal-5695',name:'Сделка № 5695 - поставка ООО «СтройМонолит»',process:'proc-deal',counterparty:'cp-stroymonolit',stage:'Согласование КД',status:'В работе',updated:'19.08.2026',amount:1840000}); })(window.DEMO_DATA);

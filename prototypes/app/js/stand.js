@@ -107,7 +107,7 @@ route(/^\/settings\/employees$/, ()=>{ SC('Сотрудники'); const rows=S(
   <div class="cgrid">${rows.map(e=>`<div class="ecard"><div class="t"><span class="ava">${I('person','ic16')}</span><div><b>${esc(e.name)}</b><span class="cap muted">${esc(e.pos)}</span></div>${chip(e.status)}</div><div class="cap">${I('mail','ic16')} Почта: <a href="mailto:${e.email}">${esc(e.email)}</a></div></div>`).join('')}</div></div></div>`);
   const q=document.getElementById('eq'); q.oninput=()=>document.querySelectorAll('.ecard').forEach(c=>c.hidden=!BP.norm(c.textContent).includes(BP.norm(q.value)));
 });
-route(/^\/settings\/profile$/, ()=>{ SC('Информация о сотруднике'); const e=S().employees[0];
+route(/^\/(?:settings\/profile|employee\/([\w-]+))$/, ([eid])=>{ SC('Информация о сотруднике'); const e=(eid&&S().employees.find(x=>x.id===eid))||S().employees[0];
   A().content(`<div class="page">${A().ph('Информация о сотруднике',{nomp:1})}<div class="paper"><dl class="dl"><dt>ФИО</dt><dd>${esc(e.name)}</dd><dt>Должность</dt><dd>${esc(e.pos)}</dd><dt>Компания</dt><dd>${esc(S().company.name)}</dd><dt>Почта</dt><dd>${esc(e.email)}</dd><dt>Статус</dt><dd>${chip(e.status)}</dd></dl></div></div>`); });
 route(/^\/settings\/groups$/, (_,q)=>{ SC('Группы пользователей'); const f=q.f||'all';
   const rows=S().groups.filter(g=>f==='all'||(f==='dyn')===(g.type==='Динамическая'));

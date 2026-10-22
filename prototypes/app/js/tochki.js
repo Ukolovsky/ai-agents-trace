@@ -9,8 +9,8 @@ function doImport(){ const id='wiki-a12'; if(!S().wiki.some(w=>w.id===id)) S().w
   store.save(); store.mark('wiki-imp'); notify('Документ импортирован в Wiki'); }
 window.MPX=window.MPX||{};
 MPX.wiki=k=>{
-  if(k==='start'){ MP.open(); MP.bot('<span>Помогу импортировать документ в Wiki.</span><span>Добавьте файл в чат и отправьте мне: я определю тип документа, распознаю строки и колонки, а потом предложу открыть результат.</span><span>Поддерживаю Excel, CSV, DOCX и PDF.</span>',[{t:'Договоры_подрядчика.docx',d:'87 КБ · DOCX',a:'attach:file-dogovory'}]); store.mark('wiki-start'); }
-  if(k==='recognized'){ MP.bot(`<span>Готово. Распознал документ как <b>реестр договоров с подрядчиками</b>. Нашёл 24 строки в 5 колонках.</span>${card()}`,[{k:'btn',t:'Открыть документ',a:'go:#/wiki-import'},{k:'btn',t:'Импортировать в Wiki',a:'ext:wiki:imp'}]); }
+  if(k==='start'){ MP.open(); MP.bot('<span>Привет, я Феликс! Помогу импортировать документ.</span><span>Добавьте файл в чат и отправьте мне: я определю тип документа, распознаю строки и колонки, а потом предложу открыть результат.</span><span>Поддерживаю Excel, CSV, DOCX и PDF.</span>'); store.mark('wiki-start'); }
+  if(k==='recognized'){ MP.bot(`<span>Готово. Распознал документ как <b>реестр договоров с подрядчиками</b>. Нашёл 24 строки и 5 колонок:</span>${card()}`,[{k:'btn',t:'Открыть документ',a:'go:#/wiki-import'},{k:'btn',t:'Импортировать в Wiki',a:'ext:wiki:imp'}]); }
   if(k==='imp'){ MP.useAll(); MP.me('Импортировать в Wiki'); doImport(); MP.bot('<span>Документ «ДОГОВОР ПОДРЯДА № А-12» импортирован в Wiki.</span>',[{t:'Открыть в Wiki',a:'go:#/wiki/wiki-a12'}]); }
 };
 route(/^\/wiki-import$/, ()=>{
@@ -25,7 +25,7 @@ route(/^\/wiki-import$/, ()=>{
    `<span style="flex:1"></span><button class="btn pri out" id="wiact">Действия</button><button class="btn" id="wiimp">Импортировать</button><button class="btn out" id="wicancel">Отменить</button>`,{close});
   document.getElementById('wicancel').onclick=close;
   document.getElementById('vx').onclick=()=>document.querySelector('.rf').remove();
-  document.getElementById('wiact').onclick=e=>{ e.stopPropagation(); A().popMenu(e.currentTarget,[['doc','Скачать исходный файл',()=>notify('Файл «Договоры_подрядчика.docx» скачан','info')]]); };
+  document.getElementById('wiact').onclick=e=>{ e.stopPropagation(); A().popMenu(e.currentTarget,[['doc','Скачать исходный файл',()=>notify('Файл «Договоры_подрядчики.docx» скачан','info')]]); };
   document.getElementById('wiimp').onclick=()=>{ doImport(); go('#/wiki/wiki-a12'); };
 });
 /* Уведомление Феликса (8-106877): вызывается из DEMO-оверлея */
