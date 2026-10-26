@@ -236,6 +236,12 @@
       cursor: pointer;
     }
     .lb-actions button[data-act="close"] { background: var(--orange); color: #fff; }
+    .plan { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .plan th, .plan td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.4; }
+    .plan th { color: var(--soft); font-weight: 700; font-size: 13px; }
+    .plan td { color: var(--muted); }
+    .plan td:first-child { color: #fff; font-weight: 700; white-space: nowrap; }
+    .plan-wrap { overflow-x: auto; padding: 6px 8px; margin-top: 16px; }
     @media (max-width: 900px) {
       .stats, .split, .people { grid-template-columns: 1fr; }
     }
@@ -400,9 +406,37 @@
           <div class="line">Подготовить <span>актуализировать схемы и согласовать на TDR встрече</span></div>
         </article>
       </div>
+      <h3 id="sprint4" style="margin:28px 0 12px;font-size:22px">4й спринт: процесс взаимодействия и план</h3>
+      <div class="prose">
+        <p><strong>Процесс взаимодействия AI-команды и Базовой платформы зафиксирован схемой.</strong> AI-команда готовит демо, проходит TDR, передаёт требования, разрабатывает на зеркальном стенде, синхронизируется с инкрементом платформы и сама выпускает сервисы сначала в параллельный BP Platform, затем в BP Platform. Базовая платформа решает о сроках, консультирует, доставляет инкремент и выпускает релиз Dev и Prod.</p>
+        <p><strong>Постоянно работают три петли.</strong> Обновлённые требования и версия целевого представления идут в платформу через TDR, скиллы vibe-coding, тестов и рефакторинга обе команды улучшают вместе, каждое временное решение разбираем методом пяти почему.</p>
+      </div>
+      <div class="shot zoomable" style="margin-top:8px">
+        <img src="ml-interaction-2026-10-26.png" alt="Процесс взаимодействия AI-команды и Базовой платформы" />
+        <div class="cap">Процесс взаимодействия AI-команды и Базовой платформы, доска Figma AI products arch, 26 октября.</div>
+      </div>
+      <div class="glass panel plan-wrap">
+        <table class="plan">
+          <tr><th>Шаг</th><th>Что происходит</th><th>Ответственные</th></tr>
+          <tr><td>0</td><td>Подготовка демо функции, агента или сервиса</td><td>AI-команда</td></tr>
+          <tr><td>1</td><td>TDR по сервису: TDR-документ, советы платформы, целевое и итерационное представление</td><td>Саша Котовенко, Алексей, советует Максим</td></tr>
+          <tr><td>2</td><td>Передача требований с контрактом и метриками, решение о срочности и сроках</td><td>Алексей передаёт, решают Виктор и Максим</td></tr>
+          <tr><td>3</td><td>Разработка агентов на зеркальном стенде со своим ревью, консультации по коду</td><td>Саша Котовенко, советует Максим</td></tr>
+          <tr><td>4</td><td>Доставка инкремента и контракта, синхронизация сервисов AI</td><td>Виктор и Максим, Саша Котовенко</td></tr>
+          <tr><td>5, 5.1</td><td>Релиз в параллельный BP Platform, Prod Beta, затем в BP Platform и запрос на релиз</td><td>AI-команда</td></tr>
+          <tr><td>6, 6.1</td><td>Dev стенд обновляется, уведомления о версиях, релиз Базовой платформы Dev</td><td>Максим, Виктор</td></tr>
+          <tr><td>7</td><td>Релиз BP Platform Prod</td><td>Базовая платформа</td></tr>
+        </table>
+      </div>
+      <h3 style="margin:28px 0 12px;font-size:20px">Гант суперспринта</h3>
+      <div class="shot zoomable" style="margin-top:16px">
+        <img src="ml-gantt-2026-10-26.png" alt="Гант суперспринта" />
+        <div class="cap">Гант суперспринта, доска Figma AI products arch, 26 октября.</div>
+      </div>
+      <p class="figma-row"><a class="figma-btn" href="https://www.figma.com/board/7J79YJJbjU0WbuVBzxm8J6/AI-products-achr?node-id=77-437" target="_blank" rel="noopener">Схема и гант в Figma</a></p>
     </section>
 
-    <footer>Собрано 13 октября 2026 из ТЗ сентября, протоколов 21 сентября, 7, 8 и 9 октября и шаблона архитектуры агента. Подробный текст процесса с монолитом появится, когда его оформит Саша Котовенко.</footer>
+    <footer>Собрано 13 октября 2026, блок 4го спринта добавлен 26 октября по доске Figma и отчёту спринта. Источники: ТЗ сентября, протоколы 21 сентября, 7, 8 и 9 октября, шаблон архитектуры агента. Подробный текст процесса с монолитом появится, когда его оформит Саша Котовенко.</footer>
   </div>
 
   <div class="lightbox" id="lightbox" hidden>
@@ -421,7 +455,8 @@
   </div>
   <script>
     (function () {
-      var shot = document.querySelector("#scheme-shot img");
+      var shots = document.querySelectorAll(".shot.zoomable img");
+      var shot = shots[0];
       var lb = document.getElementById("lightbox");
       var stage = document.getElementById("lb-stage");
       var img = document.getElementById("lb-img");
@@ -476,7 +511,8 @@
         layout();
       }
 
-      function open() {
+      function open(e) {
+        if (e && e.currentTarget) shot = e.currentTarget;
         img.src = shot.currentSrc || shot.src;
         lb.hidden = false;
         document.body.style.overflow = "hidden";
@@ -494,7 +530,7 @@
         if (!lb.hidden) showClose();
       });
 
-      shot.addEventListener("click", open);
+      shots.forEach(function (el) { el.addEventListener("click", open); });
 
       stage.addEventListener("wheel", function (e) {
         e.preventDefault();
