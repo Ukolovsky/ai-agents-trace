@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Планирование спринтов · бэклог, Гант, итоги в часах (пример)</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#343A7E;--primaryDark:#5D6198;--primaryLight:#E7E7F0;--secondary:#FF5722;--secondaryLight:#FFEBE4;
+--text:#050819;--text2:#85868A;--disabled:#CCCCCC;--bg:#F5F5F5;--paper:#FFFFFF;--g300:#D9DADF;--g600:#85868A;--g800:#424242;
+--error:#F32A16;--errorL:#FFD4D8;--success:#599C16;--successL:#EDF7ED;--warning:#FCCA25;--warningL:#FFF2D2;--info:#0B79D0;--infoL:#E0EDFF;
+--lightGrey:#EBEBEB;--mediumGrey:#ABABAB;--pBlue:#C8EEF9;--pGreen:#BCD7A2;--pLav:#D9DBFF;--pOrange:#FFBAA5;--pYellow:#FDE592;--sky:#60B5F8;
+--v200:#EFF0F6;--v400:#E5E9FD;--v600:#D2DBF1;--v800:#B1B6D4;--tr:250ms cubic-bezier(0.4,0,0.2,1)}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Fira Sans',sans-serif;color:var(--text);background:var(--bg);font-size:14px;line-height:16px;letter-spacing:0}
+.app-header{height:56px;background:var(--paper);box-shadow:0 2px 8px rgba(52,58,126,.16);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:20}
+.app-header .sec{font-size:16px;line-height:20px}
+.app-header .note{margin-left:auto;color:var(--text2);font-size:12px}
+.page{padding:20px;max-width:1880px;margin:0 auto}
+.page-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.page-header h1{font-size:24px;line-height:28px;font-weight:500;margin:0}
+.chip{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:100px;font-size:12px;background:var(--lightGrey);color:var(--text);white-space:nowrap}
+.chip.counter{background:var(--primaryLight);color:var(--primary);font-weight:500}
+.paper{background:var(--paper);border-radius:8px;padding:20px;margin-bottom:16px}
+.paper h2{font-size:20px;line-height:24px;font-weight:500;margin:0 0 4px}
+.paper .sub{color:var(--text2);font-size:12px;line-height:14px;margin-bottom:12px}
+.filters{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px;min-width:170px}
+.field label{font-size:12px;color:var(--text2)}
+select,input{font-family:inherit;font-size:14px;color:var(--text);border:1px solid var(--g300);border-radius:8px;padding:8px 12px;background:#fff;transition:border-color var(--tr)}
+select:hover,input:hover{border-color:var(--mediumGrey)}
+select:focus,input:focus{outline:none;border-color:var(--primary)}
+input[type=range]{padding:0;border:none}
+.btn{font-family:inherit;font-size:14px;border-radius:8px;padding:8px 16px;cursor:pointer;border:1px solid var(--primary);background:#fff;color:var(--primary);transition:background var(--tr)}
+.btn:hover{background:rgba(0,0,0,.04)}
+.btn.contained{background:var(--secondary);border-color:var(--secondary);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:16px}
+.kpi{background:var(--paper);border-radius:8px;padding:16px 20px}
+.kpi .l{font-size:12px;color:var(--text2);line-height:14px;min-height:28px}
+.kpi .v{font-size:32px;line-height:40px;font-weight:600;margin-top:4px}
+.kpi .h{font-size:12px;color:var(--text2)}
+.kpi.bad .v{color:var(--error)} .kpi.good .v{color:var(--success)} .kpi.warn .v{color:#B88A00}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:1100px){.grid2{grid-template-columns:1fr}}
+.scroll{overflow-x:auto}
+svg text{font-family:'Fira Sans',sans-serif}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin:8px 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:4px;vertical-align:-2px}
+table.uni{border-collapse:collapse;width:100%;font-size:13px}
+table.uni th{background:var(--v200);color:var(--text2);font-weight:500;text-align:left;padding:6px 8px;border-bottom:1px solid var(--g300);white-space:nowrap;position:sticky;top:0}
+table.uni td{padding:4px 8px;border-bottom:1px solid var(--lightGrey);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+table.uni tr:hover td{background:rgba(0,0,0,.04)}
+table.uni tr.sel td{background:rgba(0,0,0,.08)}
+table.uni input,table.uni select{padding:3px 6px;font-size:13px;border-radius:4px}
+table.uni input[type=number]{width:62px}
+.tip{position:fixed;pointer-events:none;background:#424242;color:#fff;font-size:12px;line-height:16px;padding:6px 8px;border-radius:4px;max-width:260px;z-index:50;display:none}
+.st{padding:2px 8px;border-radius:100px;font-size:12px}
+.outcome-ok{color:var(--success)} .outcome-wave{color:#B88A00} .outcome-out{color:var(--error);font-weight:500} .outcome-block{color:var(--error)}
+.research h3{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
+.research p,.research li{font-size:14px;line-height:20px}
+.research a{color:var(--info)}
+.ib{border:none;background:none;cursor:pointer;color:var(--primary);font-size:14px;padding:2px 4px;border-radius:4px}.ib:hover{background:rgba(0,0,0,.06)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.saved{color:var(--success);font-size:12px;margin-left:8px}
+textarea{font-family:monospace;font-size:12px;width:100%;border:1px solid var(--g300);border-radius:8px;padding:8px}
+.flow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.flow .s{padding:6px 12px;border-radius:100px;font-size:13px}
+.flow .a{color:var(--text2)}
+.mark{font-size:11px;color:var(--secondary);font-weight:500}
+
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.step{border:1px solid var(--g300);border-radius:8px;padding:16px}
+.step .n{display:inline-flex;width:24px;height:24px;border-radius:100px;background:var(--primary);color:#fff;align-items:center;justify-content:center;font-weight:600;margin-right:8px}
+.step b{font-size:16px}.step p{margin:8px 0 0;line-height:20px;color:var(--text)}
+h3.sec{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
+@media(max-width:1100px){.steps{grid-template-columns:1fr}}
+</style></head><body>
+<div class="app-header"><span class="sec">Планирование спринтов · пример</span><span class="note">Рабочий инструмент · данные хранятся только в этом браузере · не публиковать</span></div>
+<div class="page">
+<div class="paper"><h2>Как пользоваться</h2>
+<ol style="margin:8px 0;padding-left:20px;line-height:22px">
+<li>Один раз: в «Люди и календарь» задайте людей (часы в неделю, буфер, встречи по дням недели), даты суперспринта, спринтов и волн.</li>
+<li>Заполните бэклог: каждая строка — инкремент не больше 3–5 рабочих дней до ревью. Укажите оценку в часах, приоритет, исполнителя и ревьюера. Строки с пометкой «⚠ разбить» разделите.</li>
+<li>Каждый день в «Дейлике» внесите часы за сегодня, статус и блокер. Гант, KPI и графики пересчитаются сами. Там, где есть записи дейлика, факт берётся из них, а не из модели.</li>
+<li>Всё сохраняется в этом браузере автоматически. Для переноса и резервной копии есть «Экспорт JSON». Бэклог можно вставить из Google Таблиц через CSV.</li></ol>
+<div class="toolbar" style="margin-top:12px">
+<button class="btn" id="bExpJson">Экспорт JSON</button><button class="btn" id="bImpJson">Импорт JSON</button>
+<button class="btn" id="bExpCsv">Экспорт CSV бэклога</button><button class="btn" id="bImpCsv">Импорт CSV</button>
+<button class="btn" id="bReset" style="border-color:#F32A16;color:#F32A16">Сбросить к примеру</button><span class="saved" id="saved"></span>
+<input type="file" id="fJson" accept=".json,application/json" hidden><input type="file" id="fCsv" accept=".csv,.tsv,.txt,text/csv" hidden></div>
+<details style="margin-top:12px"><summary style="cursor:pointer;color:#343A7E;font-weight:500">Вставить бэклог из таблицы (копировать ячейки → вставить сюда)</summary>
+<div class="sub" style="margin-top:8px">Первая строка — заголовки: <code id="csvCols"></code>. Разделитель: табуляция, «;» или «,». Исполнителя и ревьюера можно писать по имени.</div>
+<textarea id="csvPaste" rows="6"></textarea><div class="toolbar" style="margin-top:8px"><button class="btn contained" id="bPaste">Заменить бэклог</button><button class="btn" id="bPasteAdd">Добавить к бэклогу</button></div></details>
+<details style="margin-top:12px" id="setBox"><summary style="cursor:pointer;color:#343A7E;font-weight:500">Люди и календарь</summary><div id="settings"></div></details>
+</div>
+<div class="page-header"><h1 id="title"></h1><span class="chip counter" id="chipTasks"></span><span class="chip" id="chipToday"></span></div>
+
+<div class="paper"><h2>Методика</h2><div class="sub">Три шага. Вручную ведётся только бэклог, всё остальное считается.</div>
+<div class="steps">
+<div class="step"><span class="n">1</span><b>Бэклог</b><p><b>Строка = инкремент не больше 3–5 рабочих дней до ревью.</b> Story points раньше были договорённостью о загрузке, но с ИИ перестали предсказывать выпуск: люди ускоряют свою часть, а растёт очередь проверки. Поэтому SP не планируем: система считает дни до ревью как оценку в часах, делённую на свободное время исполнителя в день, и помечает строки больше 5 дней «⚠ разбить». У каждого инкремента есть ревьюер и часы ревью, ревью планируется отдельно из буфера ревьюера, а итоги показывают очередь и ожидание. Заполняем задачи, оцениваем в часах, ставим приоритет, исполнителя и тип работы. На дейлике обновляем только остаток, статус и блокер. Волну руками не ставим.</p></div>
+<div class="step"><span class="n">2</span><b>Гант</b><p>Система раскладывает остаток по свободному времени каждого (минус встречи и буфер) в порядке приоритетов. Слева от «сегодня» факт, справа план. Видно блокеры, тип работы и то, что не войдёт.</p></div>
+<div class="step"><span class="n">3</span><b>Итоги</b><p>Волна по людям и по задачам, затем спринт и суперспринт: план на старте против факта и прогноза в часах, что не входит, доля сверх плана и техдолга, время в блоке. Структура задана в конфиге: суперспринт → спринты → волны-недели.</p></div>
+</div></div>
+
+<div class="paper"><h2>Фильтры и настройки</h2><div class="sub">Фильтры обновляют таблицу, Гант и итоги. Клик по задаче на Ганте выбирает её, клик по имени выбирает человека.</div>
+<div class="filters">
+<div class="field"><label>Направление</label><select id="fDir"></select></div>
+<div class="field"><label>Сотрудник</label><select id="fPerson"></select></div>
+<div class="field"><label>Период на Ганте и в итогах волны</label><select id="fWave"></select></div>
+<div class="field"><label>Задача</label><select id="fTask" style="max-width:320px"></select></div>
+<div class="field"><label>Сегодня (дейлик)</label><div style="display:flex;gap:4px"><input type="date" id="today"><button class="btn" id="todayReset" title="Вернуть реальную дату">Сегодня</button></div></div>
+<div class="field"><label>Рабочий день, ч</label><input type="number" id="dayH" min="4" max="12" step="0.5"></div>
+<div class="field" style="min-width:220px"><label>Буфер на непредвиденное: <b id="bufV"></b></label><input type="range" id="buf" min="0" max="40" step="5"></div>
+<button class="btn" id="reset">Сбросить фильтры</button></div></div>
+
+<div class="paper"><h2>1. Бэклог <span class="chip counter" id="chipRows"></span></h2>
+<div class="sub">Редактируются все поля, включая ID, ревьюера, часы ревью и плановую дату; ⊕ дублирует строку, ✕ удаляет. Оценка меняет остаток автоматически. Колонки справа («Плановая волна», «Прогноз», «Итог») система считает сама.</div>
+<div class="scroll" style="max-height:520px;overflow-y:auto"><table class="uni" id="tbl"></table></div>
+<div style="margin-top:12px;display:flex;gap:8px"><button class="btn" id="addTask">Добавить задачу</button></div></div>
+
+<div class="paper" id="dailyBox"><h2 id="hDaily">Дейлик</h2>
+<div class="sub">Запись за выбранную дату «Сегодня». Часы за день сразу добавляются в факт и уменьшают остаток. Статус «На ревью» или «Готово» фиксирует день готовности к ревью. Записи хранятся по дням.</div>
+<div class="scroll" style="max-height:420px;overflow-y:auto"><table class="uni" id="tDaily"></table></div><div class="sub" id="dailySum" style="margin-top:8px"></div></div>
+<div class="paper" id="ganttBox"><h2>2. Гант: задачи по дням, факт и план</h2>
+<div class="sub">Строка = задача, у каждой своя линия. Задачи сгруппированы по людям (клик по имени сворачивает группу), внутри — по приоритету. В строке человека — дневная загрузка: встречи, буфер, задачи, свободно. Сплошная заливка = факт, полупрозрачная = прогноз; штриховка = блокер; пунктир = плановый срок; справа часы, которые не войдут. Подробности — в подсказке.</div>
+<div class="legend" id="legG"></div><div class="scroll"><svg id="gantt"></svg></div></div>
+
+<div class="paper"><h2>3. Итоги (считаются автоматически)</h2>
+<div class="sub">План — раскладка оценок задач типа «План» от начала суперспринта. Факт — часы, списанные до «сегодня». Прогноз — раскладка остатка от «сегодня». Всё реагирует на фильтры и правки бэклога.</div>
+<h3 class="sec" id="hSS"></h3><div class="kpis" id="kpis"></div>
+<svg id="cRings"></svg>
+<div class="grid2" style="margin-top:16px"><div><h3 class="sec" id="hW1"></h3><svg id="cWaveP"></svg><div class="legend" id="lW1"></div></div>
+<div><h3 class="sec" id="hW2"></h3><div style="max-height:420px;overflow-y:auto"><svg id="cWaveT"></svg></div><div class="legend" id="lW2"></div></div></div>
+<h3 class="sec">Burnup суперспринта в часах по спринтам</h3><svg id="cBurn"></svg><div class="legend" id="lBurn"></div>
+<div class="grid2"><div><h3 class="sec" id="hRevQ">Очередь ревью по дням</h3><svg id="cRevQ"></svg><div class="legend">Столбик = инкременты, которые готовы к ревью и ждут или проходят его в этот день. Ревью берётся из буфера ревьюера.</div></div><div><h3 class="sec">Ожидание ревью по ревьюерам</h3><svg id="cRevW"></svg></div></div>
+<div class="grid2"><div><h3 class="sec">Состав работы по спринтам (факт + прогноз)</h3><svg id="cMix"></svg><div class="legend" id="lMix"></div></div>
+<div><h3 class="sec">Время в блоке</h3><svg id="cBlock"></svg></div></div>
+<details style="margin-top:16px"><summary style="cursor:pointer;color:#343A7E;font-weight:500">Подробности таблицами</summary>
+<h3 class="sec" id="hWave"></h3><div class="scroll"><table class="uni" id="tWaveP"></table></div>
+<h3 class="sec" id="hWaveT"></h3><div class="scroll"><table class="uni" id="tWaveT"></table></div>
+<h3 class="sec">Спринты</h3><div class="scroll"><table class="uni" id="tSprint"></table></div></details>
+</div>
+
+<div class="paper"><h2>Как устроены schedule-виды в похожих продуктах</h2><div class="sub">Что взято в Гант выше.</div><ul style="line-height:20px">
+<li><b>Float, Schedule</b>: строка = человек, работа выделяется в часах в день или в % ёмкости, нерабочие дни видны, перегрузка подсвечивается, итоги по диапазону дат (<a href="https://support.float.com/en/articles/11468891-schedule-plan-your-team-s-work" target="_blank">Schedule</a>, <a href="https://support.float.com/en/articles/13847946-capacity-planning-and-resource-scheduling" target="_blank">capacity</a>, <a href="https://support.float.com/en/articles/4188692-allocate-time" target="_blank">allocations</a>, <a href="https://www.float.com/product/capacity-planning" target="_blank">обзор</a>).</li>
+<li><b>Runn, People Planner</b>: над человеком сводная полоса доступности (зелёный = свободен, синий = занят, красная черта = перегруз, штриховка = выходной), раскрытие строки показывает задачи, «сегодня» выделено (<a href="https://help.runn.io/en/articles/4293043-people-planner-overview" target="_blank">People Planner</a>).</li>
+<li><b>Jira Capacity view и Plans</b>: строки людей или задач, ячейка = выделение в часах, полоса ёмкости краснеет при &gt; 100% (<a href="https://www.atlassian.com/software/jira/guides/capacity-planning/overview" target="_blank">capacity planning</a>).</li>
+<li><b>Asana Workload</b>: загрузка по людям по дням, перегруз красным, задачи перетаскиваются (<a href="https://asana.com/features/resource-management/workload" target="_blank">Workload</a>). <b>Linear Timeline</b>: скруглённые полосы с подписью внутри, вехи ромбами, линия «сегодня» (<a href="https://linear.app/docs/timeline" target="_blank">Timeline</a>).</li>
+<li>Что взято: строки людей с субдорожками без наложений, подпись внутри полосы с ч/день, тонкая полоса загрузки над строкой, затенённые выходные, ромбы вех, линия «сегодня», факт сплошной и план полупрозрачный, блокер штриховкой.</li></ul></div>
+
+<div class="paper research" id="research"></div>
+</div><div class="tip" id="tip"></div>
+<script type="application/json" id="data">{"sprint": {"start": "2026-10-19", "end": "2026-11-20", "release": "2026-11-23", "today": "2026-10-26", "dayHours": 8, "buffer": 15}, "waves": [{"id": "В1", "start": "2026-10-19", "end": "2026-10-23"}, {"id": "В2", "start": "2026-10-26", "end": "2026-10-30"}, {"id": "В3", "start": "2026-11-02", "end": "2026-11-06"}, {"id": "В4", "start": "2026-11-09", "end": "2026-11-13"}, {"id": "В5", "start": "2026-11-16", "end": "2026-11-20"}], "people": [{"id": "AU", "name": "Исполнитель 1", "meetSrc": "example", "meetWeek": [3.5, 4, 3, 2, 3.5]}, {"id": "AD", "name": "Исполнитель 2", "meetSrc": "example", "meetWeek": [1.5, 0.5, 1.5, 0.5, 1.0]}, {"id": "DK", "name": "Исполнитель 3", "meetSrc": "example", "meetWeek": [1.5, 0.5, 1.0, 0.5, 1.0]}, {"id": "AK", "name": "Исполнитель 4", "meetSrc": "example", "meetWeek": [1.0, 0.5, 1.0, 0.25, 0.75]}], "tasks": [{"id": "B1", "dir": "Продукт", "title": "Пример: Аналитика модуля 1", "person": "AU", "prio": 1, "est": 12, "spent": 14, "rem": 0, "status": "Готово", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "B2", "dir": "Продукт", "title": "Пример: Прототип экрана 2", "person": "AD", "prio": 1, "est": 12, "spent": 14, "rem": 0, "status": "Готово", "type": "План", "blocker": "", "since": "", "reviewer": "DK", "revH": 2, "parent": ""}, {"id": "B3", "dir": "Продукт", "title": "Пример: Интеграция API 3", "person": "DK", "prio": 1, "est": 13, "spent": 15, "rem": 0, "status": "Готово", "type": "План", "blocker": "", "since": "", "reviewer": "AK", "revH": 2, "parent": ""}, {"id": "B4", "dir": "Продукт", "title": "Пример: Рефакторинг сервиса 4", "person": "AK", "prio": 1, "est": 12, "spent": 14, "rem": 0, "status": "Готово", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "P11.5", "dir": "Продукт", "title": "Пример: Тесты и стенд 5", "person": "AK", "prio": 1, "est": 16, "spent": 6, "rem": 10, "status": "В работе", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "P11.3", "dir": "Продукт", "title": "Пример: Документация 6", "person": "AK", "prio": 1, "est": 6, "spent": 4, "rem": 3, "status": "В работе", "type": "Техдолг срочный", "blocker": "", "since": "", "reviewer": "AD", "revH": 1, "parent": ""}, {"id": "M1", "dir": "ML", "title": "Пример: Настройка конвейера 7", "person": "AK", "prio": 2, "est": 8, "spent": 0, "rem": 8, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 1, "parent": ""}, {"id": "P11.7", "dir": "Продукт", "title": "Пример: Исследование решения 8", "person": "AK", "prio": 2, "est": 10, "spent": 0, "rem": 10, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "M2", "dir": "ML", "title": "Пример: Аналитика модуля 9", "person": "AK", "prio": 3, "est": 12, "spent": 0, "rem": 12, "status": "Запланировано", "type": "План", "blocker": "Внешний: ждём стенд (пример)", "since": "2026-10-21", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "P11.6.1", "dir": "Продукт", "title": "Пример: Прототип экрана 10 · инкр. 1/2", "person": "AK", "prio": 3, "est": 16, "spent": 0, "rem": 16, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": "P11.6", "inc": 1}, {"id": "P11.6.2", "dir": "Продукт", "title": "Пример: Интеграция API 11 · инкр. 2/2", "person": "AK", "prio": 3, "est": 16, "spent": 0, "rem": 16, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": "P11.6", "inc": 2}, {"id": "P12.0", "dir": "Продукт", "title": "Пример: Рефакторинг сервиса 12", "person": "AK", "prio": 4, "est": 20, "spent": 0, "rem": 20, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 3, "parent": ""}, {"id": "P12.1", "dir": "Продукт", "title": "Пример: Тесты и стенд 13", "person": "AK", "prio": 4, "est": 20, "spent": 0, "rem": 20, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 3, "parent": ""}, {"id": "P12.3", "dir": "Продукт", "title": "Пример: Документация 14", "person": "AK", "prio": 5, "est": 12, "spent": 0, "rem": 12, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "P12.4", "dir": "Продукт", "title": "Пример: Настройка конвейера 15", "person": "AK", "prio": 5, "est": 24, "spent": 0, "rem": 24, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 4, "parent": ""}, {"id": "P14.1", "dir": "Продукт", "title": "Пример: Исследование решения 16", "person": "AD", "prio": 1, "est": 24, "spent": 10, "rem": 16, "status": "В работе", "type": "План", "blocker": "", "since": "", "reviewer": "DK", "revH": 4, "parent": ""}, {"id": "P14.6", "dir": "Продукт", "title": "Пример: Аналитика модуля 17", "person": "AD", "prio": 1, "est": 10, "spent": 6, "rem": 5, "status": "На ревью", "type": "План", "blocker": "Внешний: ждём стенд (пример)", "since": "2026-10-22", "reviewer": "DK", "revH": 2, "parent": ""}, {"id": "M5", "dir": "ML", "title": "Пример: Прототип экрана 18", "person": "AD", "prio": 2, "est": 20, "spent": 0, "rem": 20, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "DK", "revH": 3, "parent": ""}, {"id": "M6", "dir": "ML", "title": "Пример: Интеграция API 19", "person": "AD", "prio": 2, "est": 16, "spent": 0, "rem": 16, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "DK", "revH": 2, "parent": ""}, {"id": "P14.5.1", "dir": "Продукт", "title": "Пример: Рефакторинг сервиса 20 · инкр. 1/2", "person": "AD", "prio": 3, "est": 20, "spent": 0, "rem": 20, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "DK", "revH": 3, "parent": "P14.5", "inc": 1}, {"id": "P14.5.2", "dir": "Продукт", "title": "Пример: Тесты и стенд 21 · инкр. 2/2", "person": "AD", "prio": 3, "est": 20, "spent": 0, "rem": 20, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "DK", "revH": 3, "parent": "P14.5", "inc": 2}, {"id": "P14.T", "dir": "Продукт", "title": "Пример: Документация 22", "person": "AD", "prio": 4, "est": 12, "spent": 0, "rem": 12, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "DK", "revH": 2, "parent": ""}, {"id": "P13.1", "dir": "Продукт", "title": "Пример: Настройка конвейера 23", "person": "DK", "prio": 1, "est": 24, "spent": 8, "rem": 16, "status": "В работе", "type": "План", "blocker": "", "since": "", "reviewer": "AK", "revH": 4, "parent": ""}, {"id": "P13.4", "dir": "Продукт", "title": "Пример: Исследование решения 24", "person": "DK", "prio": 1, "est": 8, "spent": 3, "rem": 5, "status": "В работе", "type": "План", "blocker": "Внешний: ждём стенд (пример)", "since": "2026-10-23", "reviewer": "AK", "revH": 1, "parent": ""}, {"id": "M11", "dir": "ML", "title": "Пример: Аналитика модуля 25", "person": "DK", "prio": 1, "est": 4, "spent": 5, "rem": 0, "status": "Готово", "type": "План", "blocker": "", "since": "", "reviewer": "AK", "revH": 1, "parent": ""}, {"id": "M12", "dir": "ML", "title": "Пример: Прототип экрана 26", "person": "DK", "prio": 2, "est": 4, "spent": 0, "rem": 4, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AK", "revH": 1, "parent": ""}, {"id": "M13", "dir": "ML", "title": "Пример: Интеграция API 27", "person": "DK", "prio": 2, "est": 10, "spent": 0, "rem": 10, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AK", "revH": 2, "parent": ""}, {"id": "P13.2", "dir": "Продукт", "title": "Пример: Рефакторинг сервиса 28", "person": "DK", "prio": 2, "est": 20, "spent": 0, "rem": 20, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AK", "revH": 3, "parent": ""}, {"id": "M14", "dir": "ML", "title": "Пример: Тесты и стенд 29", "person": "DK", "prio": 3, "est": 12, "spent": 0, "rem": 12, "status": "Запланировано", "type": "План", "blocker": "Внешний: ждём стенд (пример)", "since": "2026-10-21", "reviewer": "AK", "revH": 2, "parent": ""}, {"id": "M15", "dir": "ML", "title": "Пример: Документация 30", "person": "DK", "prio": 3, "est": 20, "spent": 0, "rem": 20, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AK", "revH": 3, "parent": ""}, {"id": "M7", "dir": "ML", "title": "Пример: Настройка конвейера 31", "person": "AU", "prio": 1, "est": 12, "spent": 4, "rem": 8, "status": "В работе", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "M8", "dir": "ML", "title": "Пример: Исследование решения 32", "person": "AU", "prio": 1, "est": 4, "spent": 5, "rem": 0, "status": "Готово", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 1, "parent": ""}, {"id": "X1", "dir": "Продукт", "title": "Пример: Аналитика модуля 33", "person": "AU", "prio": 1, "est": 6, "spent": 3, "rem": 3, "status": "В работе", "type": "Сверх плана", "blocker": "", "since": "", "reviewer": "AD", "revH": 1, "parent": ""}, {"id": "M9", "dir": "ML", "title": "Пример: Прототип экрана 34", "person": "AU", "prio": 2, "est": 16, "spent": 0, "rem": 16, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "P-OPT.1", "dir": "Продукт", "title": "Пример: Интеграция API 35 · инкр. 1/2", "person": "AU", "prio": 2, "est": 15, "spent": 0, "rem": 15, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": "P-OPT", "inc": 1}, {"id": "P-OPT.2", "dir": "Продукт", "title": "Пример: Рефакторинг сервиса 36 · инкр. 2/2", "person": "AU", "prio": 2, "est": 15, "spent": 0, "rem": 15, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": "P-OPT", "inc": 2}, {"id": "M10", "dir": "ML", "title": "Пример: Тесты и стенд 37", "person": "AU", "prio": 3, "est": 10, "spent": 0, "rem": 10, "status": "Запланировано", "type": "План", "blocker": "Внешний: ждём стенд (пример)", "since": "2026-10-21", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "P-REL", "dir": "Продукт", "title": "Пример: Документация 38", "person": "AU", "prio": 4, "est": 12, "spent": 0, "rem": 12, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "AD", "revH": 2, "parent": ""}, {"id": "I1", "dir": "Продукт", "title": "Пример: Настройка конвейера 39", "person": "AK", "prio": 1, "est": 3, "spent": 3, "rem": 0, "status": "Готово", "type": "Инцидент", "blocker": "", "since": "", "reviewer": "AD", "revH": 1, "parent": ""}], "config": {"superSprint": {"name": "Суперспринт 4", "start": "2026-10-19", "end": "2026-11-20", "release": "2026-11-23", "sprints": [{"id": "С19", "start": "2026-10-19", "end": "2026-10-30", "waves": ["В1", "В2"]}, {"id": "С20", "start": "2026-11-02", "end": "2026-11-13", "waves": ["В3", "В4"]}, {"id": "С21", "start": "2026-11-16", "end": "2026-11-20", "waves": ["В5"]}]}}, "log": {}}</script>
+<script>
+(function(){'use strict';
+const EXAMPLE=document.getElementById('data').textContent;const LS='bp-sprint-planning-public-v1';
+const localToday=()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');};
+let D;try{D=JSON.parse(localStorage.getItem(LS)||'null');}catch(e){D=null;}let FROM_LS=!!D;if(!D)D=JSON.parse(EXAMPLE);
+D.sprint.today=localToday();let C=D.config.superSprint;
+const STATUSES=['Запланировано','В работе','На ревью','Доработка после ревью','Готово','Отложено'];
+const STI={'Запланировано':'○','В работе':'▶','На ревью':'◎','Доработка после ревью':'↺','Готово':'✓','Отложено':'‖'};
+const TYPES=['План','Сверх плана','Техдолг срочный','Инцидент','Перенос'];
+const TYPECOL={'План':'#343A7E','Сверх плана':'#FF5722','Техдолг срочный':'#FCCA25','Инцидент':'#F32A16','Перенос':'#ABABAB'};
+const PAL=['#60B5F8','#8C9EFF','#BCD7A2','#FFBAA5','#FDE592','#C8EEF9','#D9DBFF','#749EF2','#B1B6D4','#FF7E57','#C8D1FF','#ABABAB'];
+const F={dir:'all',person:'all',wave:'all',task:'all'};
+const $=id=>document.getElementById(id);
+const pd=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(Date.UTC(a,b-1,c));};
+const fd=d=>d.toISOString().slice(0,10);
+const ru=s=>s?s.slice(8)+'.'+s.slice(5,7)+'.'+s.slice(0,4):'—';const ruS=s=>s.slice(8)+'.'+s.slice(5,7);
+const h1=x=>(Math.round(x*10)/10).toLocaleString('ru-RU');const pct=x=>isFinite(x)?Math.round(x*100)+'%':'—';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function workdays(a,b){const r=[];for(let d=pd(a);d<=pd(b);d=new Date(d.getTime()+864e5)){const w=d.getUTCDay();if(w>0&&w<6)r.push(fd(d));}return r;}
+let DAYS=[];
+const waveOf=d=>{const w=D.waves.find(w=>d>=w.start&&d<=w.end);return w?w.id:null;};
+const sprintOf=d=>{const s=C.sprints.find(s=>d>=s.start&&d<=s.end);return s?s.id:null;};
+const person=id=>D.people.find(p=>p.id===id);const task=id=>D.tasks.find(t=>t.id===id);
+const meetH=(p,d)=>p.meetSrc==='calendar'?(p.meet[d]||0):((p.meetWeek||[])[pd(d).getUTCDay()-1]||0);
+let color={};
+const pdh=p=>(+p.hoursWeek||D.sprint.dayHours*5)/5;const pb=p=>(p.buffer!==undefined&&p.buffer!==''&&p.buffer!==null?+p.buffer:D.sprint.buffer)/100;
+function normalize(){C=D.config.superSprint;D.log=D.log||{};D.sprint.start=C.start;D.sprint.end=C.end;D.sprint.release=C.release;DAYS=workdays(C.start,C.end);
+ D.waves.sort((a,b)=>a.start.localeCompare(b.start));C.sprints.sort((a,b)=>a.start.localeCompare(b.start));
+ C.sprints.forEach(s=>s.waves=D.waves.filter(w=>w.start<=s.end&&w.end>=s.start).map(w=>w.id));
+ D.people.forEach(p=>{if(!p.meetWeek)p.meetWeek=[0,0,0,0,0];if(p.hoursWeek==null)p.hoursWeek=D.sprint.dayHours*5;});
+ D.tasks.forEach(t=>{['reviewer','due','blocker','since','dir'].forEach(k=>{if(t[k]==null)t[k]='';});if(t.revH==null)t.revH=Math.max(1,Math.round(t.est*.15));});
+ color={};D.tasks.forEach((t,i)=>color[t.id]=PAL[i%PAL.length]);}
+const loggedOf=(id,upTo)=>{let s=0;for(const d in D.log){if(d<=upTo&&D.log[d][id])s+=+D.log[d][id].h||0;}return s;};
+const EPS=1e-6;
+
+/* ===== расчёт ===== */
+function compute(){
+ const S=D.sprint,today=S.today,dh=S.dayHours,buf=S.buffer/100;
+ const cap={},base={},R={};
+ D.tasks.forEach(t=>R[t.id]={fact:{},fc:{},base:{},overflow:0,start:null,end:null});
+ D.people.forEach(p=>{cap[p.id]={};const dh=pdh(p),buf=pb(p);
+  DAYS.forEach(d=>{const m=Math.min(dh,meetH(p,d)),net=dh-m,past=d<today;cap[p.id][d]={meet:m,past,net:net-net*buf,buffer:past?0:net*buf,raw:net,items:[],free:past?net:net-net*buf};});
+  // базовая линия: оценки задач "План" от начала суперспринта
+  const bf={};DAYS.forEach(d=>bf[d]=cap[p.id][d].raw*(1-buf));let bi=0;
+  D.tasks.filter(t=>t.person===p.id&&t.type==='План').sort((a,b)=>a.prio-b.prio||a.id.localeCompare(b.id)).forEach(t=>{let r=+t.est;
+   while(r>EPS&&bi<DAYS.length){const d=DAYS[bi],k=Math.min(r,bf[d]);if(k>EPS){R[t.id].base[d]=(R[t.id].base[d]||0)+k;bf[d]-=k;r-=k;}if(bf[d]<=EPS)bi++;}R[t.id].baseOver=r;});
+  // факт-пример: списанные часы раскладываются по прошедшим дням по приоритету
+  // факт из ежедневного журнала (реальная история)
+  DAYS.filter(d=>d<=today&&D.log[d]).forEach(d=>{const c=cap[p.id][d];for(const id in D.log[d]){const tt=task(id);const h=+D.log[d][id].h||0;if(!tt||tt.person!==p.id||h<=EPS)continue;c.items.push({t:id,h,fact:true,log:true});c.free-=h;R[id].fact[d]=(R[id].fact[d]||0)+h;}});
+  const past=DAYS.filter(d=>d<today);let pi=0;
+  D.tasks.filter(t=>t.person===p.id&&+t.spent>0).sort((a,b)=>(a.status==='Готово'?0:1)-(b.status==='Готово'?0:1)||a.prio-b.prio).forEach(t=>{let r=Math.max(0,+t.spent-loggedOf(t.id,today));
+   while(r>EPS&&pi<past.length){const c=cap[p.id][past[pi]],k=Math.min(r,c.free);if(k>EPS){c.items.push({t:t.id,h:k,fact:true});c.free-=k;r-=k;R[t.id].fact[past[pi]]=(R[t.id].fact[past[pi]]||0)+k;}if(c.free<=EPS)pi++;}});
+  // прогноз от сегодня
+  const fut=DAYS.filter(d=>d>=today);let fi=0;
+  D.tasks.filter(t=>t.person===p.id&&t.status!=='Готово'&&t.status!=='Отложено'&&+t.rem>0&&!t.blocker).sort((a,b)=>a.prio-b.prio||a.id.localeCompare(b.id)).forEach(t=>{let r=+t.rem;
+   while(r>EPS&&fi<fut.length){const c=cap[p.id][fut[fi]],k=Math.min(r,c.free);if(k>EPS){c.items.push({t:t.id,h:k});c.free-=k;r-=k;R[t.id].fc[fut[fi]]=(R[t.id].fc[fut[fi]]||0)+k;}if(c.free<=EPS)fi++;}R[t.id].overflow=r;});
+ });
+ D.tasks.forEach(t=>{const x=R[t.id];const bd=Object.keys(x.base).sort(),fdz=Object.keys(x.fc).sort(),fa=Object.keys(x.fact).sort();
+  x.baseEnd=bd.length?bd[bd.length-1]:null;x.baseWave=x.baseEnd?waveOf(x.baseEnd):(t.type==='План'?'за суперспринтом':'вне плана');
+  x.end=t.status==='Готово'?(fa.length?fa[fa.length-1]:null):(fdz.length?fdz[fdz.length-1]:null);
+  x.blockDays=t.blocker&&t.since?Math.max(0,workdays(t.since,today).length-1):0;
+  let o,c,conf;
+  if(t.status==='Готово'){o='Готово'+(x.end?' в '+waveOf(x.end):'');c='outcome-ok';conf='—';}
+  else if(t.status==='Отложено'){o='Отложено';c='';conf='—';}
+  else if(t.blocker){o='Блокер '+x.blockDays+' раб. дн.: '+h1(t.rem)+' ч ждут';c='outcome-block';conf='Низкая';}
+  else if(x.overflow>EPS){o='Не войдёт в суперспринт: '+h1(x.overflow)+' ч';c='outcome-out';conf='Низкая';}
+  else if(x.baseEnd&&x.end>x.baseEnd&&waveOf(x.end)!==x.baseWave){o='Сдвиг: '+x.baseWave+' → '+waveOf(x.end);c='outcome-wave';conf='Средняя';}
+  else {o='В срок, '+waveOf(x.end);c='outcome-ok';conf='Высокая';}
+  x.outcome=o;x.cls=c;x.conf=conf;});
+ // ===== ревью: инкремент → «готово к ревью» → очередь → ревью у ревьюера (из буфера ревьюера)
+ const avgCap={},pool={};D.people.forEach(p=>{const buf=pb(p);let s=0;DAYS.forEach(d=>s+=cap[p.id][d].raw*(1-buf));avgCap[p.id]=s/Math.max(1,DAYS.length);pool[p.id]={};DAYS.forEach(d=>pool[p.id][d]=cap[p.id][d].raw*Math.max(buf,0.1));});
+ const di=d=>DAYS.indexOf(d);
+ D.tasks.forEach(t=>{const x=R[t.id];x.dur=(+t.est)/(avgCap[t.person]||1);x.durFlag=x.dur>5+EPS?'bad':x.dur>=3?'ok':'small';
+  const fa=Object.keys(x.fact).sort();let ready=null;
+  const lr=Object.keys(D.log).sort().find(d=>D.log[d][t.id]&&['На ревью','Готово'].includes(D.log[d][t.id].status));
+  if(lr&&DAYS.includes(lr))ready=lr;else if(t.status==='Готово')ready=fa.length?fa[fa.length-1]:null;
+  else if(t.status==='На ревью')ready=DAYS[Math.max(0,di(today)-1)]||today;
+  else if(!t.blocker&&t.status!=='Отложено'&&x.overflow<=EPS)ready=x.end;
+  x.ready=ready;x.rev={};});
+ D.tasks.filter(t=>R[t.id].ready&&DAYS.includes(R[t.id].ready)&&t.reviewer&&person(t.reviewer)).sort((a,b)=>R[a.id].ready.localeCompare(R[b.id].ready)||a.prio-b.prio).forEach(t=>{const x=R[t.id];let r=+t.revH||1,i=di(x.ready)+1;
+  while(r>EPS&&i<DAYS.length){const d=DAYS[i],k=Math.min(r,pool[t.reviewer][d]);if(k>EPS){x.rev[d]=(x.rev[d]||0)+k;pool[t.reviewer][d]-=k;r-=k;if(!x.revStart)x.revStart=d;x.revEnd=d;}if(pool[t.reviewer][d]<=EPS)i++;}
+  x.revLeft=r;x.wait=x.revStart?di(x.revStart)-di(x.ready)-1:null;});
+ const queue=DAYS.map(d=>{let n=0,h=0;D.tasks.forEach(t=>{const x=R[t.id];if(x.ready&&x.ready<d&&(!x.revEnd||x.revEnd>=d)){n++;h+=+t.revH||1;}});return {d,n,h};});
+ return {cap,R,queue,avgCap};
+}
+/* суммирование по периоду */
+function period(P,days,pids,tids){const ds=new Set(days);const o={cap:0,meet:0,plan:0,fact:0,fc:0,unpl:0,debt:0,free:0,notFit:0,blockDays:0,blockH:0,doneN:0,planN:0};
+ pids.forEach(p=>days.forEach(d=>{const c=P.cap[p][d];o.cap+=c.past?c.raw:c.net;o.meet+=c.meet;if(!c.past)o.free+=c.free;}));
+ D.tasks.filter(t=>pids.includes(t.person)&&tids.has(t.id)).forEach(t=>{const x=P.R[t.id];let b=0,f=0,fc=0;
+  for(const d in x.base)if(ds.has(d))b+=x.base[d];for(const d in x.fact)if(ds.has(d))f+=x.fact[d];for(const d in x.fc)if(ds.has(d))fc+=x.fc[d];
+  o.plan+=b;o.fact+=f;o.fc+=fc;if(t.type!=='План'){o.unpl+=f+fc;}if(t.type==='Техдолг срочный'||t.type==='Инцидент')o.debt+=f+fc;
+  const end=days[days.length-1];
+  if(b>EPS){o.planN++;// задача по плану должна закончиться в периоде
+   const doneIn=(t.status==='Готово')||(!t.blocker&&x.overflow<EPS&&x.end&&x.end<=end);if(doneIn)o.doneN++;
+   if(x.baseEnd&&ds.has(x.baseEnd)){let after=x.overflow+(t.blocker&&t.status!=='Готово'?+t.rem:0);for(const d in x.fc)if(d>end)after+=x.fc[d];o.notFit+=after;}}
+  if(t.blocker&&t.since&&t.status!=='Готово'){const bd=days.filter(d=>d>=t.since&&d<D.sprint.today).length;o.blockDays+=bd;if(bd)o.blockH+=+t.rem;}});
+ return o;}
+
+/* ===== фильтры ===== */
+const visTasks=()=>D.tasks.filter(t=>(F.dir==='all'||t.dir===F.dir)&&(F.person==='all'||t.person===F.person)&&(F.task==='all'||t.id===F.task));
+function visPeople(){let ps=D.people;if(F.person!=='all')ps=ps.filter(p=>p.id===F.person);if(F.task!=='all'){const t=task(F.task);ps=ps.filter(p=>p.id===t.person);}return ps;}
+function visDays(){if(F.wave==='all')return DAYS;const w=D.waves.find(w=>w.id===F.wave);if(w)return DAYS.filter(d=>d>=w.start&&d<=w.end);const s=C.sprints.find(s=>s.id===F.wave);return DAYS.filter(d=>d>=s.start&&d<=s.end);}
+function fillSelects(){const o=(v,l,s)=>`<option value="${esc(v)}"${s?' selected':''}>${esc(l)}</option>`;
+ $('fDir').innerHTML=o('all','Все направления',F.dir==='all')+o('Продукт','Продукт',F.dir==='Продукт')+o('ML','ML',F.dir==='ML');
+ $('fPerson').innerHTML=o('all','Вся команда',F.person==='all')+D.people.map(p=>o(p.id,p.name,F.person===p.id)).join('');
+ $('fWave').innerHTML=o('all',C.name+' целиком',F.wave==='all')+C.sprints.map(s=>o(s.id,'Спринт '+s.id+' · '+ruS(s.start)+'–'+ruS(s.end),F.wave===s.id)+s.waves.map(id=>{const w=D.waves.find(x=>x.id===id);return o(id,'  Волна '+id+' · '+ruS(w.start)+'–'+ruS(w.end),F.wave===id);}).join('')).join('');
+ const ts=D.tasks.filter(t=>(F.dir==='all'||t.dir===F.dir)&&(F.person==='all'||t.person===F.person));if(F.task!=='all'&&!ts.find(t=>t.id===F.task))F.task='all';
+ $('fTask').innerHTML=o('all','Все задачи',F.task==='all')+ts.map(t=>o(t.id,t.id+' · '+t.title,F.task===t.id)).join('');}
+
+/* ===== svg ===== */
+const NS='http://www.w3.org/2000/svg';
+function el(tag,a,p,txt){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;if(p)p.appendChild(e);return e;}
+const tip=$('tip');function hover(e,h){e.addEventListener('mousemove',ev=>{tip.style.display='block';tip.innerHTML=h;tip.style.left=Math.min(ev.clientX+12,innerWidth-270)+'px';tip.style.top=(ev.clientY+12)+'px';});e.addEventListener('mouseleave',()=>tip.style.display='none');}
+function tinfo(t,P){const x=P.R[t.id];return `<b>${esc(t.id)} · ${esc(t.title)}</b><br>${STI[t.status]} ${esc(t.status)} · ${esc(t.type)} · P${t.prio}<br>Оценка ${t.est} ч · факт ${t.spent} ч · остаток ${t.rem} ч<br>Плановая волна ${esc(x.baseWave)} · прогноз ${ru(x.end)}<br>${esc(x.outcome)}`+(t.blocker?`<br>⛔ ${esc(t.blocker)} с ${ru(t.since)}`:'')+`<br>До ревью ≈ ${h1(x.dur)} раб. дн.`+(x.durFlag==='bad'?' <b style="color:#FF7E57">⚠ больше 5 дней — разбейте на инкременты</b>':x.durFlag==='ok'?' ✓ 3–5 дней':' (меньше 3 дней)')+(x.ready?`<br>Ревью: ${esc(person(t.reviewer)?.name||'—')}, ${t.revH} ч · готово к ревью ${ru(x.ready)}`+(x.revStart?` · ждёт ${x.wait} раб. дн. · ревью ${ru(x.revStart)}–${ru(x.revEnd)}`:' · ревью не помещается'):'');}
+
+/* ===== Гант (строка = задача, группы по людям) ===== */
+const GCOL=new Set();
+function drawGantt(P){const svg=$('gantt');while(svg.firstChild)svg.removeChild(svg.firstChild);
+ const S=D.sprint,ps=visPeople(),vd=visDays(),ids=new Set(visTasks().map(t=>t.id));
+ const endAx=F.wave==='all'?C.release:vd[vd.length-1];const cal=[];for(let d=pd(vd[0]);d<=pd(endAx);d=new Date(d.getTime()+864e5))cal.push(fd(d));
+ const avail=(svg.parentNode.clientWidth||1600)-24;const L=400,OV=90;const nWd=cal.filter(d=>{const w=pd(d).getUTCDay();return w>0&&w<6;}).length,nWe=cal.length-nWd;
+ const cw=Math.max(26,Math.floor((avail-L-OV)/(nWd+nWe*0.35))),we=Math.round(cw*0.35);
+ const xs={};let cx=L;cal.forEach(d=>{const w=pd(d).getUTCDay();xs[d]={x:cx,w:(w===0||w===6)?we:cw,we:w===0||w===6};cx+=xs[d].w;});const XR=cx;
+ const RH=26,BAR=14,PH=34,HEAD=74;
+ const trunc=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
+ // группы
+ const groups=ps.map(p=>{const ts=D.tasks.filter(t=>t.person===p.id&&ids.has(t.id)).sort((a,b)=>a.prio-b.prio||a.id.localeCompare(b.id));
+  const rows=ts.map(t=>{const days=[];DAYS.forEach(d=>{if(!xs[d])return;P.cap[p.id][d].items.filter(a=>a.t===t.id).forEach(a=>days.push({d,h:a.h,fact:!!a.fact}));});
+   const runs=[];let cur=null;days.forEach(s=>{const prev=cur&&cur.days[cur.days.length-1];if(prev&&prev.d===s.d){prev.h+=s.h;prev.fact=prev.fact||s.fact;return;}const contig=prev&&DAYS.indexOf(s.d)===DAYS.indexOf(prev.d)+1;if(cur&&contig)cur.days.push(s);else{cur={days:[s]};runs.push(cur);}});
+   if(t.blocker&&t.status!=='Готово'){const s=t.since||S.today;const bd=DAYS.filter(d=>d>=s&&d<S.today&&xs[d]);if(bd.length)runs.push({blk:true,days:bd.map(d=>({d,h:0}))});}
+   runs.forEach(r=>{r.s=r.days[0].d;r.e=r.days[r.days.length-1].d;});return {t,runs};});
+  return {p,rows,open:!GCOL.has(p.id)};});
+ const H=HEAD+groups.reduce((s,g)=>s+PH+(g.open?g.rows.length*RH:0),0)+8;svg.setAttribute('width',XR+OV);svg.setAttribute('height',H);
+ const defs=el('defs',{},svg);const mk=(id,bg,ln)=>{const q=el('pattern',{id,width:6,height:6,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},defs);el('rect',{width:6,height:6,fill:bg},q);el('line',{x1:0,y1:0,x2:0,y2:6,stroke:ln,'stroke-width':2},q);};
+ mk('hWe','#F5F5F5','#EBEBEB');mk('hBlk','#FFD4D8','#F32A16');mk('hOv','#FFEBE4','#FF7E57');mk('hRev','#F3E5F5','#CE93D8');
+ // шапка
+ C.sprints.forEach(sp=>{const ds=cal.filter(d=>d>=sp.start&&d<=sp.end);if(!ds.length)return;const x1=xs[ds[0]].x,x2=xs[ds[ds.length-1]].x+xs[ds[ds.length-1]].w;el('rect',{x:x1+1,y:2,width:x2-x1-2,height:16,rx:4,fill:'#E7E7F0'},svg);el('text',{x:x1+8,y:14,'font-size':11,'font-weight':500,fill:'#343A7E'},svg,'Спринт '+sp.id);});
+ D.waves.forEach(w=>{const ds=cal.filter(d=>d>=w.start&&d<=w.end);if(!ds.length)return;el('text',{x:xs[ds[0]].x+6,y:32,'font-size':11,fill:'#5D6198'},svg,'Волна '+w.id);});
+ const hx=[[0,'Задача'],[236,'P'],[258,'Статус'],[346,'Факт/оц., ч']];hx.forEach(([x,l])=>el('text',{x,y:66,'font-size':11,fill:'#85868A','font-weight':500},svg,l));
+ cal.forEach(d=>{const c=xs[d];if(c.we){el('rect',{x:c.x,y:36,width:c.w,height:H-36,fill:'url(#hWe)'},svg);return;}
+  if(d!==S.today)el('text',{x:c.x+c.w/2,y:50,'text-anchor':'middle','font-size':10,fill:'#85868A'},svg,cw>=40?ruS(d):d.slice(8));
+  if(pd(d).getUTCDay()===1)el('line',{x1:c.x,y1:24,x2:c.x,y2:H,stroke:'#D9DADF'},svg);});
+ el('text',{x:XR+8,y:66,'font-size':11,fill:'#F32A16','font-weight':500},svg,'Не войдёт');el('line',{x1:XR,y1:36,x2:XR,y2:H,stroke:'#D9DADF'},svg);
+ el('line',{x1:0,x2:XR+OV,y1:HEAD-2,y2:HEAD-2,stroke:'#D9DADF'},svg);
+ let y=HEAD;
+ groups.forEach(({p,rows,open})=>{const y0=y;
+  el('rect',{x:0,y:y0,width:XR+OV,height:PH,fill:'#EFF0F6'},svg);
+  const hd=el('g',{style:'cursor:pointer'},svg);el('text',{x:4,y:y0+15,'font-size':12,fill:'#343A7E'},hd,open?'▾':'▸');
+  el('text',{x:18,y:y0+15,'font-size':14,'font-weight':500,fill:'#050819'},hd,p.name);
+  const sumE=rows.reduce((s,r)=>s+(+r.t.est),0),sumF=rows.reduce((s,r)=>s+(+r.t.spent),0);
+  el('text',{x:18,y:y0+28,'font-size':10,fill:p.meetSrc==='calendar'?'#0B79D0':'#FF5722'},hd,(p.meetSrc==='calendar'?'встречи: календарь':p.meetSrc==='manual'?'встречи: вручную':'встречи: пример')+' · задач '+rows.length);
+  el('text',{x:346,y:y0+15,'font-size':12,'font-weight':500,fill:'#050819'},hd,h1(sumF)+' / '+h1(sumE));
+  hd.addEventListener('click',()=>{GCOL.has(p.id)?GCOL.delete(p.id):GCOL.add(p.id);drawGantt(P);});
+  // полоса загрузки (сводная строка)
+  DAYS.forEach(d=>{if(!xs[d])return;const c=P.cap[p.id][d],x=xs[d].x+2,w=xs[d].w-4,dh=pdh(p),sy=y0+10,sh=14;const tk=c.items.reduce((s,a)=>s+a.h,0);
+   const parts=[[c.meet,'#ABABAB'],[c.buffer,'#D9DADF'],[tk,'#5D6198'],[Math.max(0,c.free),c.past?'#EBEBEB':'#599C16']];let px=x;
+   const g=el('g',{},svg);parts.forEach(([v,col])=>{if(v<=EPS)return;const ww=v/dh*w;el('rect',{x:px,y:sy,width:ww,height:sh,fill:col},g);px+=ww;});
+   if(c.meet+tk+c.buffer>dh+EPS)el('rect',{x,y:sy,width:w,height:sh,fill:'#F32A16'},g);
+   hover(g,`<b>${p.name} · ${ru(d)}</b><br>Встречи ${h1(c.meet)} ч · буфер ${h1(c.buffer)} ч<br>${c.past?'Факт':'План'} задач ${h1(tk)} ч · ${c.past?'не списано':'свободно'} ${h1(c.free)} ч`);});
+  const ovSum=rows.reduce((s,r)=>s+P.R[r.t.id].overflow,0);if(ovSum>EPS)el('text',{x:XR+8,y:y0+21,'font-size':12,'font-weight':600,fill:'#F32A16'},svg,h1(ovSum)+' ч');
+  y+=PH;if(!open)return;
+  rows.forEach(({t,runs})=>{const ry=y,by=ry+(RH-BAR)/2,sel=F.task===t.id,dim=F.task!=='all'&&!sel;const x=P.R[t.id];
+   const row=el('g',{style:'cursor:pointer',opacity:dim?.3:1},svg);
+   el('rect',{x:0,y:ry,width:XR+OV,height:RH,fill:sel?'rgba(0,0,0,.08)':'transparent'},row);
+   el('line',{x1:0,x2:XR+OV,y1:ry+RH,y2:ry+RH,stroke:'#EBEBEB'},row);
+   el('rect',{x:4,y:ry+8,width:4,height:10,rx:2,fill:TYPECOL[t.type]},row);
+   el('text',{x:14,y:ry+17,'font-size':12,fill:'#050819'},row,trunc(t.id+' '+t.title,x.durFlag==='bad'?27:34));if(x.durFlag==='bad'){const fg=el('g',{},row);el('rect',{x:186,y:ry+5,width:46,height:16,rx:8,fill:'#FFEBE4'},fg);el('text',{x:190,y:ry+17,'font-size':10,'font-weight':600,fill:'#FF5722'},fg,'⚠ разбить');}
+   el('text',{x:236,y:ry+17,'font-size':12,fill:'#85868A'},row,t.prio);
+   el('text',{x:258,y:ry+17,'font-size':12,fill:t.blocker?'#F32A16':'#424242'},row,(t.blocker?'⛔':STI[t.status])+' '+trunc(t.blocker?'Блокер':t.status,10));
+   el('text',{x:346,y:ry+17,'font-size':12,fill:'#050819'},row,h1(t.spent)+' / '+h1(t.est));
+   const col=color[t.id];
+   runs.forEach(r=>{const x1=xs[r.s].x+2,x2=xs[r.e].x+xs[r.e].w-2;
+    if(r.blk){el('rect',{x:x1,y:by,width:x2-x1,height:BAR,rx:4,fill:'url(#hBlk)',stroke:'#F32A16'},row);return;}
+    const cid='c'+t.id.replace(/\W/g,'_')+r.s;const cp=el('clipPath',{id:cid},defs);el('rect',{x:x1,y:by,width:x2-x1,height:BAR,rx:4},cp);
+    r.days.forEach(s=>{const a=xs[s.d].x,b=a+xs[s.d].w;el('rect',{x:a,y:by,width:b-a,height:BAR,fill:col,opacity:s.fact?1:.45,'clip-path':`url(#${cid})`},row);});
+    el('rect',{x:x1,y:by,width:x2-x1,height:BAR,rx:4,fill:'none',stroke:TYPECOL[t.type],'stroke-width':t.type==='План'?1:2},row);
+    if(t.blocker)el('rect',{x:x1,y:by,width:x2-x1,height:BAR,rx:4,fill:'url(#hBlk)',opacity:.5},row);});
+   if(x.ready&&xs[x.ready]){const rd=Object.keys(x.rev).sort().filter(d=>xs[d]);const rx=xs[x.ready].x+xs[x.ready].w;
+    if(rd.length){const a=xs[rd[0]].x+2,b=xs[rd[rd.length-1]].x+xs[rd[rd.length-1]].w-2;if(a>rx+2)el('line',{x1:rx,x2:a,y1:by+BAR/2,y2:by+BAR/2,stroke:'#85868A','stroke-dasharray':'2 3'},row);
+     el('rect',{x:a,y:by+2,width:Math.max(6,b-a),height:BAR-4,rx:5,fill:'url(#hRev)',stroke:'#7B1FA2','stroke-width':1.5},row);}
+    else if(x.revLeft>EPS){el('line',{x1:rx,x2:XR,y1:by+BAR/2,y2:by+BAR/2,stroke:'#7B1FA2','stroke-dasharray':'2 3'},row);}}
+   if(x.overflow>EPS){el('rect',{x:XR+6,y:by,width:OV-12,height:BAR,rx:4,fill:'url(#hOv)',stroke:'#F32A16'},row);el('text',{x:XR+OV/2,y:by+11,'text-anchor':'middle','font-size':10,'font-weight':600,fill:'#F32A16'},row,h1(x.overflow)+' ч');}
+   if(x.baseEnd&&xs[x.baseEnd]&&t.status!=='Готово'){const bx=xs[x.baseEnd].x+xs[x.baseEnd].w-2;el('line',{x1:bx,x2:bx,y1:ry+3,y2:ry+RH-3,stroke:'#343A7E','stroke-width':2,'stroke-dasharray':'2 2'},row);}
+   hover(row,tinfo(t,P)+(t.blocker?'':`<br>${STI[t.status]} ${esc(t.status)}`));
+   row.addEventListener('click',()=>{F.task=F.task===t.id?'all':t.id;render();});
+   y+=RH;});});
+ // вехи и сегодня
+ const ms=C.sprints.map(s=>({d:s.end,l:'конец '+s.id})).concat([{d:C.release,l:'релиз'}]);
+ ms.forEach(m=>{if(!xs[m.d])return;const x=xs[m.d].x+xs[m.d].w;el('line',{x1:x,y1:20,x2:x,y2:H,stroke:'#343A7E','stroke-dasharray':'3 4',opacity:.5,'pointer-events':'none'},svg);el('path',{d:`M${x} 22 l6 6 l-6 6 l-6 -6z`,fill:m.l==='релиз'?'#599C16':'#343A7E'},svg);});
+ if(xs[S.today]){const x=xs[S.today].x;el('line',{x1:x,y1:56,x2:x,y2:H,stroke:'#FF5722','stroke-width':2,'pointer-events':'none'},svg);el('rect',{x:x-30,y:40,width:60,height:16,rx:8,fill:'#FF5722'},svg);el('text',{x,y:52,'text-anchor':'middle','font-size':10,fill:'#fff','font-weight':500},svg,'сегодня '+ruS(S.today));}
+ $('legG').innerHTML=`<span><i style="background:#ABABAB"></i>Встречи</span><span><i style="background:#D9DADF"></i>Буфер ${S.buffer}%</span><span><i style="background:#5D6198"></i>Задачи</span><span><i style="background:#599C16"></i>Свободно</span><span><i style="background:#F32A16"></i>Перегруз</span> │ <span><i style="background:#60B5F8"></i>Факт</span><span><i style="background:repeating-linear-gradient(45deg,#F3E5F5 0 3px,#CE93D8 3px 5px);border:1px solid #7B1FA2"></i>Ревью (ожидание — пунктир)</span><span style="color:#FF5722">⚠ разбить = &gt;5 дней до ревью</span><span><i style="border-left:2px dashed #343A7E;width:2px;border-radius:0"></i>Плановый срок</span><span><i style="background:#60B5F8;opacity:.5"></i>План</span>`+['Сверх плана','Техдолг срочный','Инцидент'].map(k=>`<span><i style="background:#fff;border:2px solid ${TYPECOL[k]}"></i>${k}</span>`).join('')+`<span><i style="background:repeating-linear-gradient(45deg,#FFD4D8 0 3px,#F32A16 3px 5px)"></i>Блокер</span><span>◆ конец спринта / релиз</span><span>${STATUSES.map(s=>STI[s]+' '+s).join(' · ')}</span>`;}
+
+/* ===== таблица бэклога ===== */
+function drawTable(P){const ts=visTasks().slice().sort((a,b)=>a.person.localeCompare(b.person)||a.prio-b.prio);$('chipRows').textContent=ts.length;
+ const sel=(f,o,v)=>`<select data-f="${f}">${o.map(x=>`<option${x[0]===v?' selected':''} value="${esc(x[0])}">${esc(x[1])}</option>`).join('')}</select>`;const num=(f,v)=>`<input type="number" min="0" step="0.5" data-f="${f}" value="${v}">`;
+ const pp=D.people.map(p=>[p.id,p.name]);
+ let h='<tr><th></th><th>ID</th><th>Инкремент</th><th>Напр.</th><th>Исполнитель</th><th>Приор.</th><th>Тип</th><th>Оценка, ч</th><th>Факт, ч</th><th>Остаток, ч</th><th>Статус</th><th>Блокер (причина)</th><th>Блокер с</th><th>Ревьюер</th><th>Ревью, ч</th><th>Дней до ревью</th><th>Плановая дата</th><th>Плановая волна</th><th>Прогноз</th><th>Уверенность</th><th>Итог</th></tr>';
+ ts.forEach(t=>{const x=P.R[t.id];h+=`<tr data-id="${esc(t.id)}"${F.task===t.id?' class="sel"':''}><td style="white-space:nowrap"><button class="ib" data-a="dup" title="Дублировать">⊕</button><button class="ib" data-a="del" title="Удалить">✕</button></td><td><input data-f="id" value="${esc(t.id)}" style="width:70px"></td><td><input data-f="title" value="${esc(t.title)}" style="width:250px"></td><td>${sel('dir',[['Продукт','Продукт'],['ML','ML']],t.dir)}</td><td>${sel('person',pp,t.person)}</td><td>${num('prio',t.prio)}</td><td>${sel('type',TYPES.map(s=>[s,s]),t.type)}</td><td>${num('est',t.est)}</td><td>${num('spent',t.spent)}</td><td>${num('rem',t.rem)}</td><td>${sel('status',STATUSES.map(s=>[s,STI[s]+' '+s]),t.status)}</td><td><input data-f="blocker" value="${esc(t.blocker)}" placeholder="нет" style="width:170px"></td><td><input type="date" data-f="since" value="${esc(t.since)}" style="width:130px"></td><td>${sel('reviewer',[['','—']].concat(pp),t.reviewer)}</td><td>${num('revH',t.revH)}</td><td title="${x.durFlag==='bad'?'Больше 5 рабочих дней до ревью: разбейте на инкременты по 3–5 дней':x.durFlag==='ok'?'3–5 дней — норма':'Меньше 3 дней'}"><span class="st" style="background:${{bad:'#FFEBE4',ok:'#EDF7ED',small:'#EBEBEB'}[x.durFlag]};color:${x.durFlag==='bad'?'#FF5722':'inherit'}">${h1(x.dur)}${x.durFlag==='bad'?' ⚠ разбить':''}</span></td><td><input type="date" data-f="due" value="${esc(t.due)}" style="width:130px"></td><td>${esc(x.baseWave)}</td><td>${t.blocker||x.overflow>EPS?'—':ru(x.end)}${t.due&&x.end&&x.end>t.due&&!t.blocker?' <span style="color:#F32A16">позже плана</span>':''}</td><td><span class="st" style="background:${{'Высокая':'#EDF7ED','Средняя':'#FFF2D2','Низкая':'#FFD4D8'}[x.conf]||'#EBEBEB'}">${x.conf}</span></td><td class="${x.cls}">${esc(x.outcome)}</td></tr>`;});
+ $('tbl').innerHTML=h;}
+function renameTask(o,n){const t=task(o);t.id=n;for(const d in D.log)if(D.log[d][o]){D.log[d][n]=D.log[d][o];delete D.log[d][o];}if(F.task===o)F.task=n;color[n]=color[o];}
+$('tbl').addEventListener('change',e=>{const f=e.target.dataset.f;if(!f)return;const t=task(e.target.closest('tr').dataset.id);let v=e.target.value;
+ if(f==='id'){v=v.trim();if(!v||task(v)){alert('ID пустой или уже есть');render();return;}renameTask(t.id,v);setTimeout(render,0);return;}
+ if(['prio','est','spent','rem','revH'].includes(f))v=Math.max(0,parseFloat(v)||0);
+ if(f==='est'&&t.status!=='Готово'){t.rem=Math.max(0,v-(+t.spent));}
+ t[f]=v;if(f==='status'&&v==='Готово')t.rem=0;if(f==='blocker'){t.since=v?(t.since||D.sprint.today):'';}setTimeout(render,0);});
+$('tbl').addEventListener('click',e=>{const a=e.target.dataset.a;if(!a)return;const id=e.target.closest('tr').dataset.id,t=task(id);
+ if(a==='del'){if(!confirm('Удалить '+id+'?'))return;D.tasks=D.tasks.filter(x=>x!==t);for(const d in D.log)delete D.log[d][id];if(F.task===id)F.task='all';}
+ if(a==='dup'){let n=id+'-копия',k=2;while(task(n))n=id+'-копия'+k++;const c=JSON.parse(JSON.stringify(t));c.id=n;c.spent=0;c.rem=c.est;c.status='Запланировано';c.blocker='';c.since='';D.tasks.splice(D.tasks.indexOf(t)+1,0,c);}
+ normalize();render();});
+
+/* ===== итоги ===== */
+function row(cells,th){return '<tr>'+cells.map(c=>th?`<th>${c}</th>`:`<td>${c}</td>`).join('')+'</tr>';}
+const HDR=['','Ёмкость, ч','План, ч','Факт, ч','Прогноз, ч','Факт+прогноз / план','Не входит, ч','Сверх плана и техдолг','в т.ч. техдолг и инциденты','Дней в блоке (ч ждут)','Свободно, ч'];
+function cells(n,o){const fp=o.fact+o.fc;return [n,h1(o.cap),h1(o.plan),h1(o.fact),h1(o.fc),pct(fp/o.plan),`<span class="${o.notFit>EPS?'outcome-out':''}">${h1(o.notFit)}</span>`,pct(o.unpl/fp)+' · '+h1(o.unpl)+' ч',h1(o.debt)+' ч',o.blockDays?o.blockDays+' ('+h1(o.blockH)+')':'0',h1(o.free)];}
+function curWave(){if(F.wave!=='all'&&D.waves.find(w=>w.id===F.wave))return D.waves.find(w=>w.id===F.wave);return D.waves.find(w=>D.sprint.today>=w.start&&D.sprint.today<=w.end)||D.waves[0];}
+function drawTotals(P){const ps=visPeople().map(p=>p.id),tids=new Set(visTasks().map(t=>t.id));const w=curWave(),wd=DAYS.filter(d=>d>=w.start&&d<=w.end);
+ const st=w.end<D.sprint.today?'прошла':w.start<=D.sprint.today?'идёт':'впереди';
+ $('hWave').textContent=`Волна ${w.id} (${ru(w.start)} – ${ru(w.end)}, ${st}) по людям`;
+ let h=row(['Сотрудник'].concat(HDR.slice(1)),1);ps.forEach(p=>h+=row(cells(person(p).name,period(P,wd,[p],tids))));h+=row(cells('<b>Итого</b>',period(P,wd,ps,tids)));$('tWaveP').innerHTML=h;
+ $('hWaveT').textContent=`Волна ${w.id} по задачам`;
+ const ds=new Set(wd);let t2=row(['Задача','Исполнитель','P','Тип','План в волне, ч','Факт, ч','Прогноз, ч','Статус','Результат волны'],1);
+ D.tasks.filter(t=>ps.includes(t.person)&&tids.has(t.id)).sort((a,b)=>a.person.localeCompare(b.person)||a.prio-b.prio).forEach(t=>{const x=P.R[t.id];let b=0,f=0,fc=0;for(const d in x.base)if(ds.has(d))b+=x.base[d];for(const d in x.fact)if(ds.has(d))f+=x.fact[d];for(const d in x.fc)if(ds.has(d))fc+=x.fc[d];
+  if(b+f+fc<EPS&&!(t.blocker&&x.baseWave===w.id))return;
+  let res,cls;const plannedEnd=x.baseEnd&&ds.has(x.baseEnd);
+  if(t.status==='Готово'&&x.end&&ds.has(x.end)){res='Выполнено в волне';cls='outcome-ok';}
+  else if(t.blocker){res='Блокер: '+t.blocker;cls='outcome-block';}
+  else if(x.overflow>EPS&&plannedEnd){res='Не войдёт в суперспринт';cls='outcome-out';}
+  else if(x.end&&ds.has(x.end)){res=w.end<D.sprint.today?'Выполнено в волне':'Завершится в волне ('+ru(x.end)+')';cls='outcome-ok';}
+  else if(plannedEnd&&x.end>w.end){res='Перенос в '+(waveOf(x.end)||'—');cls='outcome-wave';}
+  else if(b>EPS||fc>EPS||f>EPS){res='Продолжается';cls='';}
+  t2+=row([esc(t.id+' · '+t.title),person(t.person).name,t.prio,esc(t.type),h1(b),h1(f),h1(fc),STI[t.status]+' '+esc(t.status),`<span class="${cls}">${esc(res)}</span>`]);});
+ $('tWaveT').innerHTML=t2;
+ let s=row(['Спринт / волна'].concat(HDR.slice(1)).concat(['Задач плана завершено']),1);
+ C.sprints.forEach(sp=>{const sd=DAYS.filter(d=>d>=sp.start&&d<=sp.end);const o=period(P,sd,ps,tids);s+=row(cells(`<b>${sp.id}</b> ${ruS(sp.start)}–${ruS(sp.end)}`,o).concat([o.doneN+' из '+o.planN]));
+  sp.waves.forEach(id=>{const ww=D.waves.find(x=>x.id===id);const o2=period(P,DAYS.filter(d=>d>=ww.start&&d<=ww.end),ps,tids);s+=row(cells('&nbsp;&nbsp;'+id,o2).concat([o2.doneN+' из '+o2.planN]));});});
+ $('tSprint').innerHTML=s;
+ const o=period(P,DAYS,ps,tids),fp=o.fact+o.fc;$('hSS').textContent=`${C.name}: ${ru(C.start)} – ${ru(C.end)}, релиз ${ru(C.release)}`;
+ const ov=D.tasks.filter(t=>ps.includes(t.person)&&tids.has(t.id)).reduce((s,t)=>s+P.R[t.id].overflow+(t.blocker&&t.status!=='Готово'?+t.rem:0),0);
+ const st2=D.tasks.filter(t=>ps.includes(t.person)&&tids.has(t.id)&&+t.spent>0);const acc=st2.reduce((s,t)=>s+ +t.spent+ +t.rem,0)/st2.reduce((s,t)=>s+ +t.est,0);
+ const k=(l,v,h,c)=>`<div class="kpi ${c||''}"><div class="l">${l}</div><div class="v">${v}</div><div class="h">${h}</div></div>`;
+ $('kpis').innerHTML=k('Ёмкость (чистое время)',h1(o.cap)+' ч','встречи '+h1(o.meet)+' ч исключены')+k('План на старте',h1(o.plan)+' ч','оценки задач «План»')+k('Факт + прогноз',h1(fp)+' ч',`факт ${h1(o.fact)} · прогноз ${h1(o.fc)} · ${pct(fp/o.plan)} плана`)+
+ k('Не войдёт в суперспринт',h1(ov)+' ч','хвост очереди и задачи под блокером',ov>EPS?'bad':'good')+k('Свободный резерв',h1(o.free)+' ч','под новые задачи от сегодня',o.free>8?'good':'warn')+
+ k('Сверх плана и техдолг',pct(o.unpl/fp),'техдолг и инциденты '+h1(o.debt)+' ч · цель ≤ 20%',o.unpl/fp>0.2?'bad':'good')+k('Время в блоке',o.blockDays+' дн.',h1(o.blockH)+' ч остатка ждут',o.blockDays?'bad':'good')+k('Точность оценки','×'+(isFinite(acc)?acc.toFixed(2):'—'),'(факт + остаток) / оценка, начатые задачи',Math.abs(acc-1)>0.2?'warn':'good')+(()=>{const TT=D.tasks.filter(t=>ps.includes(t.person)&&tids.has(t.id));const ws=TT.map(t=>P.R[t.id]).filter(x=>x.wait!=null);const a=ws.length?ws.reduce((s,x)=>s+x.wait,0)/ws.length:0;const big=TT.filter(t=>P.R[t.id].durFlag==='bad').length;return k('Ожидание ревью, среднее',h1(a)+' дн.','рабочих дней от «готово к ревью» до начала ревью · цель ≤ 1',a>2?'bad':a>1?'warn':'good')+k('Инкременты &gt; 5 дней',big,'строки с пометкой ⚠ разбить',big?'bad':'good');})();}
+
+/* ===== инфографика итогов ===== */
+function svgBox(id,W,H){const s=$(id);while(s.firstChild)s.removeChild(s.firstChild);s.setAttribute('viewBox',`0 0 ${W} ${H}`);s.setAttribute('width','100%');s.setAttribute('height',H);return s;}
+function axisY(s,L,T,B,W,H,mx){for(let i=0;i<=4;i++){const v=mx*i/4,y=H-B-(v/mx)*(H-B-T);el('line',{x1:L,x2:W-8,y1:y,y2:y,stroke:'#EBEBEB'},s);el('text',{x:L-6,y:y+3,'text-anchor':'end','font-size':10,fill:'#85868A'},s,Math.round(v));}}
+const sum=(o,ds)=>{let v=0;for(const d in o)if(!ds||ds.has(d))v+=o[d];return v;};
+function drawCharts(P){const ps=visPeople().map(p=>p.id),tids=new Set(visTasks().map(t=>t.id));const T=D.tasks.filter(t=>ps.includes(t.person)&&tids.has(t.id));
+ const w=curWave(),wd=DAYS.filter(d=>d>=w.start&&d<=w.end),wds=new Set(wd);
+ const st=w.end<D.sprint.today?'прошла':w.start<=D.sprint.today?'идёт':'впереди';
+ $('hW1').textContent=`Волна ${w.id} · ${ru(w.start)} – ${ru(w.end)} (${st}): план, факт и прогноз по людям`;$('hW2').textContent=`Волна ${w.id}: задачи (bullet)`;
+ // 1. столбцы по людям
+ {const W=640,H=260,L=40,B=40,Tp=16;const s=svgBox('cWaveP',W,H);const data=ps.map(p=>({p,o:period(P,wd,[p],tids)}));
+  const mx=Math.max(8,...data.map(d=>Math.max(d.o.cap,d.o.plan,d.o.fact+d.o.fc)))*1.15;axisY(s,L,Tp,B,W,H,mx);const sy=v=>H-B-(v/mx)*(H-B-Tp);const gw=(W-L-10)/data.length,bw=Math.min(34,gw/4.5);
+  data.forEach((d,i)=>{const x0=L+i*gw+(gw-bw*3-8)/2;const o=d.o;
+   const bar=(x,v,fill,lab,extra)=>{const r=el('rect',Object.assign({x,y:sy(v),width:bw,height:Math.max(0,H-B-sy(v)),rx:3,fill},extra||{}),s);hover(r,`${person(d.p).name}: ${lab} ${h1(v)} ч`);if(v>0)el('text',{x:x+bw/2,y:sy(v)-4,'text-anchor':'middle','font-size':10,fill:'#424242'},s,Math.round(v));};
+   bar(x0,o.plan,'#D9DADF','план');
+   const fx=x0+bw+4;el('rect',{x:fx,y:sy(o.fact),width:bw,height:H-B-sy(o.fact),fill:'#343A7E',rx:3},s);el('rect',{x:fx,y:sy(o.fact+o.fc),width:bw,height:H-B-sy(o.fc)-(H-B-sy(0)),fill:'#343A7E',opacity:.4,rx:3},s);
+   const hv=el('rect',{x:fx,y:sy(o.fact+o.fc),width:bw,height:H-B-sy(o.fact+o.fc),fill:'transparent'},s);hover(hv,`${person(d.p).name}: факт ${h1(o.fact)} ч + прогноз ${h1(o.fc)} ч`);el('text',{x:fx+bw/2,y:sy(o.fact+o.fc)-4,'text-anchor':'middle','font-size':10,fill:'#424242'},s,Math.round(o.fact+o.fc));
+   bar(fx+bw+4,o.cap,'#fff','ёмкость',{stroke:'#599C16','stroke-dasharray':'3 2'});
+   el('text',{x:x0+bw*1.5+4,y:H-B+16,'text-anchor':'middle','font-size':12,fill:'#050819'},s,person(d.p).name);
+   if(o.notFit>EPS)el('text',{x:x0+bw*1.5+4,y:H-B+30,'text-anchor':'middle','font-size':10,fill:'#F32A16'},s,'не входит '+h1(o.notFit)+' ч');});
+  $('lW1').innerHTML='<span><i style="background:#D9DADF"></i>План (базовая линия)</span><span><i style="background:#343A7E"></i>Факт</span><span><i style="background:#343A7E;opacity:.4"></i>Прогноз</span><span><i style="background:#fff;border:1px dashed #599C16"></i>Ёмкость</span>';}
+ // 2. bullet по задачам волны
+ {const rows=T.map(t=>{const x=P.R[t.id];return {t,x,b:sum(x.base,wds),f:sum(x.fact,wds),fc:sum(x.fc,wds)};}).filter(r=>r.b+r.f+r.fc>EPS||(r.t.blocker&&r.t.status!=='Готово')).sort((a,b)=>a.t.prio-b.t.prio||b.b-a.b);
+  const W=640,rh=26,L=230,H=Math.max(40,rows.length*rh+24);const s=svgBox('cWaveT',W,H);const mx=Math.max(8,...rows.map(r=>Math.max(r.b,r.f+r.fc,r.t.blocker?+r.t.rem:0)))*1.1;const sx=v=>L+v/mx*(W-L-90);
+  rows.forEach((r,i)=>{const y=i*rh+6,t=r.t;const lab=el('text',{x:0,y:y+13,'font-size':11,fill:'#050819',style:'cursor:pointer'},s,(STI[t.status]+' '+t.id+' '+t.title).slice(0,40));lab.addEventListener('click',()=>{F.task=F.task===t.id?'all':t.id;render();});
+   el('rect',{x:L,y:y,width:sx(r.b)-L,height:18,fill:'#E7E7F0',rx:2},s);
+   el('rect',{x:L,y:y+5,width:sx(r.f)-L,height:8,fill:TYPECOL[t.type]},s);el('rect',{x:sx(r.f),y:y+5,width:sx(r.f+r.fc)-sx(r.f),height:8,fill:TYPECOL[t.type],opacity:.4},s);
+   if(r.b>EPS)el('line',{x1:sx(r.b),x2:sx(r.b),y1:y-1,y2:y+19,stroke:'#050819','stroke-width':2},s);
+   let res,col;const pe=r.x.baseEnd&&wds.has(r.x.baseEnd);
+   if(t.blocker&&t.status!=='Готово'){el('rect',{x:L,y:y+3,width:sx(+t.rem)-L,height:12,fill:'url(#bB)',stroke:'#F32A16'},s);res='⛔ '+r.x.blockDays+' дн.';col='#F32A16';}
+   else if(t.status==='Готово'){res='✓ готово';col='#599C16';}else if(r.x.overflow>EPS){res='не войдёт';col='#F32A16';}else if(pe&&r.x.end>w.end){res='→ '+waveOf(r.x.end);col='#B88A00';}else if(r.x.end&&wds.has(r.x.end)){res='в волне';col='#599C16';}else{res='дальше';col='#85868A';}
+   el('text',{x:W-84,y:y+13,'font-size':11,fill:col,'font-weight':500},s,res);
+   const hv=el('rect',{x:L,y,width:W-L,height:18,fill:'transparent'},s);hover(hv,tinfo(t,P)+`<br>В волне: план ${h1(r.b)} · факт ${h1(r.f)} · прогноз ${h1(r.fc)} ч`);});
+  const d=el('defs',{},s);const q=el('pattern',{id:'bB',width:6,height:6,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},d);el('rect',{width:6,height:6,fill:'#FFD4D8'},q);el('line',{x1:0,y1:0,x2:0,y2:6,stroke:'#F32A16','stroke-width':2},q);
+  $('lW2').innerHTML='<span><i style="background:#E7E7F0"></i>План в волне</span><span><i style="background:#343A7E;height:6px"></i>Факт</span><span><i style="background:#343A7E;opacity:.4;height:6px"></i>Прогноз</span><span>│ цель (план)</span><span><i style="background:repeating-linear-gradient(45deg,#FFD4D8 0 3px,#F32A16 3px 5px)"></i>ждёт разблокировки</span>';}
+ // 3. burnup
+ {const W=900,H=280,L=44,B=34,Tp=16;const s=svgBox('cBurn',W,H);const today=D.sprint.today;
+  const scope=T.filter(t=>t.status!=='Отложено').reduce((a,t)=>a+ +t.spent+ +t.rem,0),basePlan=T.reduce((a,t)=>a+sum(P.R[t.id].base),0);
+  let cb=0,cf=0,cfc=0;const pts=DAYS.map(d=>{T.forEach(t=>{const x=P.R[t.id];cb+=x.base[d]||0;cf+=x.fact[d]||0;cfc+=x.fc[d]||0;});return {d,b:cb,f:cf,fc:cf+cfc};});
+  const mx=Math.max(scope,basePlan,10)*1.1;axisY(s,L,Tp,B,W,H,mx);const sx=i=>L+i*(W-L-20)/(DAYS.length-1),sy=v=>H-B-(v/mx)*(H-B-Tp);
+  C.sprints.forEach(sp=>{const i1=DAYS.indexOf(sp.start),i2=DAYS.indexOf(sp.end);el('rect',{x:sx(i1),y:Tp,width:sx(i2)-sx(i1),height:H-B-Tp,fill:F.wave===sp.id?'#E7E7F0':'#EFF0F6',opacity:F.wave===sp.id?1:.5},s);el('text',{x:sx(i1)+4,y:Tp+12,'font-size':11,fill:'#343A7E','font-weight':500},s,'Спринт '+sp.id);el('line',{x1:sx(i2),x2:sx(i2),y1:Tp,y2:H-B,stroke:'#B1B6D4'},s);});
+  const line=(arr,k,a)=>el('path',Object.assign({d:arr.map((p,i)=>(i?'L':'M')+sx(DAYS.indexOf(p.d))+' '+sy(p[k])).join(' '),fill:'none','stroke-width':2.5},a),s);
+  el('line',{x1:sx(0),x2:sx(DAYS.length-1),y1:sy(scope),y2:sy(scope),stroke:'#FF5722','stroke-width':2},s);el('text',{x:sx(DAYS.length-1)-4,'text-anchor':'end',y:sy(scope)-5,'font-size':11,fill:'#FF5722'},s,'объём работ '+h1(scope)+' ч');
+  line(pts,'b',{stroke:'#B1B6D4','stroke-dasharray':'6 4'});const past=pts.filter(p=>p.d<today),fut=pts.filter(p=>p.d>=today);
+  if(past.length)line(past,'f',{stroke:'#343A7E'});const fl=(past.length?[past[past.length-1]]:[]).map(p=>({d:p.d,fc:p.f})).concat(fut);if(fl.length>1)line(fl,'fc',{stroke:'#343A7E','stroke-dasharray':'2 4',opacity:.8});
+  const last=pts[pts.length-1],gap0=scope-last.fc;el('text',{x:sx(DAYS.length-1)-4,y:sy(last.fc)+14,'text-anchor':'end','font-size':11,fill:'#343A7E'},s,'прогноз на 20.11: '+h1(last.fc)+' ч');el('text',{x:sx(DAYS.length-1)-4,y:sy(last.fc)+28,'text-anchor':'end','font-size':11,fill:'#F32A16','font-weight':600},s,gap0>EPS?'не войдёт '+h1(gap0)+' ч':'');
+  const gap=scope-last.fc;if(gap>EPS){el('line',{x1:sx(DAYS.length-1),x2:sx(DAYS.length-1),y1:sy(scope),y2:sy(last.fc),stroke:'#F32A16','stroke-width':3},s);}
+  const ti=DAYS.indexOf(today);if(ti>=0){el('line',{x1:sx(ti),x2:sx(ti),y1:Tp,y2:H-B,stroke:'#FF5722'},s);el('text',{x:sx(ti)+4,y:H-B-6,'font-size':10,fill:'#FF5722'},s,'сегодня');}
+  DAYS.forEach((d,i)=>{if(pd(d).getUTCDay()===1)el('text',{x:sx(i),y:H-B+16,'text-anchor':'middle','font-size':10,fill:'#85868A'},s,ruS(d));});
+  $('lBurn').innerHTML='<span><i style="background:#FF5722;height:3px"></i>Объём (факт + остаток)</span><span><i style="background:#B1B6D4;height:3px"></i>План на старте</span><span><i style="background:#343A7E;height:3px"></i>Сделано (факт)</span><span>┄ прогноз</span>';}
+ // 4. состав работы по спринтам
+ {const W=420,H=240,L=40,B=34,Tp=14;const s=svgBox('cMix',W,H);const data=C.sprints.map(sp=>{const ds=new Set(DAYS.filter(d=>d>=sp.start&&d<=sp.end));const by={};TYPES.forEach(k=>by[k]=0);T.forEach(t=>{const x=P.R[t.id];by[t.type]+=sum(x.fact,ds)+sum(x.fc,ds);});return {sp,by,tot:TYPES.reduce((a,k)=>a+by[k],0)};});
+  const mx=Math.max(8,...data.map(d=>d.tot))*1.15;axisY(s,L,Tp,B,W,H,mx);const gw=(W-L-10)/data.length,bw=Math.min(56,gw*.5);
+  data.forEach((d,i)=>{let y=H-B;const x=L+i*gw+(gw-bw)/2;TYPES.forEach(k=>{const v=d.by[k];if(v<=EPS)return;const hh=v/mx*(H-B-Tp);y-=hh;const r=el('rect',{x,y,width:bw,height:hh,fill:TYPECOL[k]},s);hover(r,`${d.sp.id} · ${k}: ${h1(v)} ч (${pct(v/d.tot)})`);});
+   const un=d.tot-d.by['План'];el('text',{x:x+bw/2,y:y-4,'text-anchor':'middle','font-size':10,fill:un/d.tot>0.2?'#F32A16':'#424242'},s,pct(un/d.tot)+' вне плана');el('text',{x:x+bw/2,y:H-B+16,'text-anchor':'middle','font-size':12},s,d.sp.id);});
+  $('lMix').innerHTML=TYPES.map(k=>`<span><i style="background:${TYPECOL[k]}"></i>${k}</span>`).join('');}
+ // 5. время в блоке
+ {const bl=T.filter(t=>t.blocker&&t.status!=='Готово').map(t=>({t,d:P.R[t.id].blockDays})).sort((a,b)=>b.d-a.d);const W=420,rh=30,L=150,H=Math.max(50,bl.length*rh+30);const s=svgBox('cBlock',W,H);const mx=Math.max(3,...bl.map(b=>b.d));
+  if(!bl.length)el('text',{x:0,y:24,'font-size':13,fill:'#599C16'},s,'Блокеров нет');
+  bl.forEach((b,i)=>{const y=i*rh+4;el('text',{x:0,y:y+14,'font-size':11},s,(b.t.id+' · '+person(b.t.person).name).slice(0,24));const w=b.d/mx*(W-L-80);const r=el('rect',{x:L,y,width:Math.max(w,3),height:18,rx:4,fill:'url(#bB2)',stroke:'#F32A16'},s);hover(r,`<b>${esc(b.t.blocker)}</b><br>с ${ru(b.t.since)} · ${b.d} раб. дн. · ждут ${b.t.rem} ч`);el('text',{x:L+w+6,y:y+14,'font-size':11,fill:'#F32A16','font-weight':500},s,b.d+' дн. · '+b.t.rem+' ч');});
+  const d=el('defs',{},s);const q=el('pattern',{id:'bB2',width:6,height:6,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},d);el('rect',{width:6,height:6,fill:'#FFD4D8'},q);el('line',{x1:0,y1:0,x2:0,y2:6,stroke:'#F32A16','stroke-width':2},q);
+  el('text',{x:0,y:H-6,'font-size':11,fill:'#85868A'},s,'Всего '+bl.reduce((a,b)=>a+b.d,0)+' дн. в блоке, ждут '+h1(bl.reduce((a,b)=>a+ +b.t.rem,0))+' ч');}
+ // 7. очередь ревью
+ {const tq=new Set(T.map(t=>t.id));const vd=new Set(visDays());const Q=DAYS.filter(d=>vd.has(d)).map(d=>{let n=0,h=0;T.forEach(t=>{const x=P.R[t.id];if(x.ready&&x.ready<d&&(!x.revEnd||x.revEnd>=d)){n++;h+=+t.revH||1;}});return {d,n,h};});
+  const W=640,H=220,L=32,B=30,Tp=12;const s=svgBox('cRevQ',W,H);const mx=Math.max(3,...Q.map(q=>q.n));const bw=(W-L-8)/Q.length;
+  [0,Math.ceil(mx/2),mx].forEach(v=>{const y=H-B-v/mx*(H-B-Tp);el('line',{x1:L,x2:W,y1:y,y2:y,stroke:'#EBEBEB'},s);el('text',{x:L-6,y:y+4,'text-anchor':'end','font-size':10,fill:'#85868A'},s,v);});
+  Q.forEach((q,i)=>{const hgt=q.n/mx*(H-B-Tp),x=L+i*bw+2,past=q.d<D.sprint.today;const r=el('rect',{x,y:H-B-hgt,width:bw-4,height:Math.max(hgt,q.n?1:0),rx:3,fill:q.n>=5?'#F32A16':q.n>=3?'#FCCA25':'#7B1FA2',opacity:past?1:.5},s);
+   hover(r,`<b>${ru(q.d)}</b><br>в очереди ревью: ${q.n} инкр. · ${h1(q.h)} ч ревью`);if(i%2===0)el('text',{x:x+bw/2-2,y:H-B+14,'text-anchor':'middle','font-size':9,fill:q.d===D.sprint.today?'#FF5722':'#85868A'},s,ruS(q.d));});
+  const ws=T.map(t=>P.R[t.id]).filter(x=>x.wait!=null),avg=ws.length?ws.reduce((a,x)=>a+x.wait,0)/ws.length:0,mq=Math.max(0,...Q.map(q=>q.n)),stuck=T.filter(t=>P.R[t.id].ready&&P.R[t.id].revLeft>EPS).length;
+  $('hRevQ').textContent=`Очередь ревью по дням · среднее ожидание ${h1(avg)} раб. дн. · пик ${mq} инкр.`+(stuck?` · не успеют пройти ревью: ${stuck}`:'');
+  window.__rev={avg,mq,stuck};
+  const by=D.people.map(p=>{const xs=T.filter(t=>t.reviewer===p.id).map(t=>({t,x:P.R[t.id]})).filter(o=>o.x.ready);const w=xs.filter(o=>o.x.wait!=null);return {p,n:xs.length,h:xs.reduce((a,o)=>a+ +o.t.revH,0),avg:w.length?w.reduce((a,o)=>a+o.x.wait,0)/w.length:0,stuck:xs.filter(o=>o.x.revLeft>EPS).length};}).filter(o=>o.n);
+  const W2=520,rh=34,L2=130,H2=Math.max(60,by.length*rh+24);const s2=svgBox('cRevW',W2,H2);const m2=Math.max(3,...by.map(o=>o.avg));
+  by.forEach((o,i)=>{const y=i*rh+4;el('text',{x:0,y:y+14,'font-size':12},s2,o.p.name);el('text',{x:0,y:y+27,'font-size':10,fill:'#85868A'},s2,o.n+' инкр. · '+h1(o.h)+' ч ревью');const w=o.avg/m2*(W2-L2-110);
+   const r=el('rect',{x:L2,y:y+4,width:Math.max(3,w),height:18,rx:4,fill:o.avg>2?'#F32A16':o.avg>1?'#FCCA25':'#599C16'},s2);hover(r,`<b>${o.p.name}</b> ревьюит ${o.n} инкр.<br>среднее ожидание ${h1(o.avg)} раб. дн.`+(o.stuck?`<br>${o.stuck} не успеют`:''));
+   el('text',{x:L2+w+6,y:y+18,'font-size':11,'font-weight':500},s2,h1(o.avg)+' дн.'+(o.stuck?' · '+o.stuck+' не успеют':''));});
+  el('text',{x:0,y:H2-4,'font-size':11,fill:'#85868A'},s2,'Цель: ожидание ревью ≤ 1 раб. дня');}
+ // 6. кольца суперспринта
+ {const o=period(P,DAYS,ps,tids),fp=o.fact+o.fc;const scope=T.reduce((a,t)=>a+ +t.spent+ +t.rem,0),spent=T.reduce((a,t)=>a+ +t.spent,0);
+  const rings=[['Выполнение плана',fp/o.plan,'факт+прогноз '+h1(fp)+' из '+h1(o.plan)+' ч',v=>v>=0.9?'#599C16':v>=0.75?'#FCCA25':'#F32A16'],
+   ['Загрузка ёмкости',(fp)/o.cap,h1(fp)+' из '+h1(o.cap)+' ч чистого времени',v=>v>1?'#F32A16':'#343A7E'],
+   ['Сделано от объёма',spent/scope,'факт '+h1(spent)+' из '+h1(scope)+' ч',()=>'#0B79D0'],
+   ['Вне плана',o.unpl/fp,'сверх плана, техдолг, инциденты · цель ≤ 20%',v=>v>0.2?'#F32A16':'#599C16']];
+  const W=900,H=200;const s=svgBox('cRings',W,H);const gw=W/rings.length;
+  rings.forEach(([l,v,sub,cf],i)=>{const cx=gw*i+gw/2,cy=82,r=58,c=2*Math.PI*r;const vv=isFinite(v)?v:0;el('circle',{cx,cy,r,fill:'none',stroke:'#EBEBEB','stroke-width':14},s);
+   el('circle',{cx,cy,r,fill:'none',stroke:cf(vv),'stroke-width':14,'stroke-dasharray':`${Math.min(1,vv)*c} ${c}`,transform:`rotate(-90 ${cx} ${cy})`,'stroke-linecap':'round'},s);
+   el('text',{x:cx,y:cy+9,'text-anchor':'middle','font-size':26,'font-weight':600,fill:'#050819'},s,pct(vv));el('text',{x:cx,y:cy+r+30,'text-anchor':'middle','font-size':13,'font-weight':500},s,l);el('text',{x:cx,y:cy+r+46,'text-anchor':'middle','font-size':11,fill:'#85868A'},s,sub);});}
+}
+
+/* ===== исследование ===== */
+function drawResearch(){
+ const S=(n,c)=>`<span class="s" style="background:${c}">${n}</span>`;
+ $('research').innerHTML='';
+}
+
+function render(){D.sprint.today=$('today').value||D.sprint.today;normalize();D.sprint.buffer=+$('buf').value;D.sprint.dayHours=+$('dayH').value||8;$('bufV').textContent=D.sprint.buffer+'%';
+ fillSelects();const P=compute();$('title').textContent=`${C.name}: ${ru(C.start)} – ${ru(C.end)}, релиз ${ru(C.release)}`;$('chipTasks').textContent=D.tasks.length+' задач';$('chipToday').textContent='Сегодня '+ru(D.sprint.today)+' · '+(waveOf(D.sprint.today)||'вне волн')+' · '+(sprintOf(D.sprint.today)||'');
+ drawTable(P);drawGantt(P);drawTotals(P);drawCharts(P);drawDaily(P);drawSettings();window.__state={P};scheduleSave();}
+$('today').value=D.sprint.today;$('buf').value=D.sprint.buffer;$('dayH').value=D.sprint.dayHours;
+['fDir','fPerson','fWave','fTask'].forEach(id=>$(id).addEventListener('change',e=>{F[{fDir:'dir',fPerson:'person',fWave:'wave',fTask:'task'}[id]]=e.target.value;render();}));
+['today','buf','dayH'].forEach(id=>$(id).addEventListener('change',render));$('buf').addEventListener('input',render);
+$('reset').addEventListener('click',()=>{F.dir=F.person=F.wave=F.task='all';render();});
+/* ===== дейлик ===== */
+function drawDaily(P){const d=D.sprint.today,L=D.log[d]||{};const ps=visPeople().map(p=>p.id);
+ $('hDaily').textContent='Дейлик за '+ru(d)+(DAYS.includes(d)?'':' (не рабочий день суперспринта)');
+ const ts=D.tasks.filter(t=>ps.includes(t.person)&&(L[t.id]||!['Готово','Отложено'].includes(t.status))).sort((a,b)=>a.person.localeCompare(b.person)||a.prio-b.prio);
+ const sel=(o,v)=>`<select data-f="status">${o.map(x=>`<option${x===v?' selected':''}>${esc(x)}</option>`).join('')}</select>`;
+ let h='<tr><th>Инкремент</th><th>Исполнитель</th><th>Часы сегодня</th><th>Остаток, ч</th><th>Статус</th><th>Блокер (причина)</th><th>Дней с записями</th></tr>';
+ ts.forEach(t=>{const e=L[t.id]||{};const nd=Object.keys(D.log).filter(x=>D.log[x][t.id]).length;
+  h+=`<tr data-id="${esc(t.id)}"><td>${esc(t.id)} · ${esc(t.title)}</td><td>${esc(person(t.person)?.name||t.person)}</td><td><input type="number" min="0" step="0.5" data-f="h" value="${e.h||''}" placeholder="0"></td><td><input type="number" min="0" step="0.5" data-f="rem" value="${t.rem}"></td><td>${sel(STATUSES,t.status)}</td><td><input data-f="blocker" value="${esc(t.blocker)}" placeholder="нет" style="width:200px"></td><td>${nd}</td></tr>`;});
+ $('tDaily').innerHTML=h;let sum=0;for(const id in L)sum+=+L[id].h||0;
+ $('dailySum').textContent=`За ${ru(d)} внесено ${h1(sum)} ч по ${Object.keys(L).length} инкрементам. Всего дней с записями: ${Object.keys(D.log).filter(x=>Object.keys(D.log[x]).length).length}.`;}
+$('tDaily').addEventListener('change',e=>{const f=e.target.dataset.f;if(!f)return;const t=task(e.target.closest('tr').dataset.id),d=D.sprint.today;D.log[d]=D.log[d]||{};const L=D.log[d];const en=L[t.id]=L[t.id]||{h:0};let v=e.target.value;
+ if(f==='h'){v=Math.max(0,parseFloat(v)||0);const delta=v-(+en.h||0);en.h=v;t.spent=Math.max(0,+t.spent+delta);if(t.status!=='Готово')t.rem=Math.max(0,+t.rem-delta);if(delta>0&&t.status==='Запланировано'){t.status='В работе';en.status='В работе';}}
+ if(f==='rem')t.rem=Math.max(0,parseFloat(v)||0);
+ if(f==='status'){t.status=v;en.status=v;if(v==='Готово')t.rem=0;}
+ if(f==='blocker'){t.blocker=v;en.blocker=v;t.since=v?(t.since||d):'';}
+ if(!en.h&&!en.status&&en.blocker===undefined&&f!=='rem'){delete L[t.id];}
+ setTimeout(render,0);});
+
+/* ===== настройки: люди и календарь ===== */
+function drawSettings(){if(document.activeElement&&$('settings').contains(document.activeElement))return;
+ const inp=(k,v,ty,w)=>`<input data-k="${k}" type="${ty||'text'}" value="${esc(v??'')}" style="width:${w||120}px"${ty==='number'?' min="0" step="0.5"':''}>`;
+ let h='<h3 class="sec">Люди и ёмкость</h3><table class="uni"><tr><th>ID</th><th>Имя</th><th>Часов в неделю</th><th>Буфер, % (пусто = общий)</th><th>Встречи</th><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th></th></tr>';
+ D.people.forEach((p,i)=>{h+=`<tr data-p="${i}"><td>${esc(p.id)}</td><td>${inp('name',p.name,'text',160)}</td><td>${inp('hoursWeek',p.hoursWeek,'number',70)}</td><td>${inp('buffer',p.buffer,'number',70)}</td><td><select data-k="meetSrc">${(p.meet?[['calendar','из календаря']]:[]).concat([['manual','вручную, ч/день'],['example','пример']]).map(o=>`<option value="${o[0]}"${p.meetSrc===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></td>${[0,1,2,3,4].map(j=>`<td>${inp('mw'+j,p.meetWeek[j],'number',56)}</td>`).join('')}<td><button class="ib" data-del="${i}" title="Удалить">✕</button></td></tr>`;});
+ h+='</table><div class="toolbar" style="margin-top:8px"><button class="btn" id="addPerson">Добавить человека</button><span class="sub" style="margin:0">Если встречи «из календаря», дни недели не используются.</span></div>';
+ h+=`<h3 class="sec">Суперспринт</h3><div class="filters"><div class="field"><label>Название</label>${inp('ss.name',C.name,'text',200)}</div><div class="field"><label>Начало</label>${inp('ss.start',C.start,'date',150)}</div><div class="field"><label>Конец</label>${inp('ss.end',C.end,'date',150)}</div><div class="field"><label>Релиз</label>${inp('ss.release',C.release,'date',150)}</div></div>`;
+ const lst=(nm,arr,lbl)=>`<h3 class="sec">${lbl}</h3><table class="uni" style="width:auto"><tr><th>Название</th><th>Начало</th><th>Конец</th><th></th></tr>`+arr.map((s,i)=>`<tr data-${nm}="${i}"><td>${inp('id',s.id,'text',100)}</td><td>${inp('start',s.start,'date',150)}</td><td>${inp('end',s.end,'date',150)}</td><td><button class="ib" data-del${nm}="${i}">✕</button></td></tr>`).join('')+'</table>';
+ h+=lst('s',C.sprints,'Спринты')+'<div class="toolbar" style="margin-top:8px"><button class="btn" id="addSprint">Добавить спринт</button></div>'+lst('w',D.waves,'Волны (неделя)')+'<div class="toolbar" style="margin-top:8px"><button class="btn" id="addWave">Добавить волну</button><button class="btn" id="autoWaves">Волны по неделям заново</button></div>';
+ $('settings').innerHTML=h;}
+$('settings').addEventListener('change',e=>{const k=e.target.dataset.k;if(!k)return;const v=e.target.value,tr=e.target.closest('tr');
+ if(tr&&tr.dataset.p!=null){const p=D.people[+tr.dataset.p];if(k.startsWith('mw'))p.meetWeek[+k[2]]=Math.max(0,parseFloat(v)||0);else if(k==='hoursWeek')p.hoursWeek=Math.max(0,parseFloat(v)||0);else if(k==='buffer')p.buffer=v===''?'':Math.max(0,parseFloat(v)||0);else p[k]=v;}
+ else if(tr&&tr.dataset.s!=null){const s=C.sprints[+tr.dataset.s],old=s.id;s[k]=v;if(k==='id'&&F.wave===old)F.wave='all';}
+ else if(tr&&tr.dataset.w!=null){const w=D.waves[+tr.dataset.w];w[k]=v;F.wave='all';}
+ else if(k.startsWith('ss.'))C[k.slice(3)]=v;
+ e.target.blur();render();});
+$('settings').addEventListener('click',e=>{const b=e.target;let ch=true;
+ if(b.id==='addPerson'){let i=1;while(person('P'+i))i++;D.people.push({id:'P'+i,name:'Новый сотрудник',meetSrc:'manual',meetWeek:[1,1,1,1,1],hoursWeek:40,buffer:''});}
+ else if(b.dataset.del!=null){const p=D.people[+b.dataset.del];if(D.tasks.some(t=>t.person===p.id)){alert('Сначала переназначьте задачи '+p.name);return;}if(!confirm('Удалить '+p.name+'?'))return;D.people.splice(+b.dataset.del,1);D.tasks.forEach(t=>{if(t.reviewer===p.id)t.reviewer='';});F.person='all';}
+ else if(b.id==='addSprint'){const last=C.sprints[C.sprints.length-1];const st=last?fd(new Date(pd(last.end).getTime()+3*864e5)):C.start;C.sprints.push({id:'С'+(C.sprints.length+1),start:st,end:fd(new Date(pd(st).getTime()+11*864e5)),waves:[]});}
+ else if(b.dataset.dels!=null){C.sprints.splice(+b.dataset.dels,1);F.wave='all';}
+ else if(b.id==='addWave'){const last=D.waves[D.waves.length-1];const st=last?fd(new Date(pd(last.end).getTime()+3*864e5)):C.start;D.waves.push({id:'В'+(D.waves.length+1),start:st,end:fd(new Date(pd(st).getTime()+4*864e5))});}
+ else if(b.dataset.delw!=null){D.waves.splice(+b.dataset.delw,1);F.wave='all';}
+ else if(b.id==='autoWaves'){if(!confirm('Пересоздать волны по рабочим неделям суперспринта?'))return;const ws=[];let d=pd(C.start);while(d.getUTCDay()!==1)d=new Date(d.getTime()-864e5);for(let i=1;fd(d)<=C.end;i++){const s=fd(d)<C.start?C.start:fd(d),en=fd(new Date(d.getTime()+4*864e5));ws.push({id:'В'+i,start:s,end:en>C.end?C.end:en});d=new Date(d.getTime()+7*864e5);}D.waves=ws;F.wave='all';}
+ else ch=false;if(ch)render();});
+
+/* ===== сохранение ===== */
+let saveT=null;function scheduleSave(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(LS,JSON.stringify(D));const n=new Date();$('saved').textContent='✓ сохранено в '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}catch(e){$('saved').textContent='⚠ не удалось сохранить: '+e.message;$('saved').style.color='#F32A16';}},400);}
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
+function loadData(obj){if(!obj||!Array.isArray(obj.tasks)||!Array.isArray(obj.people)||!obj.config||!obj.sprint)throw new Error('нет tasks/people/config/sprint');const td=D.sprint.today;D=obj;D.sprint.today=td;F.dir=F.person=F.wave=F.task='all';normalize();syncInputs();render();}
+function syncInputs(){$('today').value=D.sprint.today;$('buf').value=D.sprint.buffer;$('dayH').value=D.sprint.dayHours;}
+$('bExpJson').addEventListener('click',()=>download('sprint-data-'+D.sprint.today+'.json',JSON.stringify(D,null,1),'application/json'));
+$('bImpJson').addEventListener('click',()=>$('fJson').click());
+$('fJson').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;f.text().then(s=>{try{loadData(JSON.parse(s));alert('Данные загружены');}catch(err){alert('Не удалось загрузить JSON: '+err.message);}e.target.value='';});});
+$('bReset').addEventListener('click',()=>{if(!confirm('Сбросить все данные к примеру? Текущие правки и дейлики будут удалены. Сделайте «Экспорт JSON», если они нужны.'))return;localStorage.removeItem(LS);loadData(JSON.parse(EXAMPLE));});
+$('todayReset').addEventListener('click',()=>{$('today').value=localToday();render();});
+/* CSV */
+const CSVF=['id','title','dir','person','prio','type','est','spent','rem','status','blocker','since','reviewer','revH','due'];
+const CSVH={id:'ID',title:'Инкремент',dir:'Направление',person:'Исполнитель',prio:'Приоритет',type:'Тип',est:'Оценка, ч',spent:'Факт, ч',rem:'Остаток, ч',status:'Статус',blocker:'Блокер',since:'Блокер с',reviewer:'Ревьюер',revH:'Ревью, ч',due:'Плановая дата'};
+$('csvCols').textContent=CSVF.map(f=>CSVH[f]).join(' · ');
+function toCsv(){const q=v=>{v=String(v??'');return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};return '\ufeff'+[CSVF.map(f=>CSVH[f]).join(';')].concat(D.tasks.map(t=>CSVF.map(f=>q(f==='person'||f==='reviewer'?(person(t[f])?.name||t[f]):t[f])).join(';'))).join('\n');}
+function parseCsv(s){s=s.replace(/^\ufeff/,'');const first=s.split('\n')[0];const dl=first.includes('\t')?'\t':first.split(';').length>=first.split(',').length?';':',';const rows=[];let r=[],c='',q=false;
+ for(let i=0;i<s.length;i++){const ch=s[i];if(q){if(ch==='"'){if(s[i+1]==='"'){c+='"';i++;}else q=false;}else c+=ch;}else if(ch==='"')q=true;else if(ch===dl){r.push(c);c='';}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&s[i+1]==='\n')i++;r.push(c);c='';if(r.some(x=>x.trim()))rows.push(r);r=[];}else c+=ch;}
+ r.push(c);if(r.some(x=>x.trim()))rows.push(r);return rows;}
+function normDate(v){v=(v||'').trim();let m=v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);if(m)return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:'';}
+function importCsv(text,replace){const rows=parseCsv(text);if(rows.length<2)throw new Error('нужны заголовки и хотя бы одна строка');
+ const hd=rows[0].map(x=>x.trim().toLowerCase());const idx={};CSVF.forEach(f=>{const i=hd.findIndex(x=>x===CSVH[f].toLowerCase()||x===f.toLowerCase());if(i>=0)idx[f]=i;});
+ if(idx.title==null||idx.est==null)throw new Error('нет колонок «Инкремент» и «Оценка, ч»');
+ const pid=v=>{v=(v||'').trim();const p=D.people.find(p=>p.id===v||p.name.toLowerCase()===v.toLowerCase());return p?p.id:'';};const num=v=>Math.max(0,parseFloat(String(v||'').replace(',','.'))||0);
+ const out=rows.slice(1).map((r,k)=>{const g=f=>idx[f]!=null?(r[idx[f]]||'').trim():'';const est=num(g('est')),spent=num(g('spent'));const st=STATUSES.includes(g('status'))?g('status'):'Запланировано';
+  return {id:g('id')||('CSV'+(k+1)),title:g('title')||'Без названия',dir:g('dir')||'Продукт',person:pid(g('person'))||(D.people[0]||{}).id,prio:num(g('prio'))||9,type:TYPES.includes(g('type'))?g('type'):'План',est,spent,rem:idx.rem!=null&&g('rem')!==''?num(g('rem')):(st==='Готово'?0:Math.max(0,est-spent)),status:st,blocker:g('blocker'),since:normDate(g('since')),reviewer:pid(g('reviewer')),revH:g('revH')!==''?num(g('revH')):Math.max(1,Math.round(est*.15)),due:normDate(g('due'))};});
+ if(replace){D.tasks=out;D.log={};}else out.forEach(t=>{let n=t.id,k=2;while(task(n))n=t.id+'-'+k++;t.id=n;D.tasks.push(t);});
+ const unk=out.filter(t=>!t.person).length;F.task='all';normalize();render();return out.length+' строк'+(unk?`, у ${unk} не найден исполнитель`:'');}
+$('bExpCsv').addEventListener('click',()=>download('backlog-'+D.sprint.today+'.csv',toCsv(),'text/csv;charset=utf-8'));
+$('bImpCsv').addEventListener('click',()=>$('fCsv').click());
+$('fCsv').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;f.text().then(s=>{try{if(!confirm('Заменить бэклог строками из файла? Записи дейлика будут очищены.'))return;alert('Импортировано: '+importCsv(s,true));}catch(err){alert('Ошибка CSV: '+err.message);}e.target.value='';});});
+$('bPaste').addEventListener('click',()=>{try{if(!confirm('Заменить весь бэклог вставленными строками?'))return;alert('Импортировано: '+importCsv($('csvPaste').value,true));}catch(err){alert('Ошибка: '+err.message);}});
+$('bPasteAdd').addEventListener('click',()=>{try{alert('Добавлено: '+importCsv($('csvPaste').value,false));}catch(err){alert('Ошибка: '+err.message);}});
+$('addTask').addEventListener('click',()=>{let i=D.tasks.length+1;while(task('N'+i))i++;const id='N'+i;const pid=F.person!=='all'?F.person:(D.people[0]||{}).id;D.tasks.push({id,dir:'Продукт',title:'Новый инкремент',person:pid,prio:9,est:16,spent:0,rem:16,status:'Запланировано',type:'План',blocker:'',since:'',reviewer:'',revH:2,due:''});F.task='all';render();});
+window.__dbg={get D(){return D;}};
+normalize();syncInputs();drawResearch();render();
+})();
+</script></body></html>
