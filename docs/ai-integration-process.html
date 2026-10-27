@@ -1,0 +1,40 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Процесс интеграции AI-сервиса</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml"/>
+<style>body{margin:0;font:16px/1.6 Manrope,"Segoe UI",sans-serif;color:#1b2140;background:#f5f6fb}main{max-width:900px;margin:0 auto;padding:32px 20px 60px}a{color:#3d4ed8}table{border-collapse:collapse;display:block;overflow-x:auto;font-size:14px}th,td{border:1px solid #d5d9ea;padding:6px 8px;vertical-align:top}th{background:#eef0fa}code,pre{background:#eef0fa;border-radius:6px}pre{padding:12px;overflow-x:auto}img{max-width:100%}.back{font-size:14px}</style></head>
+<body><main><p class="back"><a href="../ml-expertise.html">← ML-экспертиза</a></p>
+<h1>Процесс интеграции AI-сервиса</h1>
+<ol>
+<li>TDR — аппрувнутый целевой вариант, в состав TDR входит:<ol>
+<li>Контекст задачи (какую проблему закрывает и цель, в общих словах, своим языком, коротко)</li>
+<li>КОРОТКОЕ описание микросервиса</li>
+<li>Описание контрактов микросервиса (вход, выход, время запроса, комментарии)</li>
+<li>Flow решения, которое предлагается между клиентом, BFF, микросервисом</li>
+<li>Запрос на реализацию правок/добавлений в BFF/Монолите, коротко своими словами, что предлагается реализовать</li>
+<li>Инфраструктурная схема (та самая общая)</li>
+</ol>
+</li>
+<li>Разработка:<ol>
+<li>При необходимости — переделываем TDR, переделываем общую архитектуру в случае инфраструктурного блока, пересогласовываем</li>
+<li>При нехватке вещей со стороны БП (пример — filemanager), пишем свой костыль для закрытия функционала</li>
+</ol>
+</li>
+<li>Сначала ревью МИКРОСЕРВИСА и/или изменений в BFF/Монолите с нашей стороны. В ревью учитывается:<ol>
+<li>Файловая структура <a target="_blank" rel="noopener" href="https://wiki.yandex.ru/homepage/business-pad/development/guidlines/backend/fajjlovaja-struktura/">https://wiki.yandex.ru/homepage/business-pad/development/guidlines/backend/fajjlovaja-struktura/</a></li>
+<li>Общие правила написания кода <a target="_blank" rel="noopener" href="https://wiki.yandex.ru/homepage/business-pad/development/guidlines/backend/obshhee/">https://wiki.yandex.ru/homepage/business-pad/development/guidlines/backend/obshhee/</a></li>
+<li>Нейминг <a target="_blank" rel="noopener" href="https://wiki.yandex.ru/homepage/business-pad/development/guidlines/backend/nejjming/">https://wiki.yandex.ru/homepage/business-pad/development/guidlines/backend/nejjming/</a></li>
+<li>Логика работы микросервиса</li>
+<li>Конечный результат</li>
+<li>Возможность на словах описать проведенную работу</li>
+</ol>
+</li>
+<li>Деплой на AI dev</li>
+<li>Тестирование/доработки</li>
+<li>Деплой на AI prod</li>
+<li>Ожидание, пока backend отдел закроет все необходимые пробелы со стороны платформы</li>
+<li>Рефактор, перевод на новые фичи платформы</li>
+<li>Передаем на ревью/написание бэкенду необходимых коннекторов на стороне BFF/Монолита</li>
+<li>DevOps — запрос на разворачивание инфраструктуры</li>
+<li>Интеграция на дев</li>
+<li>Стандартный флоу тестирования</li>
+<li>Прод</li>
+</ol></main></body></html>
