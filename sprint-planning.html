@@ -200,7 +200,7 @@ function compute(){
   D.tasks.filter(t=>t.person===p.id&&t.type==='План').sort((a,b)=>a.prio-b.prio||a.id.localeCompare(b.id)).forEach(t=>{let r=+t.est;
    while(r>EPS&&bi<DAYS.length){const d=DAYS[bi],k=Math.min(r,bf[d]);if(k>EPS){R[t.id].base[d]=(R[t.id].base[d]||0)+k;bf[d]-=k;r-=k;}if(bf[d]<=EPS)bi++;}R[t.id].baseOver=r;});
   // факт = свободное время дня (минус встречи и буфер) поровну между задачами со статусом «Активна» в этот день
-  const past=DAYS.filter(d=>d<today);const mine=D.tasks.filter(t=>t.person===p.id);
+  const past=DAYS.filter(d=>d<=today);const mine=D.tasks.filter(t=>t.person===p.id);
   past.forEach(d=>{const c=cap[p.id][d];const act=mine.filter(t=>statusAt(t.id,d)==='Активна');if(!act.length)return;const av=c.raw*(1-buf),sh=av/act.length;
    act.forEach(t=>{c.items.push({t:t.id,h:sh,fact:true});R[t.id].fact[d]=sh;});c.free-=av;});
   mine.forEach(t=>{const x=R[t.id];let sp=0;for(const d in x.fact)sp+=x.fact[d];t.spent=Math.round(sp*10)/10;
@@ -216,8 +216,14 @@ function compute(){
  let resv={},key0=null;
  const runFc=()=>D.people.forEach(p=>{fut.forEach(d=>{const c=cap[p.id][d];c.items=c.items.filter(a=>a.fact);let used=0;((resv[p.id]||{})[d]||[]).forEach(a=>{c.items.push({t:a.t,h:a.h,rv:true});used+=a.ff;});c.free=Math.max(0,c.free0-used);});
   let fi=0;D.tasks.filter(t=>t.person===p.id).forEach(t=>{R[t.id].fc={};R[t.id].overflow=0;});
-  D.tasks.filter(t=>t.person===p.id&&t.status!=='Принята'&&t.status!=='Пауза/Блокер'&&+t.rem>0&&!t.blocker).sort((a,b)=>a.prio-b.prio||a.id.localeCompare(b.id)).forEach(t=>{let r=+t.rem;
-   while(r>EPS&&fi<fut.length){const c=cap[p.id][fut[fi]],k=Math.min(r,c.free);if(k>EPS){c.items.push({t:t.id,h:k});c.free-=k;r-=k;R[t.id].fc[fut[fi]]=(R[t.id].fc[fut[fi]]||0)+k;}if(c.free<=EPS)fi++;}R[t.id].overflow=r;});});
+  const Q=D.tasks.filter(t=>t.person===p.id&&t.status!=='Принята'&&t.status!=='Пауза/Блокер'&&+t.rem>0&&!t.blocker).sort((a,b)=>a.prio-b.prio||a.id.localeCompare(b.id));
+  const rm={};Q.forEach(t=>rm[t.id]=+t.rem);const put=(t,d,k)=>{const c=cap[p.id][d];c.items.push({t:t.id,h:k});c.free-=k;rm[t.id]-=k;R[t.id].fc[d]=(R[t.id].fc[d]||0)+k;};
+  // активные задачи идут параллельно: свободное время дня делится поровну, освободившееся достаётся остальным активным
+  const A=Q.filter(t=>t.status==='Активна');
+  for(const d of fut){let L=A.filter(t=>rm[t.id]>EPS);while(L.length&&cap[p.id][d].free>EPS){const sh=cap[p.id][d].free/L.length;L.forEach(t=>put(t,d,Math.min(sh,rm[t.id])));L=L.filter(t=>rm[t.id]>EPS);}}
+  // остальные — по приоритету в оставшееся время
+  Q.filter(t=>t.status!=='Активна').forEach(t=>{while(rm[t.id]>EPS&&fi<fut.length){const d=fut[fi],k=Math.min(rm[t.id],cap[p.id][d].free);if(k>EPS)put(t,d,k);if(cap[p.id][d].free<=EPS)fi++;}});
+  Q.forEach(t=>R[t.id].overflow=Math.max(0,rm[t.id]));});
  const setReady=()=>D.tasks.forEach(t=>{const x=R[t.id];const fdz=Object.keys(x.fc).sort(),fa=Object.keys(x.fact).sort();x.end=t.status==='Принята'?(fa.length?fa[fa.length-1]:null):(fdz.length?fdz[fdz.length-1]:null);
   x.ready=x.readyReal||(!t.blocker&&t.status!=='Пауза/Блокер'&&t.status!=='Принята'&&x.overflow<=EPS?x.end:null);});
  const place=()=>{const nr={},usedR={},usedF={};
