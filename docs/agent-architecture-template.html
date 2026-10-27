@@ -1,0 +1,695 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AI-XX · &lt;Название агента&gt;</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml"/>
+<style>body{margin:0;font:16px/1.6 Manrope,"Segoe UI",sans-serif;color:#1b2140;background:#f5f6fb}main{max-width:900px;margin:0 auto;padding:32px 20px 60px}a{color:#3d4ed8}table{border-collapse:collapse;display:block;overflow-x:auto;font-size:14px}th,td{border:1px solid #d5d9ea;padding:6px 8px;vertical-align:top}th{background:#eef0fa}code,pre{background:#eef0fa;border-radius:6px}pre{padding:12px;overflow-x:auto}img{max-width:100%}.back{font-size:14px}</style></head>
+<body><main><p class="back"><a href="../ml-expertise.html">← ML-экспертиза</a></p>
+<h1>AI-XX · &lt;Название агента&gt;</h1>
+<table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Статус</td>
+<td>Черновик / На ревью / Готово</td>
+</tr>
+<tr>
+<td>Версия</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>Дата</td>
+<td>ГГГГ-ММ-ДД</td>
+</tr>
+<tr>
+<td>Ответственный</td>
+<td>&lt;команда или роль&gt;</td>
+</tr>
+<tr>
+<td>Схема</td>
+<td><code>&lt;файл&gt;.svg</code> · <code>&lt;файл&gt;.html</code> (собираются из блока «Схема» в конце)</td>
+</tr>
+</tbody>
+</table>
+<p>Правила заполнения:
+- Каждое утверждение помечается: <strong>есть</strong> (работает на стенде), <strong>целевое</strong> (решено, не сделано), <strong>TBD</strong> (не решено). Неизвестное не додумывается, а пишется как TBD и уходит в раздел 16.
+- Опирайтесь на источники из раздела 0. Утверждение без источника — TBD.
+- Пункт, который к агенту не относится, помечается «N/A» с причиной. Пропускать молча нельзя.</p>
+<h2>00. Тип поставки и путь разработки</h2>
+<p>Заполняется первым, до паспорта. Правила и чеклист TDR по типам: <code>.cursor/skills/bp-ai-docs/references/delivery-type.md</code>. Без выбранного типа документ не идёт на TDR.</p>
+<table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Тип поставки</td>
+<td>А микросервис / Б сервис-исполнитель / В встроено в монолит BP / Г конфигурация на платформе</td>
+</tr>
+<tr>
+<td>Почему этот тип</td>
+<td>по критериям 0.2 референса</td>
+</tr>
+<tr>
+<td>Граница с ядром BP</td>
+<td>контракт через BFF, общий API как автоматический пользователь, события file manager, очередь: все стрелки к ядру</td>
+</tr>
+<tr>
+<td>Что берём у платформы</td>
+<td>file manager, S3 по presigned URL, LLM-шлюз, Keycloak, кластер; только через контракт или стандартную оболочку</td>
+</tr>
+<tr>
+<td>Свои данные</td>
+<td>своя база (какая), что хранится, где текст и артефакты</td>
+</tr>
+<tr>
+<td>Нефункциональные требования</td>
+<td>память, CPU и GPU, скорость p95, качество по метрикам, мультитенантность</td>
+</tr>
+<tr>
+<td>Зависимости от платформы</td>
+<td>задачи с номером, через планирование и Егора, волна</td>
+</tr>
+<tr>
+<td>Версия схемы под релиз</td>
+<td>ссылка</td>
+</tr>
+<tr>
+<td>Статус TDR</td>
+<td>не начат / подготовлен / пройден / с замечаниями, дата, протокол</td>
+</tr>
+</tbody>
+</table>
+<p>Чеклист TDR (to-do, скопировать из 0.4 референса по своему типу и отмечать):</p>
+<ul>
+<li>[ ] Тип выбран и обоснован, хранилищ монолита внутри границы сервиса нет.</li>
+<li>[ ] Контракт описан до кода: методы, схемы, ошибки, версия.</li>
+<li>[ ] Путь файлов только через file manager и S3, между сервисами ссылки.</li>
+<li>[ ] Нефункциональные требования и метрики названы.</li>
+<li>[ ] Зависимости от платформы заведены задачами через планирование.</li>
+<li>[ ] Перечень изменений с прошлого TDR (для повторного ревью).</li>
+</ul>
+<p>Путь разработки: тип → TDR по контракту → контракт и ADR → разработка в своём репозитории → ревью команды и платформы → DevOps → dev-стенд → релиз (схема в 0.5 референса).</p>
+<h2>0. Паспорт агента</h2>
+<table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Назначение</td>
+<td>Одна фраза: какую работу снимает с человека</td>
+</tr>
+<tr>
+<td>Класс</td>
+<td>Generative / Predictive / Agentic / Workflow — и почему</td>
+</tr>
+<tr>
+<td>Способ встречи</td>
+<td>Assist / Embedded / Autonomous-first / Semantic</td>
+</tr>
+<tr>
+<td>Умения</td>
+<td>Understand, Generate, Reason, Advise, Execute… — только реальные</td>
+</tr>
+<tr>
+<td>Самостоятельность</td>
+<td>L1…L5 и что именно агент делает сам</td>
+</tr>
+<tr>
+<td>Роль человека</td>
+<td>in-the-loop / on-the-loop / in-command</td>
+</tr>
+<tr>
+<td>Риск</td>
+<td>низкий / средний / высокий / критический — и почему</td>
+</tr>
+<tr>
+<td>Паттерн</td>
+<td>один runtime / несколько агентов / детерминированная цепочка / ReAct</td>
+</tr>
+<tr>
+<td>Владелец ответа пользователю</td>
+<td>кто отдаёт результат в канал</td>
+</tr>
+<tr>
+<td>Отвергнуто</td>
+<td>что сознательно не делаем (swarm, handoff, свободный цикл…)</td>
+</tr>
+</tbody>
+</table>
+<p>Источники: аналитика (BRD, FR, UC), TDR, протоколы решений, код. Список с датами редакций.</p>
+<h2>1. Канал (User Query)</h2>
+<p>Откуда приходит работа. Для каждого входа: контракт входа (текст, файл, событие), контекст вызова (сессия, тенант, экземпляр), чего ждёт вызывающий (реплику, черновик, итог), лимиты входа.</p>
+<h2>2. Gateway и Auth</h2>
+<p>Кто принимает вызов, где аутентификация, где изоляция тенанта, где авторизация на действия. Какие проверки выполняются до агента.</p>
+<h2>3. Application Core</h2>
+<p>Какие доменные сервисы хранят истину и выполняют запись. Каким API агент их зовёт. Агент сам в операционную базу не пишет — кто пишет за него.</p>
+<h2>4. Agent Pattern и runtime</h2>
+<p>Один runtime или несколько агентов, кто владеет ответом, где выполняется (сервис, движок), таймауты, повторы, отмена, пауза на человеке и где хранится состояние паузы.</p>
+<h2>5. Pipeline: шаги</h2>
+<p>Шаги работы по порядку, развилки и их условия. Есть ли цикл; если есть — условие выхода (схема, лимит кругов, человек, эскалация). Если нет — написать «линейная цепочка».</p>
+<h2>6. Reasoning и выбор модели</h2>
+<p>Где решает модель, а где правило кода. Какие модели на каких шагах, через что они вызываются, по какому измеримому сигналу переключаемся на сильную модель или на человека. Лимит контекста и что делаем при переполнении.</p>
+<h2>7. Tool Execution</h2>
+<p>Полный список инструментов таблицей: имя, класс (чтение / поиск / запись), хозяин данных, когда вызывается, нужна ли пауза на человеке. Как ограничен список (allowlist) и где фильтр результата перед моделью.</p>
+<table>
+<thead>
+<tr>
+<th>Инструмент</th>
+<th>Класс</th>
+<th>Хозяин данных</th>
+<th>Когда</th>
+<th>Пауза на человеке</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>8. Human Validation</h2>
+<p>Где пауза перед побочным эффектом, что человек видит, что обязан поправить, что подтверждает одним действием, что происходит при отмене. Права человека на подтверждаемые действия.</p>
+<h2>9. Stress testing и входные правила</h2>
+<p>Что отсекается до рассуждения и что проверяем нагрузкой. Для каждого сценария — ожидаемое поведение.</p>
+<table>
+<thead>
+<tr>
+<th>Сценарий</th>
+<th>Ожидаемое поведение</th>
+<th>Статус</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>10. Data Processing</h2>
+<p>Подготовка данных вне запроса пользователя (распознавание, нарезка, индексация) — отдельно от пути запроса. Если такой подготовки нет — N/A с причиной.</p>
+<h2>11. Database Layer</h2>
+<p>Каждое хранилище: что лежит, хозяин, кто читает и кто пишет, протокол. Отдельно: где состояние задачи агента. Если движок не выбран — так и написать.</p>
+<table>
+<thead>
+<tr>
+<th>Хранилище</th>
+<th>Что лежит</th>
+<th>Хозяин</th>
+<th>Читает</th>
+<th>Пишет</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>12. Evaluation</h2>
+<p>Метрики и пороги, эталонные наборы, где они лежат, как правки человека становятся разметкой. Evaluation — офлайн, не шаг цепочки.</p>
+<h2>13. Логи и наблюдаемость</h2>
+<p>Что пишется в трассу на каждую задачу (поля), как маскируются ПДн, что считается аудитом (подтверждение человека) и где он хранится.</p>
+<h2>14. Версии и повторяемость</h2>
+<p>Что версионируется (промпты, модель, пакет знаний, инструменты), где номер версии пишется в задание, можно ли повторить прогон и чего не хватает.</p>
+<h2>15. Покрытие канона</h2>
+<p>Что означает каждый пункт и где его раскрывать — <code>reference/canon.md</code>. Статус: есть / частично / целевое / TBD / N/A. Для N/A — причина обязательна.</p>
+<table>
+<thead>
+<tr>
+<th>§</th>
+<th>Пункт</th>
+<th>Статус</th>
+<th>Где / причина</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§49</td>
+<td>Тип поставки и путь разработки</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§1</td>
+<td>Architecture Views</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§2</td>
+<td>AI Taxonomy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§3</td>
+<td>AI Capability Model</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§4</td>
+<td>AI Interaction / Adoption</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§5</td>
+<td>System / Solution Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§6</td>
+<td>AI and Agentic Platform</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§7</td>
+<td>Agent Runtime Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§8</td>
+<td>Agent Node Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§9</td>
+<td>Agent Orchestration</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§10</td>
+<td>Tool Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§11</td>
+<td>Integration Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§12</td>
+<td>MCP / API Gateway Model</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§13</td>
+<td>Data and Knowledge Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§14</td>
+<td>Database Layer</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§15</td>
+<td>ETL / ELT Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§16</td>
+<td>Data Processing Pipeline</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§17</td>
+<td>RAG Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§18</td>
+<td>Vector DB Policy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§19</td>
+<td>Metadata Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§20</td>
+<td>Chunking Strategy</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§21</td>
+<td>Semantic Layer Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§22</td>
+<td>Agent Memory and State</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§23</td>
+<td>Agent Specification</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§24</td>
+<td>Autonomy Model</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§25</td>
+<td>Autonomous Research</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§26</td>
+<td>Reasoning Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§27</td>
+<td>Model Routing and Escalation</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§28</td>
+<td>Continuous Learning</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§29</td>
+<td>Agent Alerting</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§30</td>
+<td>AI Evaluation Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§31</td>
+<td>Eval Types</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§32</td>
+<td>Stress Testing</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§33</td>
+<td>AI Governance Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§34</td>
+<td>AI Risk Classification</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§35</td>
+<td>Human Validation</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§36</td>
+<td>Observability</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§37</td>
+<td>Metrics Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§38</td>
+<td>AI Lifecycle Architecture</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§39</td>
+<td>Agent Versioning</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§40</td>
+<td>Reproducibility</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§41</td>
+<td>Agent Registry</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§42</td>
+<td>Architecture Registry</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§43</td>
+<td>Architecture Decision Records</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§44</td>
+<td>Итоговая классификация компонентов</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§45</td>
+<td>Страница конкретного агента</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§46</td>
+<td>Финальная архитектурная карта</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§47</td>
+<td>Четыре понятия не смешивать</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>§48</td>
+<td>Критерий полноты архитектуры</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>16. Открытые вопросы</h2>
+<p>Всё, что помечено TBD. У каждого вопроса — кому он адресован и что блокирует.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Вопрос</th>
+<th>Кому</th>
+<th>Что блокирует</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>17. Журнал проверки</h2>
+<p>Контрольные точки проходит человек. Пока строка не подписана, статус документа не может быть «Готово».</p>
+<table>
+<thead>
+<tr>
+<th>Точка</th>
+<th>Что проверено</th>
+<th>Кто, дата</th>
+<th>Результат</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>К1</td>
+<td>Источники полные и актуальные, лишних нет</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>К2</td>
+<td>Паспорт (класс, паттерн, риск, самостоятельность) согласован</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>К3</td>
+<td>«есть» сверено со стендом или кодом, «целевое» — с решениями</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>К4</td>
+<td>Схема проверена глазами по чек-листу ревью</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>К5</td>
+<td>Кросс-ревью другим разработчиком</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>К6</td>
+<td>Открытые вопросы разнесены владельцам</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>Схема</h2>
+<p>Спецификация схемы. Правьте здесь, затем пересоберите: <code>python render_board.py &lt;файл&gt;.md --png</code>.</p>
+<p>Схема рисует этого агента, а не эталон: число шагов, узлов и хранилищ, место паузы, набор блоков — из разделов выше. Чего у агента нет — <code>na: "причина"</code>, а не выдуманное содержимое. Раскладку рендер считает сам; ключи и правила — <code>reference/notation.md</code>.</p>
+<p>```yaml board
+agent: "AI-XX · Название"
+version: "0.1"
+pattern: "один runtime, детерминированная цепочка шагов"
+owner: "кто отдаёт ответ пользователю"
+rejected: "что отвергли и почему коротко"
+sources: "аналитика, TDR, протоколы"</p>
+<p>channel:
+  request_label: "запрос"
+  return_label: "ответ в тот же канал"
+  # return_from: core          # кто отдаёт итог в канал; по умолчанию core, без него — hv или runtime
+  entries:                      # kind: user | event | system
+    - {kind: user, name: "Канал 1", sub: "как вызывается", note: ["контекст вызова"]}
+  note: ["лимиты входа", "чего ждёт вызывающий"]</p>
+<p>gateway:                        # или na: "причина"
+  title: "GATEWAY · BFF"
+  nodes:                        # kind: shield | step | decision
+    - {kind: shield, label: "OIDC", sub: "личность установлена"}
+    - {kind: decision, label: "Входные правила", sub: "формат, лимиты"}</p>
+<p>runtime:
+  title: "AGENT RUNTIME · ПРОФИЛЬ"
+  subtitle: "одна фраза про паттерн"
+  linear: true                  # или loop: {from: id, to: id, label: "...", exit: "условие выхода"}
+  handoff_label: "план"         # подпись стрелки из runtime к следующему блоку пути запроса
+  steps:                        # столько, сколько в разделе 5; kind: step | decision
+    - {id: s1, label: "Шаг 1", sub: "что делает"}
+    - {id: d1, kind: decision, label: "Развилка?", sub: "условие", else: "нет", branch: "да: куда уходит"}
+  # agents: [{name: "Агент A", role: "роль"}]   # только если агентов несколько
+  model:                        # только если в шагах есть модель
+    items:                      # icon: doc | chip | filter | search
+      - {icon: doc, label: "Промпт", sub: "что в контексте"}
+      - {icon: chip, label: "Вызов модели", sub: "зачем"}
+      - {icon: filter, label: "Фильтр", sub: "проверка ответа"}
+    from_steps: [s1]            # шаги, где работает модель
+    llm: {label: "LLM", sub: "как вызывается"}
+  reasoning:
+    lines: ["Planner: ...", "Router: ..."]</p>
+<p>hv:                             # или na: "причина" (тогда записи быть не может)
+  label: "Подтверждение"
+  sub: "что видит человек"
+  pauses:                       # где цепочка останавливается; after — id шага, после которого пауза
+    - {after: d1, label: "что подтверждает", bullets: ["что обязан поправить"]}
+  bullets: ["общее для всех пауз: права, отмена"]</p>
+<p>core:                           # или na: "причина"
+  title: "APPLICATION CORE"
+  nodes:
+    - {label: "Проверка прав", sub: "..."}
+    - {label: "Запись", sub: "..."}
+  note: ["кто пишет в базу"]</p>
+<p>stress:
+  bullets: ["сценарий → ожидаемое поведение"]</p>
+<p>tools:
+  read: ["domain.read"]         # больше 12 — категории
+  write: ["domain.write"]       # больше 6 — категории
+  note: ["как ограничен список"]</p>
+<p>evaluation:
+  feedback_from: hv             # откуда приходит разметка: hv | logs | none | &lt;блок&gt;
+  feedback_label: "правки = разметка"
+  bullets: ["метрика ≥ порог"]</p>
+<p>logs:
+  title: "ЛОГИ · LANGFUSE"
+  headline: "трасса на задачу"
+  bullets: ["поля трассы"]</p>
+<p>data_processing:
+  na: "подготовки данных вне запроса нет"
+  # pipelines: [{id: p1, title: "...", tool: ["domain.read"], steps: [{label, sub}], note: ["..."]}]</p>
+<p>database:
+  stores:                       # kind: cyl | cube; open: true — не выбрано
+    # read / write: true (по умолчанию tools / core) или имя блока, который читает / пишет
+    - {label: "БД", sub: "что лежит", read: true, write: core}</p>
+<h1>Только если без этого агента не понять (внешняя система клиента, соседний агент, очередь):</h1>
+<h1>extras:</h1>
+<h1>- {id: source, title: "ВНЕШНИЙ ИСТОЧНИК", row: 3, before: data_processing, section: ["1"],</h1>
+<h1>stores: [{label: "БД клиента", sub: "только чтение", read: tools}], note: ["..."]}</h1>
+<h1>Нестандартные связи — только описанные в тексте md:</h1>
+<h1>links:</h1>
+<h1>- {from: "runtime:s1", to: source, label: "что передаётся", kind: flow}   # flow | trace | attack | hv</h1>
+<h1>Порядок блоков в рядах — только если умолчание искажает смысл:</h1>
+<h1>layout:</h1>
+<h1>rows: [[channel, gateway, runtime, core], [stress, tools, hv, evaluation, logs], [source, data_processing, database]]</h1>
+<p>```</p></main></body></html>

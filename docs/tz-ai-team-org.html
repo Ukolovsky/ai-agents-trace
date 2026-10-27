@@ -1,0 +1,420 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ТЗ. Оргструктура AI-команды (Lead + 3 разработчика)</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml"/>
+<style>body{margin:0;font:16px/1.6 Manrope,"Segoe UI",sans-serif;color:#1b2140;background:#f5f6fb}main{max-width:900px;margin:0 auto;padding:32px 20px 60px}a{color:#3d4ed8}table{border-collapse:collapse;display:block;overflow-x:auto;font-size:14px}th,td{border:1px solid #d5d9ea;padding:6px 8px;vertical-align:top}th{background:#eef0fa}code,pre{background:#eef0fa;border-radius:6px}pre{padding:12px;overflow-x:auto}img{max-width:100%}.back{font-size:14px}</style></head>
+<body><main><p class="back"><a href="../ml-expertise.html">← ML-экспертиза</a></p>
+<h1>ТЗ. Оргструктура AI-команды (Lead + 3 разработчика)</h1>
+<p>Модель: команда из <strong>4 человек</strong> (Lead + 3 разработчика). Не четыре одинаковых «AI Engineer», а <strong>T-shaped команда</strong>: общий обязательный фундамент у всех и своя зона глубокой экспертизы у каждого.</p>
+<hr />
+<h2>1. Lead AI Team: Solution / AI Architect</h2>
+<p><strong>Главная задача:</strong> отвечать за то, <em>что именно строим, как это будет устроено и как оно попадёт в production</em>.</p>
+<p>Должен уверенно уметь:</p>
+<h3>Solution Architecture</h3>
+<ul>
+<li>декомпозировать POC в production solution;</li>
+<li>выбирать между обычным backend, AI feature, agent, workflow, multi-agent;</li>
+<li>проектировать end-to-end архитектуру;</li>
+<li>определять границы AI-компонента и core product.</li>
+</ul>
+<h3>Agentic Architecture</h3>
+<ul>
+<li>agents / workflows / multi-agent;</li>
+<li>orchestration;</li>
+<li>state, memory, planning, reasoning;</li>
+<li>tool calling;</li>
+<li>MCP;</li>
+<li>human-in-the-loop;</li>
+<li>autonomy boundaries.</li>
+</ul>
+<h3>Integration Architecture</h3>
+<ul>
+<li>понимать Backend / Frontend / DB / API;</li>
+<li>формировать TDR;</li>
+<li>определять, какие изменения нужны core product;</li>
+<li>договариваться с Backend/Frontend Lead'ами.</li>
+</ul>
+<h3>Semantic Layer</h3>
+<ul>
+<li>определять бизнес-сущности;</li>
+<li>relationships;</li>
+<li>definitions;</li>
+<li>business rules;</li>
+<li>capabilities;</li>
+<li>контракты для AI/tools.</li>
+</ul>
+<h3>AI Governance</h3>
+<ul>
+<li>permissions;</li>
+<li>allowed/forbidden actions;</li>
+<li>approval;</li>
+<li>escalation;</li>
+<li>audit;</li>
+<li>data boundaries;</li>
+<li>security.</li>
+</ul>
+<h3>AI Evaluation</h3>
+<ul>
+<li>определять, как доказать, что решение работает;</li>
+<li>quality criteria;</li>
+<li>golden datasets;</li>
+<li>regression;</li>
+<li>business KPI;</li>
+<li>tool-use evaluation.</li>
+</ul>
+<h3>Technology Assessment</h3>
+<ul>
+<li>выбирать модели, фреймворки, MCP, vector/RAG, orchestration и т.д.;</li>
+<li>проводить benchmark/POC;</li>
+<li>понимать trade-offs.</li>
+</ul>
+<h3>Delivery</h3>
+<ul>
+<li>вести решение от POC до production;</li>
+<li>разбивать работу;</li>
+<li>принимать архитектурные решения;</li>
+<li>проводить design review;</li>
+<li>контролировать техническое качество.</li>
+</ul>
+<p><strong>Ключевой критерий:</strong> Lead должен быть способен сам спроектировать и объяснить всю систему, даже если код отдельных частей пишут сотрудники.</p>
+<hr />
+<h2>2. AI Engineer #1: Agentic / AI Engineering</h2>
+<p><strong>Главная специализация:</strong> непосредственно <strong>строить AI-систему</strong>.</p>
+<p>Это самый сильный человек команды именно в агентной логике.</p>
+<p>Должен уметь:</p>
+<ul>
+<li>LLM API;</li>
+<li>structured output;</li>
+<li>function/tool calling;</li>
+<li>agents;</li>
+<li>workflows;</li>
+<li>multi-agent;</li>
+<li>orchestration;</li>
+<li>state management;</li>
+<li>memory;</li>
+<li>reasoning;</li>
+<li>planning;</li>
+<li>routing;</li>
+<li>fallback;</li>
+<li>model selection;</li>
+<li>prompt engineering;</li>
+<li>context engineering;</li>
+<li>RAG;</li>
+<li>embeddings;</li>
+<li>MCP clients/servers;</li>
+<li>LangGraph / аналогичные frameworks;</li>
+<li>streaming;</li>
+<li>async execution.</li>
+</ul>
+<p>И главное: <strong>не просто написать POC</strong>, а сделать production-grade implementation:</p>
+<pre><code class="language-text">User
+ ↓
+AI Interface
+ ↓
+Orchestrator
+ ↓
+Agent
+ ↓
+Tools / MCP
+ ↓
+Core Product APIs
+ ↓
+Business operation
+</code></pre>
+<p>Он должен понимать, где здесь должны быть deterministic workflows, где agentic behavior, где обычный backend.</p>
+<h3>Production AI code</h3>
+<p>Он должен уметь писать <strong>production AI code</strong>, который AI-команда реально отдаёт в production:</p>
+<ul>
+<li>тесты;</li>
+<li>error handling;</li>
+<li>retries;</li>
+<li>timeout;</li>
+<li>state persistence;</li>
+<li>logging;</li>
+<li>tracing;</li>
+<li>versioning;</li>
+<li>configuration;</li>
+<li>deployment.</li>
+</ul>
+<hr />
+<h2>3. AI Engineer #2: Integration / Semantic / Backend</h2>
+<p><strong>Главная специализация:</strong> сделать так, чтобы AI действительно <strong>понимал и мог использовать продукт</strong>.</p>
+<p>Это человек на стыке AI ↔ Backend ↔ Domain.</p>
+<h3>Backend / Integration</h3>
+<p>Должен хорошо понимать:</p>
+<ul>
+<li>REST/API;</li>
+<li>service architecture;</li>
+<li>DB;</li>
+<li>transactions;</li>
+<li>events;</li>
+<li>queues;</li>
+<li>authentication/authorization;</li>
+<li>permissions;</li>
+<li>API contracts;</li>
+<li>idempotency;</li>
+<li>async operations;</li>
+<li>error handling.</li>
+</ul>
+<p>Главное отличие: уметь переводить «агенту нужно уметь создать заказ» в конкретный набор продуктовых возможностей:</p>
+<pre><code class="language-text">AI capability
+      ↓
+Required business operation
+      ↓
+API / event / service capability
+      ↓
+TDR
+      ↓
+Backend implementation
+      ↓
+Tool / MCP
+      ↓
+Agent
+</code></pre>
+<h3>Semantic Layer</h3>
+<p>Здесь он <strong>главный владелец Semantic Layer</strong>.</p>
+<p>Он должен уметь описывать:</p>
+<ul>
+<li>Business Entity;</li>
+<li>Entity Definition;</li>
+<li>Attributes;</li>
+<li>Relationships;</li>
+<li>Business Rules;</li>
+<li>Actions;</li>
+<li>Capabilities;</li>
+<li>Permissions;</li>
+<li>Context;</li>
+<li>Terminology;</li>
+<li>Tool contracts.</li>
+</ul>
+<p>Например, не просто <code>POST /orders</code>, а понимать: что такое Order в бизнесе, кто может его создавать, какие состояния существуют, какие правила действуют, какие поля обязательны, какие действия допустимы в каждом состоянии.</p>
+<h3>Результат его работы</h3>
+<p>AI получает не просто API, а <strong>machine-understandable business context</strong>.</p>
+<hr />
+<h2>4. AI Engineer #3: Evaluation / Governance / Production</h2>
+<p><strong>Главная специализация:</strong> сделать так, чтобы AI-решение было <strong>надёжным, измеримым и безопасным в production</strong>.</p>
+<p>Без этой роли команда легко превращается в: «Агент вроде работает, давайте выкатывать».</p>
+<h3>Evaluation</h3>
+<p>Должен уметь строить:</p>
+<ul>
+<li>evaluation datasets;</li>
+<li>golden sets;</li>
+<li>test cases;</li>
+<li>deterministic evaluation;</li>
+<li>LLM-as-a-judge;</li>
+<li>trajectory evaluation;</li>
+<li>tool-use evaluation;</li>
+<li>regression tests;</li>
+<li>quality metrics;</li>
+<li>business KPI;</li>
+<li>automated evaluation pipelines.</li>
+</ul>
+<p>Оценивать не только «правильно ли ответил LLM?», но и «правильно ли агент выполнил бизнес-процесс?»:</p>
+<pre><code class="language-text">Task success
+Tool selection
+Arguments correctness
+Business rule compliance
+Final result
+Latency
+Cost
+Safety
+</code></pre>
+<h3>Governance / Security</h3>
+<p>Должен глубоко понимать:</p>
+<ul>
+<li>authorization;</li>
+<li>permissions;</li>
+<li>tool permissions;</li>
+<li>prompt injection;</li>
+<li>data leakage;</li>
+<li>excessive agency;</li>
+<li>privilege escalation;</li>
+<li>unsafe actions;</li>
+<li>human approval;</li>
+<li>audit;</li>
+<li>policy enforcement.</li>
+</ul>
+<p>И уметь превращать это в технические механизмы:</p>
+<pre><code class="language-text">Agent wants to refund order
+        ↓
+Policy check
+        ↓
+Is action allowed?
+        ↓
+Amount &gt; threshold?
+        ↓
+Human approval
+        ↓
+Tool execution
+        ↓
+Audit
+</code></pre>
+<h3>Production AI</h3>
+<p>Также:</p>
+<ul>
+<li>observability;</li>
+<li>tracing;</li>
+<li>metrics;</li>
+<li>token/cost monitoring;</li>
+<li>latency;</li>
+<li>model failures;</li>
+<li>retries;</li>
+<li>fallback;</li>
+<li>rate limits;</li>
+<li>caching;</li>
+<li>model routing;</li>
+<li>queues;</li>
+<li>deployment;</li>
+<li>rollback;</li>
+<li>incident analysis.</li>
+</ul>
+<hr />
+<h2>5. Матрица компетенций</h2>
+<table>
+<thead>
+<tr>
+<th>Компетенция</th>
+<th style="text-align: right;">Lead</th>
+<th style="text-align: right;">Engineer 1</th>
+<th style="text-align: right;">Engineer 2</th>
+<th style="text-align: right;">Engineer 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Solution Architecture</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+</tr>
+<tr>
+<td>Agentic Engineering</td>
+<td style="text-align: right;"><strong>Strong</strong></td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+</tr>
+<tr>
+<td>LLM / Prompt / Context</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+</tr>
+<tr>
+<td>Agents / Orchestration</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+</tr>
+<tr>
+<td>MCP / Tools</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+</tr>
+<tr>
+<td>Backend</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Medium</td>
+</tr>
+<tr>
+<td>Integration / TDR</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+</tr>
+<tr>
+<td>Semantic Layer</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Medium</td>
+</tr>
+<tr>
+<td>AI Evaluation</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+</tr>
+<tr>
+<td>AI Governance</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+</tr>
+<tr>
+<td>AI Security</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+</tr>
+<tr>
+<td>Production / DevOps</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Strong</strong></td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+</tr>
+<tr>
+<td>Frontend / AI UX</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Medium</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Medium</td>
+</tr>
+<tr>
+<td>Business Analysis</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Strong</td>
+</tr>
+<tr>
+<td>Tech Scouting</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;"><strong>Strong</strong></td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Strong</td>
+</tr>
+<tr>
+<td>Client / Stakeholder</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">Medium</td>
+<td style="text-align: right;">Strong</td>
+<td style="text-align: right;">Medium</td>
+</tr>
+<tr>
+<td>Team / Technical Leadership</td>
+<td style="text-align: right;"><strong>Expert</strong></td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6. Общий фундамент и специализация</h2>
+<p>Людей <strong>не закреплять намертво</strong> по принципу «этот только evaluation, этот только backend».</p>
+<p>У каждого должны быть:</p>
+<p><strong>Обязательный общий фундамент:</strong></p>
+<blockquote>
+<p>LLM → Agent → Tools → MCP → Orchestration → API → Semantic Layer → Evaluation → Governance → Production</p>
+</blockquote>
+<p>А специализация: второй уровень.</p>
+<p>Каждый из трёх сотрудников должен быть способен самостоятельно взять относительно небольшой POC и довести его до production. При этом:</p>
+<ul>
+<li><strong>Engineer 1</strong> быстрее и глубже решит агентную архитектуру;</li>
+<li><strong>Engineer 2</strong> быстрее и глубже решит интеграцию с продуктом и Semantic Layer;</li>
+<li><strong>Engineer 3</strong> быстрее и глубже решит evaluation, governance и production reliability.</li>
+</ul>
+<p><strong>Lead</strong> связывает всё это в единую Solution Architecture.</p>
+<p>Тогда команда соответствует заявленной модели:</p>
+<p><strong>Vibe Coding → POC → AI Team → Architecture + TDR → AI Build + Core Development → Evaluation/Governance → Production → Reusable Capability.</strong></p></main></body></html>

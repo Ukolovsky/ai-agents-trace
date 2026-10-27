@@ -1,0 +1,140 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ТЗ: как описывать и рисовать архитектуру агента</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml"/>
+<style>body{margin:0;font:16px/1.6 Manrope,"Segoe UI",sans-serif;color:#1b2140;background:#f5f6fb}main{max-width:900px;margin:0 auto;padding:32px 20px 60px}a{color:#3d4ed8}table{border-collapse:collapse;display:block;overflow-x:auto;font-size:14px}th,td{border:1px solid #d5d9ea;padding:6px 8px;vertical-align:top}th{background:#eef0fa}code,pre{background:#eef0fa;border-radius:6px}pre{padding:12px;overflow-x:auto}img{max-width:100%}.back{font-size:14px}</style></head>
+<body><main><p class="back"><a href="../ml-expertise.html">← ML-экспертиза</a></p>
+<h1>ТЗ: как описывать и рисовать архитектуру агента</h1>
+<table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Дата</td>
+<td>07.09.2026</td>
+</tr>
+<tr>
+<td>Версия</td>
+<td>3.2</td>
+</tr>
+<tr>
+<td>Для кого</td>
+<td>Архитектор или разработчик, которому нужно начертить схему своего сервиса или агента</td>
+</tr>
+</tbody>
+</table>
+<p>Образцы нотации ниже вырезаны из двух учебных досок. Рисовать нужно <strong>в той же грамматике фигур</strong>, не копируя чужие имена продуктов как обязательный деплой.</p>
+<p><strong>Правило нотации на всех блоках.</strong> Цветная рамка с заголовком задаёт границу ответственности. Внутри узлы: иконка и подпись. Сплошная стрелка это рабочий поток. Пунктир это побочный контур: след, атака, обратная связь. Кружки это ноды пути. Ромб или router это развилка.</p>
+<p>Полные доски, откуда взяты кропы:</p>
+<p><img alt="Agent contour: Reasoning Engine, Human Validation, Evaluation, Database Layer, Data Processing" src="media/notation/board-agentic.jpg" /></p>
+<p><img alt="Layers: LangGraph, LangChain, LangSmith" src="media/notation/board-stack.png" /></p>
+<h2>Зачем этот документ</h2>
+<p>Схема должна ответить человеку: <strong>откуда пришла работа</strong>, <strong>через какие сервисы она дошла до модели</strong>, <strong>кто владеет ответом пользователю</strong>, <strong>где цикл</strong>, <strong>где побочный эффект</strong>, <strong>куда пишутся данные</strong>, <strong>как это потом проверить</strong>.</p>
+<p>Если у агента нет цикла, это показывают явно: линейный путь, без петли «ради красоты». Если специализаций несколько, сначала решают: это <strong>один runtime с навыками</strong> или <strong>несколько независимых агентов</strong>. LangGraph, LangChain, Langfuse и LangSmith на схеме это <strong>метки слоя</strong>, а не обязательный состав поставки.</p>
+<h2>User Query</h2>
+<p><strong>Вопрос блока:</strong> кто и чем инициировал работу. Модель сама не «просыпается».</p>
+<p><strong>Из чего состоит.</strong> Channel это способ входа, не агент и не человек. У канала три свойства: <strong>контракт входа</strong> (текст, файл, событие), <strong>контекст вызова</strong> (сессия, тенант), <strong>ожидание ответа</strong> (вернуть реплику в тот же канал или только поставить работу и уйти). Эти два ожидания нельзя рисовать одной стрелкой.</p>
+<p><strong>Какие виды бывают.</strong> Диалог ждёт реплику. Поиск часто ждёт карточку или ссылку. Загрузка файла ждёт поля или черновик объекта. Конструктор ждёт сохранённую конфигурацию. Мастер интеграции ждёт опубликованный инструмент. Вызов во внешнюю базу из уже идущей работы это <strong>Tool Execution</strong>, не User Query.</p>
+<p><strong>Что отобразить.</strong> Один явный вход на эту схему. Фигура User или Channel, подпись входа, сплошная стрелка <code>request</code> в runtime. Runtime без канала не рисуют.</p>
+<p><strong>Пример нотации.</strong> Вход это иконка человека и подписанная сплошная стрелка в контур исполнения. Не прячьте запрос внутри «AI-коробки».</p>
+<p><img alt="User Query: User and request" src="media/notation/n-user.png" /></p>
+<h2>Gateway and Application Core</h2>
+<p><strong>Вопрос блока:</strong> кто хранит сессию, кто хранит предметную истину, кто имеет право звать модель. Если всё схлопнуть в «backend», схема это не объясняет.</p>
+<p><strong>Из чего состоит.</strong> Между человеком и моделью стоят обычные сервисы. <strong>Gateway</strong> (BFF или API Gateway) принимает вызов канала, видит сессию и тенант, отсекает чужой запрос. <strong>OIDC broker</strong> рядом: личность уже установлена, агент её не добывает сам. <strong>Application Core</strong> держит процессы или домен, файлы, поиск, знания. <strong>Agent Runtime</strong> стоит отдельно: специализации, инструменты, фильтр результата до модели. Снаружи: IdP, LLM, traces, чужая база.</p>
+<p><strong>Какие виды бывают.</strong> Gateway с сессией у клиента (BFF) или Gateway только с токеном (API Gateway). Application Core как монолит или набор доменных сервисов. Для схемы агента важнее запрет: Gateway не хозяин предметных данных, Application Core не читает чужие таблицы напрямую.</p>
+<p><strong>Что отобразить.</strong> Минимум четыре разные фигуры: <strong>Channel</strong>, <strong>Gateway</strong>, <strong>Application Core</strong>, <strong>Runtime</strong>. Пунктиром внешние зависимости. Агент не пишет в операционную базу сам: он отдаёт структурированный результат, запись делает хозяин данных.</p>
+<p><strong>Пример нотации.</strong> На учебных досках Gateway часто опущен. Его рисуют <strong>той же грамматикой</strong>, что цветной контейнер LangGraph: рамка, заголовок, вход <code>request</code> слева. Ставят контейнер <strong>между</strong> фигурой User и контейнером Reasoning Engine / LangGraph. Не сливать User и Planner в один узел.</p>
+<p><img alt="LangGraph container: request enters after Gateway" src="media/notation/n-langgraph.png" /></p>
+<h2>Auth (OIDC)</h2>
+<p><strong>Вопрос блока:</strong> почему работа идёт от имени этого пользователя, а не «потому что модель так решила».</p>
+<p><strong>Из чего состоит.</strong> Три слоя, их путают. <strong>Authentication:</strong> OAuth / OIDC на Gateway. <strong>Tenant and session:</strong> чужие объекты не видны. <strong>Authorization:</strong> даже свой пользователь может не иметь права на инструмент или на запись без Human Validation.</p>
+<p><strong>Какие виды бывают.</strong> Простой контур: вошёл и попал в тенант. Процессный контур: плюс белый список инструментов и флаг «без человека нельзя». Лестницу «чем умнее агент, тем больше можно» не рисуют, пока её нет как продукта.</p>
+<p><strong>Что отобразить.</strong> Узел или ромб <strong>OIDC у Gateway</strong>. Секреты внешних систем не в контексте модели. Стрелки «агент → IdP» нет.</p>
+<p><strong>Пример нотации.</strong> На снимках отдельного OIDC нет. Auth рисуют как <strong>узел на входе контейнера</strong>, тем же приёмом, что Execution Router: иконка развилки / щита и подпись под ней, сплошная стрелка <code>request</code> проходит через этот узел <strong>до</strong> Planner.</p>
+<p><img alt="Execution Router at the entry of the path" src="media/notation/n-langgraph.png" /></p>
+<h2>Agent Pattern</h2>
+<p><strong>Вопрос блока:</strong> сколько runtime и <strong>кто отвечает пользователю</strong>.</p>
+<p><strong>Из чего состоит.</strong> База: <strong>один агент с инструментами</strong>. Инструмент это способность, не второй агент. Второй агент появляется, когда не хватает окна контекста, владельцев способности или контроля задачи.</p>
+<p><strong>Какие виды бывают.</strong> Навык без смены говорящего: skills / agents-as-tools, диалог остаётся у runtime. <strong>Handoff:</strong> следующий ответ отдаёт уже другой агент, это должно быть видно. Много исполнителей: coordinator, parallel, swarm. Детерминированная цепочка без LLM-router: код ведёт шаги. Цикл ReAct рисуют кольцом <strong>с выходом</strong> (схема, лимит кругов, Human Validation, эскалация).</p>
+<p><strong>Что отобразить.</strong> Одна фраза паттерна на листе. Рядом что отвергли, чтобы не дорисовали swarm или handoff. Несколько фигурок «Agent 1 / 2 / 3» без подписи владельца ответа читать как swarm: так можно только если swarm выбран.</p>
+<p><strong>Пример нотации.</strong> Учебный снимок показывает контейнер <strong>Multi Agent System</strong>. Если у вас один runtime, этот ящик <strong>не копируют как деплой</strong>. Либо подписывают специализации как skills внутри runtime, либо оставляют контейнер и явно пишут «не отдельные процессы».</p>
+<p><img alt="Multi Agent System: copy only if this pattern is chosen" src="media/notation/n-multiagent.jpg" /></p>
+<h2>Pipeline and Nodes</h2>
+<p><strong>Вопрос блока:</strong> из каких шагов складывается одна работа. Agent Pattern говорит, кто владеет ответом. Pipeline говорит, что по дороге происходит.</p>
+<p><strong>Из чего состоит.</strong> Два семейства узлов. <strong>Path (LangGraph):</strong> куда дальше, ветка, повтор, стоп. <strong>Step (LangChain):</strong> prompt, retrieve, tool, model call. Один квадрат «LLM» посередине Pipeline не считается.</p>
+<p><strong>Какие виды бывают.</strong> Retrieve может кончиться ссылкой без генерации абзаца. Разбор документа: текст, поля, запись. Публикация коннектора: инструмент в реестре, не «ответ чата». Запись состояния процесса это следствие стопа, не шаг модели.</p>
+<p><strong>Что отобразить.</strong> Имена узлов человеческим языком. Если цикла нет, линейность подписывают.</p>
+<p><strong>Пример нотации Path.</strong> Кружки-ноды, Execution Router, подпись <code>conditional branch</code> на ребре.</p>
+<p><img alt="LangGraph nodes" src="media/notation/n-langgraph.png" /></p>
+<p><strong>Пример нотации Step.</strong> Внутри синей рамки LangChain отдельные иконки: Prompt Builder, Retrieval, Model Call, Tool Execution.</p>
+<p><img alt="LangChain step nodes" src="media/notation/n-langchain.png" /></p>
+<h2>LangGraph · LangChain · LangSmith</h2>
+<p><strong>Вопрос блока:</strong> три разные работы не должны склеиться в квадрат «AI platform».</p>
+<p><strong>Из чего состоит.</strong> <strong>LangGraph (path):</strong> узлы, состояние, ветки, цикл, пауза. Он не ищет документы и не пишет след. <strong>LangChain (step):</strong> как сделан шаг внутри узла. <strong>LangSmith / Langfuse (observability):</strong> что случилось. Он <strong>не выбирает</strong> следующий узел.</p>
+<p><strong>Какие виды бывают.</strong> В контуре называют ту систему следов, которая стоит. Вторая остаётся эталоном слоя. Автопетля «Evaluation сама поменяла prompt в проде» это отдельный вид, его нет по умолчанию.</p>
+<p><strong>Что отобразить.</strong> Три рамки рядом или вложенность: path содержит step, observability пунктиром с обоих. Сплошные стрелки внутри LangGraph и LangChain. Пунктир в следы: <code>log inputs</code>, <code>log outputs</code>, <code>log invocations</code>.</p>
+<p><strong>Пример нотации.</strong> Целая учебная доска слоёв: слева LangGraph, в центре LangChain, справа LangSmith, LLM снаружи.</p>
+<p><img alt="LangGraph, LangChain, LangSmith" src="media/notation/n-stack-full.png" /></p>
+<h2>Tool Execution</h2>
+<p><strong>Вопрос блока:</strong> какими руками агент трогает систему. Без блока кажется, что модель «просто знает» данные.</p>
+<p><strong>Из чего состоит.</strong> Tool это вызов с контрактом: имя, вход, выход, хозяин данных. <strong>Internal tools</strong> ходят к своим сервисам. <strong>External tools</strong> к чужим. Протокол вроде MCP удобен, но на схеме важнее <strong>граница доступа</strong>, не логотип. <strong>Tool-result filter</strong> стоит между ответом инструмента и следующим шагом Reasoning Engine.</p>
+<p><strong>Какие виды бывают.</strong> Поиск, чтение файла, запись поля, запрос во внешнюю таблицу это разные tools, не разные агенты, если владелец ответа один. Белый список разный у специализаций. К внешней базе по умолчанию параметризованное чтение. Секрет в вызове, не в prompt.</p>
+<p><strong>Что отобразить.</strong> Два контура рук лучше одного ящика <code>tools</code>. Filter на ребре «результат → модель». Иконка Tool Execution как на учебном шаге LangChain.</p>
+<p><strong>Пример нотации.</strong> Узел Tool Execution с иконкой терминала, сплошная связь с нодой path, пунктир в LangSmith <code>log invocations</code>.</p>
+<p><img alt="Tool Execution on the LangChain layer" src="media/notation/n-langchain.png" /></p>
+<h2>Reasoning Engine</h2>
+<p><strong>Вопрос блока:</strong> как агент думает, без облака «brain» на весь лист.</p>
+<p><strong>Из чего состоит.</strong> Три проверяемых части. <strong>Planner:</strong> что запросили и какой навык. <strong>Tool Execution:</strong> вызов инструмента. <strong>Conditional Router:</strong> повторить, остановиться, спросить человека.</p>
+<p><strong>Какие виды бывают.</strong> Для навигации по известным объектам план короткий. Для разбора документа цикл естественен. User Query и чистая запись результата этот блок не содержат: думает runtime.</p>
+<p><strong>Что отобразить.</strong> Три узла с именами внутри одной рамки Reasoning Engine. Кольцо цикла замыкают на Conditional Router, не на LLM напрямую.</p>
+<p><strong>Пример нотации.</strong> Рамка Reasoning Engine: Planner → Tool Execution → Conditional Router. Вход User Query сплошной. Атака, если есть, красным пунктиром сбоку, не той же стрелкой, что <code>request</code>.</p>
+<p><img alt="Reasoning Engine" src="media/notation/n-reasoning.jpg" /></p>
+<h2>Stress Testing</h2>
+<p><strong>Вопрос блока:</strong> что отсекается <strong>до</strong> рассуждения. Иначе любая строка выглядит как законный вход в модель.</p>
+<p><strong>Из чего состоит.</strong> Правила того же Pipeline: тип и размер входа, вреносный файл, повтор одной и той же работы, prompt injection в тексте, запрет превратить модель в автора произвольного запроса к чужой базе. Это не отдельный театр атак.</p>
+<p><strong>Какие виды бывают.</strong> Файл, короткая строка поиска и диалог требуют разных правил. Контур red team рисуют только если он есть как практика. Иначе достаточно узлов правил на входе Gateway.</p>
+<p><strong>Что отобразить.</strong> Красная рамка сбоку или узлы на входе Gateway. Связь с Reasoning Engine <strong>красным пунктиром</strong> и подписью, не сплошным <code>request</code>.</p>
+<p><strong>Пример нотации.</strong> Заголовок STRESS TESTING, внутри иконки угроз (Biased Opinion, Information Evasion, Prompt Injection), красный пунктир <code>red team attacks</code> в Reasoning Engine.</p>
+<p><img alt="Stress Testing" src="media/notation/n-stress.jpg" /></p>
+<h2>Human Validation</h2>
+<p><strong>Вопрос блока:</strong> где действие уже нельзя назвать «просто ответом». Запись, создание карточки, публикация наружу это <strong>side effect</strong>. Без подтверждения его нет.</p>
+<p><strong>Из чего состоит.</strong> Состояние «нужно решение», причина паузы, продолжение runtime после решения. Несколько ролей Gatekeeper / Auditor / Strategist рисуют только если такой продукт есть. Иначе один контур подтверждения.</p>
+<p><strong>Какие виды бывают.</strong> Поиск часто без паузы. Извлечение полей часто с правкой спорного. Публикация наружу почти всегда с согласием.</p>
+<p><strong>Что отобразить.</strong> Паузу на ребре к side effect. Золотая рамка, сплошной вход из Conditional Router, выход в Evaluation или обратно в runtime.</p>
+<p><strong>Пример нотации.</strong> Учебный контейнер HUMAN VALIDATION с внутренними ролями. Если ролей нет, рамку оставляют, внутри один узел confirmation, без тройки должностей.</p>
+<p><img alt="Human Validation" src="media/notation/n-human.jpg" /></p>
+<h2>Database Layer</h2>
+<p><strong>Вопрос блока:</strong> куда агент ходит за памятью и почему это <strong>не одна база</strong>.</p>
+<p><strong>Из чего состоит.</strong> Несколько контуров, даже на одном кластере. <strong>Operational DB</strong> процесса. <strong>Knowledge store</strong> для общих имён. <strong>Files</strong> как байты. <strong>Vector Store</strong> как сходство. <strong>Queues</strong> фона. <strong>Traces</strong> наблюдения. <strong>External data</strong> только через tool. <strong>Secrets</strong> это control, не память процесса.</p>
+<p><strong>Какие виды ошибки бывают.</strong> Vector Store в том же бакете, что байты, без границы. Парсер чужой схемы как истина знаний. Trace наблюдения в тех же таблицах, что поля процесса.</p>
+<p><strong>Что отобразить.</strong> Цилиндры с хозяином и протоколом. Если движок вектора не выбран, так и пишут.</p>
+<p><strong>Пример нотации.</strong> Рамка DATABASE LAYER, внутри отдельно Vector Store (кубы) и Relational Database (цилиндр). Двусторонняя связь с исполнением, не «агент читает всё».</p>
+<p><img alt="Database Layer" src="media/notation/n-database.jpg" /></p>
+<h2>Data Processing</h2>
+<p><strong>Вопрос блока:</strong> не склеить подготовку корпуса и исполнение одной работы в одну стрелку «ETL → агент».</p>
+<p><strong>Из чего состоит.</strong> <strong>Corpus ingest:</strong> источник → файловый сервис → разбор текста → при необходимости вектор → индекс. Имена сущностей живут в знаниях. <strong>Request path:</strong> Channel, Gateway, skill, узкий контекст, tools, стоп, запись. Исполнение не переиндексирует весь мир «на лету», если это не его задача.</p>
+<p><strong>Какие виды бывают.</strong> Простой: текст и поиск по сходству. Сложный: сохранить таблицы и заголовки, навесить описания фрагментов. Сложный рисуют только если он есть.</p>
+<p><strong>Что отобразить.</strong> Два контура. Снизу Data Processing, сверху request path. Источники отдельной рамкой Data Sources.</p>
+<p><strong>Пример нотации.</strong> DATA SOURCES (Documents, Code, Spreadsheets, Images) входят в широкую зелёную рамку DATA PROCESSING с тремя стадиями: Re-structuring Data, Structure-aware Chunking, Metadata Creation.</p>
+<p><img alt="Data Processing" src="media/notation/n-processing.jpg" /></p>
+<p><img alt="Data Sources" src="media/notation/n-sources.jpg" /></p>
+<h2>Vector Store and Relational Database</h2>
+<p><strong>Вопрос блока:</strong> какие <strong>уровни чтения</strong> есть, когда уже тянет нарисовать «всё в Postgres».</p>
+<p><strong>Из чего состоит.</strong> Relational уровень процесса и relational уровень знаний различны. Vector Store про сходство, не про истину поля. Files про байты. External relational только через tool. Observability про качество работы.</p>
+<p><strong>Что отобразить.</strong> Легенда уровней. Каждая стрелка чтения заканчивается в одном уровне. Стрелки «агент читает всё» нет.</p>
+<p><strong>Пример нотации.</strong> Те же два знака, что в Database Layer: кубы Vector Store и цилиндр Relational Database, подписанные по-разному. Не один цилиндр на оба смысла.</p>
+<p><img alt="Vector Store and Relational Database" src="media/notation/n-database.jpg" /></p>
+<h2>Evaluation</h2>
+<p><strong>Вопрос блока:</strong> как узнать, что путь сработал. Без блока архитектура кончается на «вызвали модель».</p>
+<p><strong>Из чего состоит.</strong> Trace: специализация, tools, попадания поиска, вход и выход, время, стоимость, был ли Human Validation. Дальше метрика по виду пути: находка и ссылка, схема полей, верный навык, стоп по правилу.</p>
+<p><strong>Какие виды зрелости бывают.</strong> Только trace. Trace плюс эталонные примеры. Плюс LLM Judges. Автопетля правки prompt в проде это отдельное решение, его нет по умолчанию.</p>
+<p><strong>Что отобразить.</strong> Пунктир с узлов LangGraph и LangChain в LangSmith / Langfuse. Обратная связь в Conditional Router, если петля улучшения принята, тоже пунктиром <code>feedback loop</code>. Observability не ставят третьим оркестратором вместо Reasoning Engine.</p>
+<p><strong>Пример нотации Evaluation.</strong> Рамка EVALUATION: LLM Judges, Precision &amp; Recall, Latency &amp; Cost. Пунктир назад в Reasoning Engine.</p>
+<p><img alt="Evaluation" src="media/notation/n-eval.jpg" /></p>
+<p><strong>Пример нотации traces.</strong> Рамка LangSmith справа: Trace Logger, Output Recorder, Decision Tracker. Только пунктир <code>log inputs</code> / <code>log outputs</code> / <code>log invocations</code>, без сплошного управления путём.</p>
+<p><img alt="LangSmith" src="media/notation/n-langsmith.png" /></p>
+<h2>Что должно получиться на листе</h2>
+<p>С листа без устного комментария видно: <strong>User Query</strong>, <strong>Gateway и Application Core как разные узлы</strong>, <strong>Agent Pattern и владелец ответа</strong>, <strong>цикл или его отсутствие</strong>, <strong>Tool Execution</strong>, <strong>Human Validation на side effect</strong>, <strong>Database Layer</strong>, <strong>Evaluation пунктиром</strong>.</p>
+<p>Если видны только подписи технологий без этой грамматики рамок, иконок и типов линий, это перечень слов, а не архитектура.</p></main></body></html>

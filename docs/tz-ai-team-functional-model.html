@@ -1,0 +1,729 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ТЗ. Видение и функциональная модель AI-команды по внедрению продуктовых решений</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml"/>
+<style>body{margin:0;font:16px/1.6 Manrope,"Segoe UI",sans-serif;color:#1b2140;background:#f5f6fb}main{max-width:900px;margin:0 auto;padding:32px 20px 60px}a{color:#3d4ed8}table{border-collapse:collapse;display:block;overflow-x:auto;font-size:14px}th,td{border:1px solid #d5d9ea;padding:6px 8px;vertical-align:top}th{background:#eef0fa}code,pre{background:#eef0fa;border-radius:6px}pre{padding:12px;overflow-x:auto}img{max-width:100%}.back{font-size:14px}</style></head>
+<body><main><p class="back"><a href="../ml-expertise.html">← ML-экспертиза</a></p>
+<h1>ТЗ. Видение и функциональная модель AI-команды по внедрению продуктовых решений</h1>
+<h2>1. Назначение AI-команды</h2>
+<p>AI-команда обеспечивает полный цикл внедрения AI- и Agentic AI-решений: от получения POC и подтвержденного бизнес-сценария до реализации, интеграции с основным продуктом и формирования стабильной переиспользуемой capability.</p>
+<p>AI-команда отвечает за технологическое взросление AI-решений, их архитектуру, интеграцию с основным продуктом, production-реализацию AI-части и формирование необходимых требований к Frontend, Backend, Design и Analytics.</p>
+<p>AI-команда не заменяет команды основной разработки и не дублирует Vibe Coding.</p>
+<hr />
+<h2>2. Место AI-команды в процессе разработки</h2>
+<p>Процесс разработки AI-решений строится по следующей модели:</p>
+<p><strong>Клиент / Бизнес → Vibe Coding → AI-команда → Основная разработка + AI-команда → Production → Capability → Vibe Coding</strong></p>
+<h3>Vibe Coding</h3>
+<p>Vibe Coding обеспечивает:</p>
+<ul>
+<li>быстрое уточнение бизнес-задачи;</li>
+<li>согласование основных требований с клиентом;</li>
+<li>создание рабочего POC;</li>
+<li>проверку бизнес-сценария;</li>
+<li>получение обратной связи от клиента;</li>
+<li>фиксацию результата эксперимента.</li>
+</ul>
+<p>Результатом этапа является подтвержденный бизнес-сценарий и POC, достаточный для перехода к технологическому проектированию.</p>
+<h3>AI-команда</h3>
+<p>AI-команда обеспечивает:</p>
+<ul>
+<li>анализ POC;</li>
+<li>разработку целевой архитектуры;</li>
+<li>проектирование AI/Agentic AI-части;</li>
+<li>определение границ автономности AI;</li>
+<li>проектирование интеграции с основным продуктом;</li>
+<li>формирование TDR;</li>
+<li>формирование требований к Backend и Frontend;</li>
+<li>развитие Semantic Layer;</li>
+<li>определение Governance;</li>
+<li>разработку Evaluation;</li>
+<li>выбор технологического решения;</li>
+<li>разработку AI-кода;</li>
+<li>интеграцию AI-кода с основным продуктом;</li>
+<li>доведение AI-решения до production;</li>
+<li>формирование переиспользуемых capabilities.</li>
+</ul>
+<h3>Основная разработка</h3>
+<p>Основная разработка обеспечивает реализацию изменений в core product, необходимых для интеграции AI-решения:</p>
+<ul>
+<li>Backend;</li>
+<li>Frontend;</li>
+<li>Design;</li>
+<li>Analytics;</li>
+<li>API;</li>
+<li>domain logic;</li>
+<li>data model;</li>
+<li>product capabilities.</li>
+</ul>
+<hr />
+<h2>3. Основной принцип ответственности</h2>
+<p>AI-команда является владельцем AI Solution.</p>
+<p>AI-команда самостоятельно реализует и доводит до production:</p>
+<ul>
+<li>agents;</li>
+<li>AI services;</li>
+<li>orchestration;</li>
+<li>tools;</li>
+<li>MCP-интеграции;</li>
+<li>AI APIs;</li>
+<li>agent state;</li>
+<li>AI-specific logic;</li>
+<li>evaluation;</li>
+<li>governance-механизмы;</li>
+<li>AI-specific integration layer.</li>
+</ul>
+<p>Основная разработка является владельцем core product и самостоятельно реализует изменения внутри основного продукта, необходимые для предоставления AI-команде требуемых product capabilities.</p>
+<hr />
+<h2>4. Жизненный цикл AI-решения</h2>
+<h3>4.1. Discovery и POC</h3>
+<p>Vibe Coding:</p>
+<ol>
+<li>получает бизнес-задачу;</li>
+<li>проводит discovery;</li>
+<li>уточняет требования с клиентом;</li>
+<li>определяет пользовательский сценарий;</li>
+<li>создает POC;</li>
+<li>проверяет результат с клиентом;</li>
+<li>передает результат AI-команде.</li>
+</ol>
+<p>На данном этапе архитектура production-решения не является обязательным результатом.</p>
+<h3>4.2. AI Solution Analysis</h3>
+<p>AI-команда анализирует полученный POC и определяет:</p>
+<ul>
+<li>целевой бизнес-сценарий;</li>
+<li>роль AI в процессе;</li>
+<li>необходимость использования AI;</li>
+<li>тип AI-решения;</li>
+<li>границы ответственности AI;</li>
+<li>границы автономности;</li>
+<li>необходимые инструменты;</li>
+<li>необходимые данные;</li>
+<li>необходимые интеграции;</li>
+<li>существующие product capabilities;</li>
+<li>отсутствующие product capabilities.</li>
+</ul>
+<p>AI-команда определяет целевую модель решения.</p>
+<hr />
+<h2>5. AI Solution Architecture</h2>
+<p>AI-команда разрабатывает архитектуру решения, включающую:</p>
+<ul>
+<li>AI-компоненты;</li>
+<li>agents;</li>
+<li>orchestration;</li>
+<li>tools;</li>
+<li>MCP;</li>
+<li>AI services;</li>
+<li>APIs;</li>
+<li>data flow;</li>
+<li>state management;</li>
+<li>Semantic Layer;</li>
+<li>Governance;</li>
+<li>Evaluation;</li>
+<li>Human-in-the-loop;</li>
+<li>интеграцию с core product.</li>
+</ul>
+<p>Архитектура определяет границы ответственности между AI-командой и командами основной разработки.</p>
+<hr />
+<h2>6. Проектирование Agentic AI</h2>
+<p>Для каждого агента AI-команда определяет:</p>
+<ul>
+<li>назначение;</li>
+<li>бизнес-сценарий;</li>
+<li>входные данные;</li>
+<li>контекст;</li>
+<li>доступные знания;</li>
+<li>Semantic Layer;</li>
+<li>tools;</li>
+<li>допустимые действия;</li>
+<li>запрещенные действия;</li>
+<li>уровень автономности;</li>
+<li>точки human approval;</li>
+<li>правила эскалации;</li>
+<li>состояние;</li>
+<li>взаимодействие с другими агентами;</li>
+<li>взаимодействие с пользователем;</li>
+<li>критерии успешного выполнения;</li>
+<li>критерии остановки и fallback.</li>
+</ul>
+<p>AI-команда определяет, является ли конкретный сценарий:</p>
+<ul>
+<li>AI Assistant;</li>
+<li>AI Advice;</li>
+<li>AI Execution;</li>
+<li>AI Collaboration;</li>
+<li>Agent;</li>
+<li>Multi-Agent Solution;</li>
+<li>AI Orchestrator;</li>
+<li>deterministic workflow с AI-компонентами.</li>
+</ul>
+<hr />
+<h2>7. TDR и интеграция с основным продуктом</h2>
+<p>TDR является основным артефактом интеграции AI-решения с core product.</p>
+<p>AI-команда формирует TDR и определяет:</p>
+<ul>
+<li>необходимые product capabilities;</li>
+<li>необходимые API;</li>
+<li>необходимые backend changes;</li>
+<li>необходимые frontend changes;</li>
+<li>необходимые изменения domain model;</li>
+<li>необходимые данные;</li>
+<li>необходимые права доступа;</li>
+<li>необходимые события;</li>
+<li>необходимые интеграции;</li>
+<li>границы ответственности систем;</li>
+<li>контракты взаимодействия;</li>
+<li>требования к состоянию и результатам AI-операций.</li>
+</ul>
+<p>TDR используется для согласования AI-решения с Backend и Frontend-командами.</p>
+<p>AI-команда сопровождает TDR до момента согласования необходимых изменений и реализации интеграционных контрактов.</p>
+<hr />
+<h2>8. Требования к Backend</h2>
+<p>AI-команда формирует требования к Backend основной разработки, необходимые для реализации AI-сценария.</p>
+<p>Требования включают:</p>
+<ul>
+<li>новые API;</li>
+<li>расширение существующих API;</li>
+<li>product capabilities;</li>
+<li>domain operations;</li>
+<li>доступ к данным;</li>
+<li>события;</li>
+<li>permissions;</li>
+<li>состояния;</li>
+<li>бизнес-операции;</li>
+<li>интеграционные контракты;</li>
+<li>требования к производительности;</li>
+<li>требования к безопасности.</li>
+</ul>
+<p>Backend-команда реализует изменения внутри core product.</p>
+<p>AI-команда обеспечивает соответствие реализованных изменений требованиям AI Solution.</p>
+<hr />
+<h2>9. Требования к Frontend</h2>
+<p>AI-команда формирует требования к Frontend основной разработки, необходимые для полноценного пользовательского сценария AI.</p>
+<p>Требования включают:</p>
+<ul>
+<li>точки входа в AI-функциональность;</li>
+<li>отображение состояния агента;</li>
+<li>отображение результата;</li>
+<li>отображение ошибок;</li>
+<li>approval / confirmation;</li>
+<li>управление AI-действиями;</li>
+<li>настройки;</li>
+<li>пользовательский контроль;</li>
+<li>отображение статуса выполнения;</li>
+<li>взаимодействие пользователя с AI.</li>
+</ul>
+<p>Frontend-команда реализует изменения внутри core product.</p>
+<p>AI-команда обеспечивает соответствие реализации целевому AI-сценарию.</p>
+<hr />
+<h2>10. Semantic Layer</h2>
+<p>AI-команда отвечает за развитие Semantic Layer в рамках AI-решений.</p>
+<p>Для каждого нового сценария AI-команда определяет:</p>
+<ul>
+<li>необходимые бизнес-сущности;</li>
+<li>определения;</li>
+<li>связи;</li>
+<li>бизнес-правила;</li>
+<li>контекст;</li>
+<li>capabilities;</li>
+<li>tool contracts;</li>
+<li>ограничения;</li>
+<li>дополнительные семантические зависимости.</li>
+</ul>
+<p>Новые знания и изменения Semantic Layer становятся частью переиспользуемой AI-инфраструктуры компании.</p>
+<hr />
+<h2>11. AI Governance</h2>
+<p>AI-команда определяет Governance для AI-решения.</p>
+<p>Governance включает:</p>
+<ul>
+<li>допустимые действия AI;</li>
+<li>запрещенные действия;</li>
+<li>права доступа;</li>
+<li>доступные tools;</li>
+<li>ограничения автономности;</li>
+<li>human approval;</li>
+<li>правила эскалации;</li>
+<li>audit trail;</li>
+<li>logging;</li>
+<li>контроль изменений;</li>
+<li>обработку ошибок;</li>
+<li>контроль использования данных;</li>
+<li>контроль критических операций.</li>
+</ul>
+<p>AI Solution не считается production-ready без определенных механизмов контроля, соответствующих его уровню автономности и риску.</p>
+<hr />
+<h2>12. AI Validation &amp; Testing</h2>
+<p>AI-команда отвечает за комплексную валидацию AI/Agentic AI-решения перед его передачей в production. Цель этапа: подтвердить не только техническую работоспособность решения, но и его качество, надёжность, безопасность, производительность и экономическую эффективность.</p>
+<p>AI Validation является отдельной инженерной функцией и не сводится к стандартному QA или функциональному тестированию продукта.</p>
+<h3>12.1. Функции AI Validation</h3>
+<p>AI-команда должна:</p>
+<ul>
+<li>формировать стратегию тестирования AI/Agentic AI-решения;</li>
+<li>определять критерии успешности AI-решения;</li>
+<li>формировать evaluation datasets и тестовые сценарии;</li>
+<li>создавать golden datasets / эталонные наборы;</li>
+<li>проверять качество ответов и выполнения бизнес-задач;</li>
+<li>проверять корректность выбора и использования tools / MCP;</li>
+<li>проверять корректность аргументов, передаваемых инструментам;</li>
+<li>проверять соблюдение бизнес-правил;</li>
+<li>тестировать edge cases и негативные сценарии;</li>
+<li>проводить adversarial testing;</li>
+<li>проверять поведение при неполном, противоречивом или некорректном входе;</li>
+<li>проверять необходимость и корректность human-in-the-loop;</li>
+<li>проводить regression testing при изменении модели, промптов, tools, orchestration или Semantic Layer;</li>
+<li>оценивать latency, throughput и стабильность;</li>
+<li>проводить нагрузочное и стресс-тестирование AI-компонентов;</li>
+<li>оценивать token consumption и стоимость выполнения;</li>
+<li>проверять устойчивость к сбоям моделей, tools и внешних сервисов;</li>
+<li>проверять AI Governance и ограничения автономности;</li>
+<li>фиксировать результаты тестирования и ограничения решения;</li>
+<li>определять готовность решения к production engineering.</li>
+</ul>
+<h3>12.2. Объекты тестирования</h3>
+<p>Тестироваться должен не только финальный ответ LLM, а весь AI execution flow:</p>
+<p><strong>User Input → Context → Agent/Orchestrator → Reasoning → Tool Selection → Tool Execution → Business Operation → Final Result</strong></p>
+<p>В зависимости от решения оцениваются:</p>
+<ul>
+<li>качество понимания задачи;</li>
+<li>корректность reasoning / planning;</li>
+<li>корректность выбора агента или workflow;</li>
+<li>корректность выбора инструмента;</li>
+<li>корректность параметров tool call;</li>
+<li>соблюдение Semantic Layer и бизнес-контекста;</li>
+<li>соблюдение бизнес-правил;</li>
+<li>корректность результата;</li>
+<li>необходимость эскалации человеку;</li>
+<li>безопасность выполнения;</li>
+<li>устойчивость к ошибкам;</li>
+<li>latency;</li>
+<li>стоимость;</li>
+<li>воспроизводимость и стабильность поведения.</li>
+</ul>
+<h3>12.3. Типы AI Evaluation</h3>
+<p>AI-команда должна применять комбинацию различных методов оценки:</p>
+<p><strong>Functional Evaluation</strong></p>
+<ul>
+<li>выполнение целевой задачи;</li>
+<li>корректность результата;</li>
+<li>соответствие acceptance criteria.</li>
+</ul>
+<p><strong>Tool / Agent Evaluation</strong></p>
+<ul>
+<li>выбор правильного tool;</li>
+<li>корректность tool arguments;</li>
+<li>правильность последовательности действий;</li>
+<li>корректность agent trajectory;</li>
+<li>корректность orchestration.</li>
+</ul>
+<p><strong>Business Evaluation</strong></p>
+<ul>
+<li>соблюдение бизнес-правил;</li>
+<li>корректность работы с бизнес-сущностями;</li>
+<li>выполнение бизнес-процесса;</li>
+<li>достижение требуемого business outcome.</li>
+</ul>
+<p><strong>LLM Evaluation</strong></p>
+<ul>
+<li>качество генерации;</li>
+<li>factuality;</li>
+<li>relevance;</li>
+<li>consistency;</li>
+<li>structured output;</li>
+<li>использование LLM-as-a-Judge там, где это оправдано.</li>
+</ul>
+<p><strong>Safety &amp; Governance Evaluation</strong></p>
+<ul>
+<li>попытки выполнить запрещённые действия;</li>
+<li>обход ограничений;</li>
+<li>prompt injection;</li>
+<li>excessive agency;</li>
+<li>privilege escalation;</li>
+<li>утечка данных;</li>
+<li>нарушение permission model;</li>
+<li>корректность human approval.</li>
+</ul>
+<p><strong>Performance Evaluation</strong></p>
+<ul>
+<li>latency;</li>
+<li>throughput;</li>
+<li>concurrency;</li>
+<li>error rate;</li>
+<li>resource consumption;</li>
+<li>деградация качества под нагрузкой.</li>
+</ul>
+<p><strong>Economic Evaluation</strong></p>
+<ul>
+<li>token consumption;</li>
+<li>стоимость одного execution;</li>
+<li>стоимость пользовательской операции;</li>
+<li>стоимость при целевой нагрузке;</li>
+<li>сравнение моделей и архитектурных вариантов.</li>
+</ul>
+<h3>12.4. Evaluation Dataset</h3>
+<p>Для значимых AI-решений должен формироваться отдельный набор тестовых сценариев, включающий:</p>
+<ul>
+<li>типовые успешные сценарии;</li>
+<li>edge cases;</li>
+<li>негативные сценарии;</li>
+<li>неоднозначные запросы;</li>
+<li>неполные данные;</li>
+<li>противоречивые данные;</li>
+<li>запрещённые действия;</li>
+<li>сценарии с human approval;</li>
+<li>сценарии ошибок tools и внешних систем;</li>
+<li>реальные обезличенные пользовательские сценарии, если это допустимо;</li>
+<li>синтетические сценарии для покрытия редких случаев.</li>
+</ul>
+<p>Набор должен версионироваться и использоваться для regression testing.</p>
+<h3>12.5. Automated Evaluation</h3>
+<p>По возможности evaluation должна быть автоматизирована и встроена в delivery pipeline.</p>
+<p>Изменения следующих компонентов могут требовать повторного evaluation:</p>
+<ul>
+<li>AI model;</li>
+<li>system prompt;</li>
+<li>context;</li>
+<li>agent instructions;</li>
+<li>orchestration;</li>
+<li>tools / MCP;</li>
+<li>Semantic Layer;</li>
+<li>business rules;</li>
+<li>external integrations.</li>
+</ul>
+<p>Результаты evaluation должны быть измеримыми и сопоставимыми между версиями решения.</p>
+<h3>12.6. Load &amp; Stress Testing</h3>
+<p>Для AI-решений, предполагающих существенную пользовательскую нагрузку, AI-команда определяет и проводит:</p>
+<ul>
+<li>load testing;</li>
+<li>stress testing;</li>
+<li>concurrency testing;</li>
+<li>endurance testing;</li>
+<li>rate-limit testing;</li>
+<li>failure/recovery testing.</li>
+</ul>
+<p>Тестируется не только инфраструктура, но и поведение AI-системы при росте нагрузки:</p>
+<ul>
+<li>изменение latency;</li>
+<li>рост error rate;</li>
+<li>деградация AI quality;</li>
+<li>рост token consumption;</li>
+<li>рост стоимости;</li>
+<li>доступность моделей и tools;</li>
+<li>корректность очередей и retry-механизмов;</li>
+<li>корректность state management.</li>
+</ul>
+<h3>12.7. Validation Report</h3>
+<p>По результатам проверки AI-команда формирует <strong>AI Validation Report</strong>, содержащий:</p>
+<ul>
+<li>проверяемый сценарий;</li>
+<li>версию AI-решения;</li>
+<li>использованные модели;</li>
+<li>evaluation dataset;</li>
+<li>набор тестов;</li>
+<li>результаты;</li>
+<li>выявленные ограничения;</li>
+<li>known issues;</li>
+<li>performance characteristics;</li>
+<li>estimated cost;</li>
+<li>security/governance findings;</li>
+<li>рекомендации по production;</li>
+<li>критерии, которые не выполнены.</li>
+</ul>
+<p>Результат validation должен позволять принять техническое решение:</p>
+<p><strong>Ready for Production Engineering / Requires Changes / Not Ready</strong></p>
+<p>При этом AI Validation не заменяет Product Acceptance и стандартное QA тестирование продукта.</p>
+<h3>12.8. Production Gate</h3>
+<p>AI-решение не считается готовым к production только на основании положительной клиентской оценки POC.</p>
+<p>Перед переходом в production должны быть подтверждены:</p>
+<ul>
+<li>business acceptance;</li>
+<li>AI quality;</li>
+<li>tool/agent correctness;</li>
+<li>business rule compliance;</li>
+<li>governance and security;</li>
+<li>reliability;</li>
+<li>performance;</li>
+<li>cost;</li>
+<li>integration readiness;</li>
+<li>regression results.</li>
+</ul>
+<hr />
+<h2>13. Технологическая экспертиза</h2>
+<p>AI-команда отвечает за выбор технологического подхода для AI Solution.</p>
+<p>В зону экспертизы входят:</p>
+<ul>
+<li>GenAI;</li>
+<li>Agentic AI;</li>
+<li>LLM;</li>
+<li>agents;</li>
+<li>multi-agent systems;</li>
+<li>orchestration;</li>
+<li>MCP;</li>
+<li>Semantic Layer;</li>
+<li>reasoning;</li>
+<li>autonomous research;</li>
+<li>AI assistants;</li>
+<li>AI advice;</li>
+<li>AI execution;</li>
+<li>AI collaboration;</li>
+<li>evaluation;</li>
+<li>observability;</li>
+<li>governance.</li>
+</ul>
+<p>Выбор технологии осуществляется исходя из требований бизнес-сценария, архитектуры, качества, надежности, стоимости, производительности, безопасности и эксплуатационных требований.</p>
+<hr />
+<h2>14. Реализация AI Solution</h2>
+<p>AI-команда самостоятельно реализует AI-часть решения.</p>
+<p>В состав реализации входят:</p>
+<ul>
+<li>agent code;</li>
+<li>AI services;</li>
+<li>orchestration;</li>
+<li>tools;</li>
+<li>MCP;</li>
+<li>AI APIs;</li>
+<li>prompts;</li>
+<li>context management;</li>
+<li>state management;</li>
+<li>evaluation;</li>
+<li>governance;</li>
+<li>AI-specific integration code.</li>
+</ul>
+<p>AI-код размещается в согласованной архитектуре основного продукта либо в отдельном сервисе, если архитектура требует выделения AI-компонента.</p>
+<p>AI-команда отвечает за сопровождение и развитие реализованной AI-части.</p>
+<hr />
+<h2>15. Интеграция с основным продуктом</h2>
+<p>AI-команда и основная разработка совместно обеспечивают end-to-end интеграцию.</p>
+<p>AI-команда:</p>
+<ul>
+<li>реализует AI-компоненты;</li>
+<li>реализует AI-specific integration;</li>
+<li>интегрирует agents и tools;</li>
+<li>проверяет API и контракты;</li>
+<li>проводит end-to-end testing AI-сценария;</li>
+<li>контролирует соответствие архитектуре.</li>
+</ul>
+<p>Основная разработка:</p>
+<ul>
+<li>реализует необходимые изменения Backend;</li>
+<li>реализует необходимые изменения Frontend;</li>
+<li>реализует изменения core product;</li>
+<li>обеспечивает стабильность существующей продуктовой функциональности.</li>
+</ul>
+<hr />
+<h2>16. Production Readiness</h2>
+<p>AI Solution считается готовым к production при выполнении следующих условий:</p>
+<ul>
+<li>согласована целевая архитектура;</li>
+<li>определена AI-модель решения;</li>
+<li>определены границы автономности;</li>
+<li>определены tools и интеграции;</li>
+<li>согласован TDR;</li>
+<li>согласованы требования к Backend;</li>
+<li>согласованы требования к Frontend;</li>
+<li>реализованы необходимые изменения core product;</li>
+<li>реализована AI-часть;</li>
+<li>актуализирован Semantic Layer;</li>
+<li>определен Governance;</li>
+<li>реализован Evaluation;</li>
+<li>проведено end-to-end тестирование;</li>
+<li>определены эксплуатационные требования;</li>
+<li>определены механизмы мониторинга и контроля.</li>
+</ul>
+<hr />
+<h2>17. Capability Engineering</h2>
+<p>AI-команда анализирует реализованные решения на предмет выделения переиспользуемых capabilities.</p>
+<p>В capability могут быть преобразованы:</p>
+<ul>
+<li>agents;</li>
+<li>tools;</li>
+<li>MCP-интеграции;</li>
+<li>orchestration patterns;</li>
+<li>Semantic Layer components;</li>
+<li>evaluation mechanisms;</li>
+<li>governance mechanisms;</li>
+<li>integration patterns;</li>
+<li>AI services;</li>
+<li>reusable APIs;</li>
+<li>product capabilities.</li>
+</ul>
+<p>Целью является переход от разработки отдельных AI-функций к формированию набора переиспользуемых AI capabilities компании.</p>
+<hr />
+<h2>18. Knowledge Loop</h2>
+<p>AI-команда возвращает накопленные знания в Vibe Coding.</p>
+<p>В Vibe Coding передаются:</p>
+<ul>
+<li>готовые AI-паттерны;</li>
+<li>reusable components;</li>
+<li>tools;</li>
+<li>capabilities;</li>
+<li>Semantic Layer;</li>
+<li>ограничения;</li>
+<li>governance patterns;</li>
+<li>evaluation patterns;</li>
+<li>интеграционные паттерны;</li>
+<li>успешные архитектурные решения;</li>
+<li>выявленные anti-patterns;</li>
+<li>lessons learned.</li>
+</ul>
+<p>Vibe Coding использует полученные capabilities и знания при создании следующих POC.</p>
+<p>Таким образом формируется замкнутый цикл:</p>
+<p><strong>POC → AI Engineering → Production → Capability → Knowledge → Vibe Coding → новый POC</strong></p>
+<hr />
+<h2>19. Распределение ответственности</h2>
+<table>
+<thead>
+<tr>
+<th>Область</th>
+<th>Vibe Coding</th>
+<th>AI-команда</th>
+<th>Основная разработка</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Discovery</td>
+<td><strong>Ответственность</strong></td>
+<td>Участие</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Согласование бизнес-требований с клиентом</td>
+<td><strong>Ответственность</strong></td>
+<td>Участие при AI-вопросах</td>
+<td>-</td>
+</tr>
+<tr>
+<td>POC</td>
+<td><strong>Ответственность</strong></td>
+<td>Участие</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Production Architecture</td>
+<td>-</td>
+<td><strong>Ответственность</strong></td>
+<td>Ответственность за Core</td>
+</tr>
+<tr>
+<td>AI Architecture</td>
+<td>-</td>
+<td><strong>Ответственность</strong></td>
+<td>-</td>
+</tr>
+<tr>
+<td>Agent Design</td>
+<td>-</td>
+<td><strong>Ответственность</strong></td>
+<td>-</td>
+</tr>
+<tr>
+<td>AI Governance</td>
+<td>-</td>
+<td><strong>Ответственность</strong></td>
+<td>-</td>
+</tr>
+<tr>
+<td>AI Evaluation</td>
+<td>-</td>
+<td><strong>Ответственность</strong></td>
+<td>Участие при необходимости</td>
+</tr>
+<tr>
+<td>Semantic Layer</td>
+<td>Использует</td>
+<td><strong>Развивает</strong></td>
+<td>Участие</td>
+</tr>
+<tr>
+<td>TDR</td>
+<td>-</td>
+<td><strong>Формирует и сопровождает</strong></td>
+<td>Согласует</td>
+</tr>
+<tr>
+<td>Backend requirements</td>
+<td>-</td>
+<td><strong>Формирует</strong></td>
+<td>Реализует</td>
+</tr>
+<tr>
+<td>Frontend requirements</td>
+<td>-</td>
+<td><strong>Формирует</strong></td>
+<td>Реализует</td>
+</tr>
+<tr>
+<td>AI code</td>
+<td>POC</td>
+<td><strong>Реализует production</strong></td>
+<td>-</td>
+</tr>
+<tr>
+<td>Agents</td>
+<td>POC</td>
+<td><strong>Реализует production</strong></td>
+<td>-</td>
+</tr>
+<tr>
+<td>Tools / MCP</td>
+<td>POC</td>
+<td><strong>Реализует production</strong></td>
+<td>-</td>
+</tr>
+<tr>
+<td>Core Backend</td>
+<td>-</td>
+<td>Требует / интегрирует</td>
+<td><strong>Реализует</strong></td>
+</tr>
+<tr>
+<td>Core Frontend</td>
+<td>-</td>
+<td>Требует / интегрирует</td>
+<td><strong>Реализует</strong></td>
+</tr>
+<tr>
+<td>AI integration</td>
+<td>POC</td>
+<td><strong>Реализует</strong></td>
+<td>Участие</td>
+</tr>
+<tr>
+<td>End-to-end AI solution</td>
+<td>-</td>
+<td><strong>Ответственность</strong></td>
+<td>Участие</td>
+</tr>
+<tr>
+<td>Production Core</td>
+<td>-</td>
+<td>Участие</td>
+<td><strong>Ответственность</strong></td>
+</tr>
+<tr>
+<td>Reusable AI capabilities</td>
+<td>-</td>
+<td><strong>Создает</strong></td>
+<td>Участие</td>
+</tr>
+<tr>
+<td>Knowledge transfer</td>
+<td>Получает</td>
+<td><strong>Формирует и передает</strong></td>
+<td>Участие</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>20. Ключевая зона ответственности AI-команды</h2>
+<p>AI-команда отвечает за переход:</p>
+<p><strong>от работающего POC</strong></p>
+<p><strong>к production-интегрированному AI Solution</strong></p>
+<p><strong>и далее к переиспользуемой AI Capability.</strong></p>
+<p>Ключевой результат работы команды:</p>
+<blockquote>
+<p><strong>AI Solution, реализованный по согласованной архитектуре, интегрированный с основным продуктом, контролируемый, измеримый и готовый к промышленной эксплуатации.</strong></p>
+</blockquote>
+<p>Основной принцип взаимодействия команд:</p>
+<blockquote>
+<p><strong>Vibe Coding: Validate.<br />
+AI Team: Architect, Integrate &amp; Build.<br />
+Main Development: Build &amp; Operate Core Product.</strong></p>
+</blockquote></main></body></html>
