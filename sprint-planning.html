@@ -318,7 +318,9 @@ function stCol(t){if(t.status==='Принята')return {f:'#599C16',s:'#3E7A0E'
 /* ===== утверждение спринта (baseline) ===== */
 function sprintTasks(P,sp){return D.tasks.filter(t=>{const x=P.R[t.id];if(x.accepted&&x.accepted<sp.start)return false;if(t.due)return t.due>=sp.start&&t.due<=sp.end;return Object.keys(x.fact).concat(Object.keys(x.fc)).some(d=>d>=sp.start&&d<=sp.end);});}
 function approveSprint(sid,asOf,auto){const sp=C.sprints.find(s=>s.id===sid);if(!sp)return;const keep=D.sprint.today;if(asOf)D.sprint.today=asOf;const P=compute();const plan={};
- sprintTasks(P,sp).forEach(t=>plan[t.id]=P.R[t.id].endR||null);D.sprint.today=keep;compute();const L=D.baselines[sid]=D.baselines[sid]||[];L.push({v:L.length+1,date:asOf||keep,auto:!!auto,plan});}
+ const work={};sprintTasks(P,sp).forEach(t=>{plan[t.id]=P.R[t.id].endR||null;work[t.id]=P.R[t.id].end||null;});D.sprint.today=keep;compute();const L=D.baselines[sid]=D.baselines[sid]||[];L.push({v:L.length+1,date:asOf||keep,auto:!!auto,plan,work,mv:BLMV});}
+const BLMV=2;
+function migrateBaselines(){let n=0;Object.entries(D.baselines||{}).forEach(([sid,L])=>{const sp=C.sprints.find(s=>s.id===sid);if(!sp)return;L.forEach(b=>{if(b.mv===BLMV)return;const keep=D.sprint.today;D.sprint.today=b.date||sp.start;const P=compute();const plan={},work={};sprintTasks(P,sp).forEach(t=>{plan[t.id]=P.R[t.id].endR||null;work[t.id]=P.R[t.id].end||null;});D.sprint.today=keep;b.plan=plan;b.work=work;b.mv=BLMV;b.recalc=true;n++;});});if(n)compute();return n;}
 const blOf=sid=>{const L=(D.baselines||{})[sid];return L&&L.length?L[L.length-1]:null;};
 function planOf(t){let best=null;C.sprints.forEach(sp=>{const b=blOf(sp.id);if(b&&t.id in b.plan&&(!best||sp.start>best.sp.start))best={sp,b,d:b.plan[t.id]};});return best;}
 function slip(t,P){const pl=planOf(t);if(!pl)return null;const f=P.R[t.id].endR;if(!pl.d)return {pl,f,dd:f?-1:0,txt:f?'раньше плана':'план и прогноз за горизонтом'};if(!f)return {pl,f,dd:99,txt:'прогноз за горизонтом'};
@@ -394,7 +396,7 @@ function drawGantt(P){const svg=$('gantt');while(svg.firstChild)svg.removeChild(
     if(x.risk){const ed=x.endA&&xs[x.endA]?X2(x.endA):(runs.length?X2(runs[runs.length-1].e):XR-14);el('text',{x:ed+3,y:by+12,'font-size':13,'font-weight':700,fill:'#E65100'},row,'⚠');}
     const rr=runs.filter(q=>!q.blk&&xs[q.s]&&xs[q.e]);if(rr.length)POS[t.id]={x1:X1(rr[0].s)+2,x2:X2(rr[rr.length-1].e)-2,y:by+BAR/2};}
    if(x.overflow>EPS){el('rect',{x:XR+6,y:by,width:OV-12,height:BAR,rx:4,fill:'url(#hOv)',stroke:'#F32A16'},row);el('text',{x:XR+OV/2,y:by+11,'text-anchor':'middle','font-size':10,'font-weight':600,fill:'#F32A16'},row,h1(x.overflow)+' ч');}
-   {const pl=planOf(t);if(pl&&pl.d&&xs[pl.d]){const bx=xs[pl.d].x+xs[pl.d].w-2;const sl=slip(t,P);el('line',{x1:bx,x2:bx,y1:ry+2,y2:ry+RH-2,stroke:sl&&sl.dd>0?'#F32A16':'#343A7E','stroke-width':2.5,'stroke-dasharray':'3 2'},row);}}
+   {const pl=planOf(t);const wd0=pl&&(pl.b.work&&pl.b.work[t.id]||pl.d);if(pl&&wd0&&xs[wd0]){const bx=xs[wd0].x+xs[wd0].w-2;const sl=slip(t,P);el('line',{x1:bx,x2:bx,y1:ry+2,y2:ry+RH-2,stroke:sl&&sl.dd>0?'#F32A16':'#343A7E','stroke-width':2.5,'stroke-dasharray':'3 2'},row);}}
    hover(row,tinfo(t,P)+(t.blocker?'':`<br>${STI[t.status]} ${esc(t.status)}`));
    row.style.cursor='pointer';row.addEventListener('click',ev=>{ev.stopPropagation();openPop(t.id,ev);});
    y+=RH;});});
@@ -654,7 +656,7 @@ function drawCharts(P){const ps=visPeople().map(p=>p.id),tids=new Set(visTasks()
 }
 
 function render(){D.sprint.today=$('today').value||D.sprint.today;normalize();D.sprint.buffer=+$('buf').value;D.sprint.dayHours=+$('dayH').value||8;$('bufV').textContent=D.sprint.buffer+'%';
- fillSelects();if(D.autoApprove){const a=D.autoApprove;delete D.autoApprove;a.forEach(sid=>{const sp=C.sprints.find(s=>s.id===sid);if(sp&&!blOf(sid))approveSprint(sid,sp.start,true);});}const P=compute();
+ fillSelects();migrateBaselines();if(D.autoApprove){const a=D.autoApprove;delete D.autoApprove;a.forEach(sid=>{const sp=C.sprints.find(s=>s.id===sid);if(sp&&!blOf(sid))approveSprint(sid,sp.start,true);});}const P=compute();
  drawTable(P);drawGantt(P);drawTotals(P);drawCharts(P);drawPop(P);drawSettings();fillSpaceSel();window.__state={P};scheduleSave();}
 $('today').value=D.sprint.today;$('buf').value=D.sprint.buffer;$('dayH').value=D.sprint.dayHours;
 $('selSpr').addEventListener('change',e=>{F.wave=e.target.value;render();});
