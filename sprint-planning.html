@@ -398,6 +398,7 @@ function drawGantt(P){const svg=$('gantt');while(svg.firstChild)svg.removeChild(
     const rr=runs.filter(q=>!q.blk&&xs[q.s]&&xs[q.e]);if(rr.length)POS[t.id]={x1:X1(rr[0].s)+2,x2:X2(rr[rr.length-1].e)-2,y:by+BAR/2};}
    if(x.overflow>EPS){el('rect',{x:XR+6,y:by,width:OV-12,height:BAR,rx:4,fill:'url(#hOv)',stroke:'#F32A16'},row);el('text',{x:XR+OV/2,y:by+11,'text-anchor':'middle','font-size':10,'font-weight':600,fill:'#F32A16'},row,h1(x.overflow)+' ч');}
    {const pl=planOf(t);const wd0=pl&&(pl.b.work&&pl.b.work[t.id]||pl.d);if(pl&&wd0&&xs[wd0]){const bx=xs[wd0].x+xs[wd0].w-2;const sl=slip(t,P);el('line',{x1:bx,x2:bx,y1:ry+2,y2:ry+RH-2,stroke:sl&&sl.dd>0?'#F32A16':'#343A7E','stroke-width':2.5,'stroke-dasharray':'3 2'},row);}}
+   if(t.status==='На ревью'){const bx0=(xs[S.today]?xs[S.today].x+xs[S.today].w:(POS[t.id]?POS[t.id].x2:XR-150))+4;[['ok','✓ Подтвердить','#BCD7A2','#3E7A0E',74],['back','↩ Вернуть','#FFE0B2','#E65100',58]].reduce((bx,[a,l,f,s,w])=>{const g=el('g',{style:'cursor:pointer','data-rv':a},row);el('rect',{x:bx,y:by-1,width:w,height:BAR+2,rx:5,fill:f,stroke:s},g);el('text',{x:bx+w/2,y:by+11,'text-anchor':'middle','font-size':10,'font-weight':600,fill:s},g,l);g.addEventListener('click',ev=>{ev.stopPropagation();if(stDo(t,a))render();});return bx+w+4;},bx0);}
    hover(row,tinfo(t,P)+(t.blocker?'':`<br>${STI[t.status]} ${esc(t.status)}`));
    row.style.cursor='pointer';row.addEventListener('click',ev=>{ev.stopPropagation();openPop(t.id,ev);});
    y+=RH;});});
@@ -673,6 +674,21 @@ $('selSpr').addEventListener('change',e=>{F.wave=e.target.value;render();});
 ['fDir','fPerson','fWave','fTask'].forEach(id=>$(id).addEventListener('change',e=>{F[{fDir:'dir',fPerson:'person',fWave:'wave',fTask:'task'}[id]]=e.target.value;render();}));
 ['today','buf','dayH'].forEach(id=>$(id).addEventListener('change',render));$('buf').addEventListener('input',render);
 $('reset').addEventListener('click',()=>{F.dir=F.person=F.wave=F.task='all';render();});
+/* ===== машина состояний статуса ===== */
+const curSt=t=>t.status==='Пауза/Блокер'?(t.blocker==='Пауза'?'Пауза':'Блокер'):t.status;
+function stActs(t){const c=curSt(t);return ({'Запланировано':[['start','▶ Взять в работу','#C8EEF9']],
+ 'Активна':[['pause','⏸ Пауза','#EBEBEB'],['block','⛔ Блокер','#FFD4D8'],t.needRev?['rev','◎ На ревью','#D9DBFF']:['acc','✓ Принята','#BCD7A2'],['undo','↺ Отменить активацию','#fff']],
+ 'Пауза':[['resume','▶ Возобновить','#C8EEF9']],'Блокер':[['unblock','▶ Снят блокер','#C8EEF9']],
+ 'На ревью':[['ok','✓ Подтвердить','#BCD7A2'],['back','↩ Вернуть','#FFE0B2']],
+ 'Принята':[['reopen','↩ Вернуть в работу','#FFE0B2']]})[c]||[];}
+function stDo(t,a){const d=D.sprint.today;if(!stActs(t).some(q=>q[0]===a))return false;
+ if(a==='undo'){if(!confirm('Отменить активацию «'+t.title+'»? Ошибочная запись «Активна» удалится из истории.'))return false;const h=histOf(t.id).filter(e=>e.s);let k=-1;h.forEach((e,i)=>{if(e.s==='Активна'&&(i===0||h[i-1].s==='Запланировано'))k=i;});
+  if(k>=0)h.slice(k).forEach(e=>setHist(t.id,e.d,{s:'',cause:''}));if(statusAt(t.id,d)!=='Запланировано')setHist(t.id,d,{s:'Запланировано',cause:''});return true;}
+ if(a==='reopen'&&!confirm('Вернуть «'+t.title+'» в работу? Приёмка будет снята.'))return false;
+ const M={start:{s:'Активна',cause:''},resume:{s:'Активна',cause:''},unblock:{s:'Активна',cause:''},back:{s:'Активна',cause:''},reopen:{s:'Активна',cause:''},
+  pause:{s:'Пауза/Блокер',cause:'Пауза'},block:{s:'Пауза/Блокер',cause:'Блокер'},rev:{s:'На ревью',cause:''},acc:{s:'Принята',cause:''},ok:{s:'Принята',cause:''}};
+ setHist(t.id,d,M[a]);return true;}
+window.__sm={openPop:(i,e)=>openPop(i,e),stDo:(t,a)=>stDo(t,a),task:i=>task(i)};
 /* ===== поповер статуса на Ганте ===== */
 let POP=null;
 const pop=document.createElement('div');pop.id='pop';pop.style.cssText='position:absolute;z-index:50;display:none;width:430px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(5,8,25,.25);padding:16px;font-size:13px;line-height:18px';document.body.appendChild(pop);
@@ -686,7 +702,7 @@ function drawPop(P){if(!POP||!task(POP.id)){pop.style.display='none';return;}con
  const hist=histOf(t.id).filter(q=>q.s).map(q=>ru(q.d).slice(0,5)+' '+(q.s==='Пауза/Блокер'?(q.cause&&q.cause!=='Пауза'?'Блокер: '+q.cause:'Пауза'):q.s)).join(' → ')||'—';
  pop.innerHTML=`<div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:15px">${esc(t.id)} · ${esc(t.title)}</b><button class="ib" data-a="x">✕</button></div>
  <div style="color:#85868A;margin:4px 0 10px">Статус на ${ru(d)} · сейчас: ${esc(cur)}</div>
- <div style="display:flex;gap:6px;flex-wrap:wrap">${B.map(b=>`<button class="btn" data-s="${b[0]}" style="padding:4px 10px;background:${b[0]===cur?b[2]:'#fff'};border:1px solid ${b[0]===cur?'#343A7E':'#D9DADF'}">${b[1]} ${b[0]}</button>`).join('')}</div>
+ <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span id="stCur" style="padding:4px 10px;border-radius:6px;font-weight:600;background:${(B.find(b=>b[0]===cur)||[0,0,'#F0F0F5'])[2]};border:2px solid #343A7E">${cur==='Запланировано'?'○':(B.find(b=>b[0]===cur)||[0,''])[1]} ${esc(cur)}</span><span style="color:#85868A">→</span>${stActs(t).map(b=>`<button class="btn" data-st="${b[0]}" style="padding:4px 10px;background:${b[2]};border:1px solid #D9DADF">${b[1]}</button>`).join('')}</div>
  <div style="display:${cur==='Блокер'?'block':'none'};margin-top:8px">${L('Причина блокера',`<input data-f="cause" value="${esc(cur==='Блокер'?t.blocker:'')}" placeholder="например: ждём стенд">`)}</div>
  <div style="display:flex;gap:12px;margin-top:10px;align-items:flex-end">${L('Факт (авто) / оценка',`<span style="font-size:13px;color:${x.overrun>0.05?'#FF5722':'#050819'}">${h1(t.spent)} / ${h1(t.est)} ч${x.overrun>0.05?' · перерасход':''}</span>`)}${L('Остаток, ч (поправить, необяз.)',`<input type="number" min="0" step="0.5" data-f="rem" value="${e.rem!=null?e.rem:''}" placeholder="${h1(t.rem)}" style="width:90px">`)}${L('Итог',`<span class="${x.cls}">${esc(x.outcome)}</span>`)}</div>
  <details style="margin-top:10px"><summary style="cursor:pointer;color:#343A7E">Поля задачи</summary><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
@@ -697,7 +713,7 @@ function drawPop(P){if(!POP||!task(POP.id)){pop.style.display='none';return;}con
  <div style="margin-top:10px;font-size:12px;line-height:18px">${(()=>{const sl=slip(t,P);const a=[];
  if(t.needRev){a.push('Ревью: <b>'+esc(revName(t.reviewer))+'</b>'+(t.revSet?' (вручную)':' (по роли)')+' · срок '+D.sprint.revSla+' раб. дн.');a.push('Работа готова: <b>'+(x.ready?ru(x.ready):'—')+'</b> · ревью до: <b>'+(x.revDue?ru(x.revDue):'—')+'</b>');
   if(x.revLate)a.push('<b style="color:#E65100">⚠ Ревью просрочено на '+x.wait+' раб. дн.</b>');
-  a.push(`<label style="display:inline-flex;gap:6px;align-items:center;margin-top:2px;font-weight:600"><input type="checkbox" data-f="revOk"${t.status==='Принята'?' checked':''}${['Принята','На ревью'].includes(t.status)?'':' disabled'}> Ревью принято</label> <span style="color:#85868A">(доступно в статусе «На ревью»; задача → «Принята» на ${ru(d)})</span>`);}
+  a.push(`<label style="display:inline-flex;gap:6px;align-items:center;margin-top:2px;font-weight:600"><input type="checkbox" data-f="revOk"${t.status==='Принята'?' checked':''}${t.status==='На ревью'?'':' disabled'}> Ревью принято</label> <span style="color:#85868A">(доступно в статусе «На ревью»; задача → «Принята» на ${ru(d)})</span>`);}
  else a.push('Ревью не требуется — задача принимается по готовности.');
  const pr=t.dep&&task(t.dep);if(pr){const px=P.R[pr.id];a.push('Зависит от <b>'+esc(pr.id)+'</b>: '+(px.accepted?'принята '+ru(px.accepted):'приёмка ожидается '+(px.endA?ru(px.endA):'за горизонтом'))+(x.depRisk?' · <b style="color:#E65100">⚠ риск: не успевает к плановому старту'+(x.baseStart?' '+ru(x.baseStart):'')+'</b>':''));}
  a.push('Прогноз приёмки: <b>'+(x.endA?ru(x.endA):'за горизонтом')+'</b>');
@@ -708,10 +724,10 @@ function drawPop(P){if(!POP||!task(POP.id)){pop.style.display='none';return;}con
 pop.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const t=task(POP.id),d=D.sprint.today;
  if(b.dataset.a==='x'){POP=null;pop.style.display='none';return;}
  if(b.dataset.a==='only'){F.task=F.task===t.id?'all':t.id;render();return;}
- const s=b.dataset.s;if(!s)return;if(s==='Пауза')setHist(t.id,d,{s:'Пауза/Блокер',cause:'Пауза'});else if(s==='Блокер')setHist(t.id,d,{s:'Пауза/Блокер',cause:(t.blocker&&t.blocker!=='Пауза')?t.blocker:'Блокер'});else setHist(t.id,d,{s,cause:''});
- render();if(s==='Блокер')setTimeout(()=>{const i=pop.querySelector('[data-f=cause]');if(i){i.focus();i.select();}},30);});
+ const s=b.dataset.st;if(!s)return;if(!stDo(t,s))return;
+ render();if(s==='block')setTimeout(()=>{const i=pop.querySelector('[data-f=cause]');if(i){i.focus();i.select();}},30);});
 pop.addEventListener('change',e=>{const f=e.target.dataset.f;if(!f)return;const t=task(POP.id),d=D.sprint.today;let v=e.target.value;if(f==='reviewer')t.revSet=true;
- if(f==='needRev'){t.needRev=e.target.checked;t.needRevSet=true;render();return;}if(f==='revOk'){setHist(t.id,d,{s:e.target.checked?'Принята':'На ревью',cause:''});render();return;}if(f==='dep'){if(v&&depCycle(t.id,v)){alert('Получится циклическая зависимость');render();return;}t.dep=v;render();return;}
+ if(f==='needRev'){t.needRev=e.target.checked;t.needRevSet=true;render();return;}if(f==='revOk'){if(!stDo(t,e.target.checked?'ok':'reopen'))e.target.checked=!e.target.checked;render();return;}if(f==='dep'){if(v&&depCycle(t.id,v)){alert('Получится циклическая зависимость');render();return;}t.dep=v;render();return;}
  if(f==='cause'){setHist(t.id,d,{s:'Пауза/Блокер',cause:v.trim()||'Блокер'});render();return;}
  if(f==='rem'){setHist(t.id,d,{rem:v===''?'':Math.max(0,parseFloat(v)||0)});render();return;}
  if(['est','prio','revH'].includes(f))v=Math.max(0,parseFloat(v)||0);if(f==='est'&&!t.revManual)t.revH=Math.max(1,Math.round(v*.15));if(f==='revH')t.revManual=true;
