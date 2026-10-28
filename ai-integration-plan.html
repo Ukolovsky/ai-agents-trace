@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Интеграция и план суперспринта 4 · спринты 19-20</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #ffffff;
+      --muted: rgba(255,255,255,.78);
+      --soft: rgba(255,255,255,.62);
+      --glass: rgba(255,255,255,.14);
+      --line: rgba(255,255,255,.22);
+      --orange: #ff5a1f;
+      --green-bg: #d9f7e3;
+      --orange-bg: #ffe4d6;
+      --shadow: 0 18px 50px rgba(28, 42, 140, .28);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Manrope, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 480px at 8% 0%, rgba(170, 196, 255, .55), transparent 60%),
+        radial-gradient(700px 420px at 100% 12%, rgba(90, 110, 230, .45), transparent 55%),
+        linear-gradient(160deg, #7aa4f2 0%, #5b78ee 28%, #4a62e4 58%, #3d4ed8 100%);
+      background-attachment: fixed;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+    header.top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 0 8px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px 6px 6px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .mark {
+      width: 26px; height: 26px; border-radius: 8px;
+      background: linear-gradient(135deg, #7aa2ff, #3a4fe0);
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 800;
+    }
+    .date { font-size: 14px; color: var(--muted); font-weight: 600; }
+    .hero { padding: 28px 0 10px; }
+    .pill {
+      display: inline-flex;
+      background: var(--orange);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 6px 12px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      max-width: 16ch;
+    }
+    .lead {
+      margin: 0;
+      max-width: 720px;
+      font-size: 18px;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 28px 0 8px;
+    }
+    .stat, .glass {
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .stat { padding: 18px 20px; text-decoration: none; color: inherit; }
+    .stat:hover { background: rgba(255,255,255,.2); }
+    .stat b { display: block; font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin: 10px 0 6px; }
+    .stat .tag { display: inline-flex; }
+    .stat .desc { color: var(--muted); font-size: 13px; font-weight: 600; line-height: 1.35; display: block; }
+    section { padding: 28px 0; }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .sub { margin: 0 0 18px; color: var(--muted); font-size: 16px; max-width: 760px; line-height: 1.45; }
+    .prose { max-width: 760px; }
+    .prose p, .panel p, .person p { margin: 0 0 14px; line-height: 1.5; color: var(--muted); font-size: 16px; }
+    .prose p strong, .panel p strong { color: #fff; font-weight: 700; }
+    .shot {
+      background: #0c0e13;
+      border-radius: 18px;
+      overflow: auto;
+      box-shadow: var(--shadow);
+    }
+    .shot img, .shot object { display: block; width: 100%; min-width: 920px; height: auto; }
+    .cap {
+      padding: 10px 14px 12px;
+      color: #24306e;
+      font-size: 13px;
+      font-weight: 700;
+      background: #fff;
+      line-height: 1.4;
+    }
+    .tag {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .tag.go { background: var(--green-bg); color: #147a32; }
+    .tag.work { background: var(--orange-bg); color: #c2410c; }
+    .tag.draft { background: rgba(255,255,255,.85); color: #3d4ed8; }
+    .split { display: grid; grid-template-columns: 1.05fr .95fr; gap: 16px; }
+    .scheme { display: block; width: 100%; height: auto; }
+    .panel { padding: 18px 20px; }
+    .panel h3 { margin: 0 0 12px; font-size: 20px; }
+    .line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+      font-weight: 650;
+    }
+    .line:first-of-type { border-top: 0; }
+    .line span { font-weight: 500; color: var(--muted); text-align: right; }
+    .people { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .person { padding: 18px 20px; }
+    .person h3 { margin: 10px 0 8px; font-size: 20px; }
+    .person strong { color: #fff; }
+    .links { display: flex; gap: 18px; flex-wrap: wrap; padding: 8px 0 8px; }
+    .links a { color: #fff; font-weight: 700; }
+    .figma-row { margin: 16px 0 0; }
+    .figma-btn {
+      display: inline-flex;
+      align-items: center;
+      background: #fff;
+      color: #3d4ed8;
+      font-weight: 800;
+      font-size: 15px;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+    }
+    .figma-btn:hover { background: #f3f6ff; }
+    footer { color: var(--soft); font-size: 13px; padding-bottom: 36px; line-height: 1.45; }
+    .shot.zoomable img { cursor: zoom-in; }
+    .shot.zoomable .cap::after { content: " Нажмите, чтобы открыть крупно."; font-weight: 600; color: #5b678f; }
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(18, 28, 78, .92);
+    }
+    .lightbox[hidden] { display: none; }
+    .lb-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+    }
+    .lb-stage.grabbing { cursor: grabbing; }
+    .lb-stage img {
+      position: absolute;
+      max-width: none;
+      width: auto;
+      height: auto;
+      visibility: hidden;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .lb-stage img.ready { visibility: visible; }
+    .lb-bar {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.28);
+      backdrop-filter: blur(12px);
+      color: #fff;
+    }
+    .lb-bar p { margin: 0; font-size: 14px; font-weight: 600; }
+    .lb-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .lb-actions button {
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      color: #24306e;
+      background: #fff;
+      cursor: pointer;
+    }
+    .lb-actions button[data-act="close"] { background: var(--orange); color: #fff; }
+    .plan { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .plan th, .plan td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.4; }
+    .plan th { color: var(--soft); font-weight: 700; font-size: 13px; }
+    .plan td { color: var(--muted); }
+    .plan td:first-child { color: #fff; font-weight: 700; white-space: nowrap; }
+    .plan-wrap { overflow-x: auto; padding: 6px 8px; margin-top: 16px; }
+    @media (max-width: 900px) {
+      .stats, .split, .people { grid-template-columns: 1fr; }
+    }
+    .rules { margin: 0; padding: 18px 22px 18px 44px; }
+    .rules li { margin: 0 0 10px; line-height: 1.45; color: var(--muted); font-size: 16px; }
+    .rules li:last-child { margin-bottom: 0; }
+    .rules li strong { color: #fff; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="mark">AI</span> Product AI · интеграция и план</div>
+      <div class="date">28 октября 2026</div>
+    </header>
+
+    <section class="hero">
+      <h1>Интеграция и план на спринты 19-20</h1>
+      <p class="lead">Как AI-команда и Базовая платформа работают вместе в суперспринте 4. Сначала правила, на которых держится взаимодействие, затем интеграция, ближайшие инкременты и план.</p>
+    </section>
+
+    <section id="rules">
+      <h2>Правила взаимодействия</h2>
+      <p class="sub">Постулаты Кирилла Юрьевича. Источник: «Взаимодействие AI-команды и Базовой платформы: правила и план», 26 октября, раздел «Цели и правила взаимодействия».</p>
+      <div class="glass panel">
+        <ol class="rules">
+          <li><strong>Две равноправные части.</strong> Платформа BP состоит из базовой и AI. Ни одна не встраивается в другую и не зависит от другой.</li>
+          <li><strong>Цель выпускать работающие продукты, а не идеальный код.</strong> К 01.02 должно быть 50 агентов.</li>
+          <li><strong>Изоляции нет.</strong> Команда разрабатывает своё и одновременно формулирует, что поменять в платформе.</li>
+          <li><strong>AI приходит к платформе заказчиком.</strong> Когда нужная возможность появляется, переходим на неё, даже ценой рефактора.</li>
+          <li><strong>Интеграции с инфраструктурой монолита нет.</strong> У сервиса свои Redis, Postgres и RabbitMQ, с ядром он работает через BFF по контракту.</li>
+          <li><strong>За AI-сервисы отвечают Алексей и Саша Котовенко.</strong> Максим даёт экспертное ревью, но не принимает работу. Комплект продуктов в релиз BP Platform AI-команда публикует сама.</li>
+          <li><strong>MVP выпускается по стадиям.</strong> Работающая функция с возможными проблемами лучше идеальной через год.</li>
+          <li><strong>Рефактор это норма на ближайшие год-два.</strong> Костыль допустим только с документацией.</li>
+          <li><strong>Срок рефактора определяет решение.</strong> Если рефактор дальше полугода, а сделать можно за спринт, сейчас делаем временное рабочее решение. Если рефактор в следующем суперспринте, сразу делаем правильно.</li>
+          <li><strong>Ближайшие полгода AI-релизы выходят только в параллельной зеркальной Dev-среде.</strong></li>
+          <li><strong>Базовая платформа работает, даже если весь AI отключён.</strong> Её цели: масштабируемость, отказоустойчивость и безопасность.</li>
+          <li><strong>Сначала требования и скиллы, потом код.</strong> На старте на это уходит до половины времени.</li>
+          <li><strong>Каждую ошибку разбираем методом пяти почему.</strong> Планирование заканчивается рукопожатием сторон.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="tdr">
+      <h2>Интеграция</h2>
+      <div class="split">
+        <article class="glass panel prose">
+          <p><strong>ML-команда ведёт две схемы.</strong> Первая это целевая общая схема будущего со всеми сервисами AI. Вторая это итерация архитектуры в текущем виде: план внедрения и подробные связи.</p>
+          <p><strong>Схемы служат артефактом для TDR.</strong> По ним обсуждают встречу и рассматривают сервис.</p>
+          <p><strong>После согласования схема уходит в продукт.</strong> Составляют декомпозицию интеграции и передают её в разработку. Затем проходит ревью, решение внедряют в основной продукт и проверяют тестированием.</p>
+          <div class="links"><a href="docs/ai-integration-process.html">Процесс интеграции AI-сервиса</a></div>
+        </article>
+        <article class="glass panel">
+          <h3>Ближайшие инкременты</h3>
+          <div class="line">Первый <span>Импорт, Поиск</span></div>
+          <div class="line">Второй <span>File-Indexer, Видео-Трекер, Договор</span></div>
+          <div class="line">Далее <span>Настройщик</span></div>
+          <div class="line">Подготовить <span>актуализировать схемы и согласовать на TDR встрече</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="sprint4">
+      <h2>Суперспринт 4, спринт 19-20: процесс взаимодействия и план</h2>
+      <div class="prose">
+        <p><strong>Процесс взаимодействия AI-команды и Базовой платформы зафиксирован схемой.</strong> AI-команда готовит демо, проходит TDR, передаёт требования, разрабатывает на зеркальном стенде, синхронизируется с инкрементом платформы и сама выпускает сервисы сначала в параллельный BP Platform, затем в BP Platform. Базовая платформа решает о сроках, консультирует, доставляет инкремент и выпускает релиз Dev и Prod.</p>
+        <p><strong>Постоянно работают три петли.</strong> Обновлённые требования и версия целевого представления идут в платформу через TDR, скиллы vibe-coding, тестов и рефакторинга обе команды улучшают вместе, каждое временное решение разбираем методом пяти почему.</p>
+      </div>
+      <div class="shot zoomable" style="margin-top:8px">
+        <img src="ml-interaction-2026-10-26.png" alt="Процесс взаимодействия AI-команды и Базовой платформы" />
+        <div class="cap">Процесс взаимодействия AI-команды и Базовой платформы, доска Figma AI products arch, 26 октября.</div>
+      </div>
+      <div class="glass panel plan-wrap">
+        <table class="plan">
+          <tr><th>Шаг</th><th>Что происходит</th><th>Ответственные</th></tr>
+          <tr><td>0</td><td>Подготовка демо функции, агента или сервиса</td><td>AI-команда</td></tr>
+          <tr><td>1</td><td>TDR по сервису: TDR-документ, советы платформы, целевое и итерационное представление</td><td>Саша Котовенко, Алексей, советует Максим</td></tr>
+          <tr><td>2</td><td>Передача требований с контрактом и метриками, решение о срочности и сроках</td><td>Алексей передаёт, решают Виктор и Максим</td></tr>
+          <tr><td>3</td><td>Разработка агентов на зеркальном стенде со своим ревью, консультации по коду</td><td>Саша Котовенко, советует Максим</td></tr>
+          <tr><td>4</td><td>Доставка инкремента и контракта, синхронизация сервисов AI</td><td>Виктор и Максим, Саша Котовенко</td></tr>
+          <tr><td>5, 5.1</td><td>Релиз в параллельный BP Platform, Prod Beta, затем в BP Platform и запрос на релиз</td><td>AI-команда</td></tr>
+          <tr><td>6, 6.1</td><td>Dev стенд обновляется, уведомления о версиях, релиз Базовой платформы Dev</td><td>Максим, Виктор</td></tr>
+          <tr><td>7</td><td>Релиз BP Platform Prod</td><td>Базовая платформа</td></tr>
+        </table>
+      </div>
+      <h3 style="margin:28px 0 12px;font-size:20px">Гант суперспринта</h3>
+      <div class="shot zoomable" style="margin-top:16px">
+        <img src="ml-gantt-2026-10-26.png" alt="Гант суперспринта" />
+        <div class="cap">Гант суперспринта, доска Figma AI products arch, 26 октября.</div>
+      </div>
+      <p class="figma-row"><a class="figma-btn" href="https://www.figma.com/board/7J79YJJbjU0WbuVBzxm8J6/AI-products-achr?node-id=77-437" target="_blank" rel="noopener">Схема и гант в Figma</a></p>
+    </section>
+
+    <footer>Собрано 28 октября 2026. Источники: документ «Взаимодействие AI-команды и Базовой платформы: правила и план» от 26 октября и страница «Экспертиза работы AI ML команды».</footer>
+  </div>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <div class="lb-stage" id="lb-stage">
+      <img id="lb-img" alt="Схема крупно" draggable="false" />
+    </div>
+    <div class="lb-bar">
+      <p>Колёсико приближает, перетаскивание двигает схему</p>
+      <div class="lb-actions">
+        <button type="button" data-act="out">−</button>
+        <button type="button" data-act="in">+</button>
+        <button type="button" data-act="fit">Вся схема</button>
+        <button type="button" data-act="close">Закрыть</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var shots = document.querySelectorAll(".shot.zoomable img");
+      var shot = shots[0];
+      var lb = document.getElementById("lightbox");
+      var stage = document.getElementById("lb-stage");
+      var img = document.getElementById("lb-img");
+      var scale = 1;
+      var x = 0;
+      var y = 0;
+      var dragging = false;
+      var originX = 0;
+      var originY = 0;
+
+      function layout() {
+        img.style.width = (img.naturalWidth * scale) + "px";
+        img.style.height = (img.naturalHeight * scale) + "px";
+        img.style.left = x + "px";
+        img.style.top = y + "px";
+        img.classList.add("ready");
+      }
+
+      function closeScale() {
+        return Math.max((stage.clientWidth - 24) / img.naturalWidth, 0.05);
+      }
+
+      function fitScale() {
+        var w = (stage.clientWidth - 32) / img.naturalWidth;
+        var h = (stage.clientHeight - 88) / img.naturalHeight;
+        return Math.min(w, h);
+      }
+
+      function showClose() {
+        scale = closeScale();
+        x = (stage.clientWidth - img.naturalWidth * scale) / 2;
+        y = 16;
+        layout();
+      }
+
+      function showFit() {
+        scale = fitScale();
+        x = (stage.clientWidth - img.naturalWidth * scale) / 2;
+        y = (stage.clientHeight - 72 - img.naturalHeight * scale) / 2;
+        if (y < 16) y = 16;
+        layout();
+      }
+
+      function zoomAt(next, cx, cy) {
+        var min = fitScale() * 0.85;
+        var max = 2;
+        next = Math.min(max, Math.max(min, next));
+        var k = next / scale;
+        x = cx - (cx - x) * k;
+        y = cy - (cy - y) * k;
+        scale = next;
+        layout();
+      }
+
+      function open(e) {
+        if (e && e.currentTarget) shot = e.currentTarget;
+        img.src = shot.currentSrc || shot.src;
+        lb.hidden = false;
+        document.body.style.overflow = "hidden";
+        if (img.complete && img.naturalWidth) showClose();
+      }
+
+      function close() {
+        lb.hidden = true;
+        document.body.style.overflow = "";
+        dragging = false;
+        stage.classList.remove("grabbing");
+      }
+
+      img.addEventListener("load", function () {
+        if (!lb.hidden) showClose();
+      });
+
+      shots.forEach(function (el) { el.addEventListener("click", open); });
+
+      stage.addEventListener("wheel", function (e) {
+        e.preventDefault();
+        var rect = stage.getBoundingClientRect();
+        var factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        zoomAt(scale * factor, e.clientX - rect.left, e.clientY - rect.top);
+      }, { passive: false });
+
+      stage.addEventListener("pointerdown", function (e) {
+        if (e.button !== 0) return;
+        dragging = true;
+        stage.classList.add("grabbing");
+        originX = e.clientX - x;
+        originY = e.clientY - y;
+        stage.setPointerCapture(e.pointerId);
+      });
+      stage.addEventListener("pointermove", function (e) {
+        if (!dragging) return;
+        x = e.clientX - originX;
+        y = e.clientY - originY;
+        layout();
+      });
+      function stopDrag() {
+        dragging = false;
+        stage.classList.remove("grabbing");
+      }
+      stage.addEventListener("pointerup", stopDrag);
+      stage.addEventListener("pointercancel", stopDrag);
+
+      stage.addEventListener("dblclick", function (e) {
+        var rect = stage.getBoundingClientRect();
+        var target = scale < closeScale() * 1.05 ? 1 : closeScale();
+        zoomAt(target, e.clientX - rect.left, e.clientY - rect.top);
+      });
+
+      document.querySelector(".lb-actions").addEventListener("click", function (e) {
+        var btn = e.target.closest("button");
+        if (!btn) return;
+        var act = btn.getAttribute("data-act");
+        var rect = stage.getBoundingClientRect();
+        if (act === "in") zoomAt(scale * 1.25, rect.width / 2, rect.height / 2);
+        if (act === "out") zoomAt(scale / 1.25, rect.width / 2, rect.height / 2);
+        if (act === "fit") showFit();
+        if (act === "close") close();
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (lb.hidden) return;
+        if (e.key === "Escape") close();
+      });
+    })();
+  </script>
+</body>
+</html>
