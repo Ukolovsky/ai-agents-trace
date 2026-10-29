@@ -83,7 +83,7 @@ h3.sec{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
 <div class="page">
 <div class="paper"><h2>Как пользоваться</h2>
 <div class="sub" style="font-size:14px;line-height:20px;color:var(--text)">Вариант 1: скачайте шаблон (листы «Люди», «Календарь», «Бэклог»), заполните и загрузите обратно.<br>Вариант 2: заполните ниже «Люди и календарь» и бэклог. Статусы ставятся кликом по задаче на Ганте, всё остальное пересчитывается само и сохраняется в браузере.</div>
-<div class="toolbar" style="margin-top:12px;flex-wrap:wrap"><div class="field" style="margin:0"><label>Команда</label><select id="selSpace" style="min-width:160px"></select></div><div class="field" style="margin:0"><label>Суперспринт</label><select id="selSS" style="min-width:240px"></select></div><button class="btn" id="bNextSS" style="align-self:flex-end">+ Следующий суперспринт</button><span style="flex-basis:100%;height:0"></span><button class="btn contained" id="bTpl">Скачать шаблон</button><button class="btn" id="bLoad">Загрузить шаблон</button><span class="saved" id="saved"></span>
+<div class="toolbar" style="margin-top:12px;flex-wrap:wrap"><div class="field" style="margin:0"><label>Команда</label><select id="selSpace" style="min-width:160px"></select></div><div class="field" style="margin:0"><label>Суперспринт</label><select id="selSS" style="min-width:240px"></select></div><button class="btn" id="bNextSS" style="align-self:flex-end">+ Следующий суперспринт</button><span style="flex-basis:100%;height:0"></span><button class="btn contained" id="bTpl">Скачать шаблон</button><button class="btn" id="bLoad">Загрузить шаблон</button><button class="btn" id="bExpState" title="Скачать sprint-state.json: всё сохранённое в этом браузере состояние страницы">Экспорт состояния</button><span class="saved" id="saved"></span>
 <input type="file" id="fTpl" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden></div></div>
 <div class="paper"><h2>Люди и календарь</h2><div class="sub">Ёмкость людей и даты. Встречи вычитаются из рабочего дня, буфер оставляется на непредвиденное и ревью.</div><div id="settings"></div></div>
 <details class="paper" id="blBox"><summary style="cursor:pointer;list-style:none"><h2 style="display:inline">▸ Бэклог <span class="chip counter" id="chipRows"></span></h2> <span class="sub" style="margin-left:8px">задача, ответственный, часы, приоритет · развернуть</span></summary>
@@ -146,7 +146,10 @@ h3.sec{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
 const EXAMPLE=document.getElementById('data').textContent;const LS='bp-sprint-planning-public-v6';
 const localToday=()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');};
 const DEF_SPACES=['AI','Enablement','Platform','RND','Marketing','DEVOPS','Backend','Frontend','QA'];
-const SEED=JSON.parse(document.getElementById('seed').textContent||'{}');if(!SEED.AI)SEED.AI=JSON.parse(EXAMPLE);
+const SEED=JSON.parse(document.getElementById('seed').textContent||'{}');
+ /* общий SEED: при новой версии сида состояние браузера заменяется сидом */
+ const SMETA=SEED.__meta||null;delete SEED.__meta;
+ try{if(SMETA&&SMETA.v&&SMETA.ls&&localStorage.getItem(LS+':seedv')!==SMETA.v){Object.keys(localStorage).filter(k=>k.startsWith(LS+':')).forEach(k=>localStorage.removeItem(k));Object.entries(SMETA.ls).forEach(([k,v])=>localStorage.setItem(LS+':'+k,v));localStorage.setItem(LS+':seedv',SMETA.v);}}catch(e){}if(!SEED.AI)SEED.AI=JSON.parse(EXAMPLE);
 let IDX;try{IDX=JSON.parse(localStorage.getItem(LS+':idx')||'null');}catch(e){IDX=null;}
 if(!IDX)IDX={spaces:DEF_SPACES.slice(),cur:'AI',ss:{}};
 function ssOf(sp){if(!IDX.ss[sp]){const s=SEED[sp];IDX.ss[sp]={list:[{id:'ss1',name:s?s.config.superSprint.name:'Суперспринт 1',start:s?s.config.superSprint.start:''}],cur:'ss1'};}return IDX.ss[sp];}
@@ -897,7 +900,10 @@ const XL=(()=>{const enc=new TextEncoder();
 /* ===== сохранение ===== */
 let saveT=null;function scheduleSave(){clearTimeout(saveT);saveT=setTimeout(()=>{try{saveNow();const n=new Date();$('saved').textContent='✓ сохранено в '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}catch(e){$('saved').textContent='⚠ не удалось сохранить: '+e.message;$('saved').style.color='#F32A16';}},400);}
 function syncInputs(){$('today').value=D.sprint.today;$('buf').value=D.sprint.buffer;$('dayH').value=D.sprint.dayHours;}
-$('todayReset').addEventListener('click',()=>{$('today').value=localToday();render();});
+$('bExpState').addEventListener('click',()=>{saveNow();const keys={};Object.keys(localStorage).filter(k=>k.startsWith(LS+':')&&k!==LS+':seedv').sort().forEach(k=>keys[k.slice(LS.length+1)]=localStorage.getItem(k));
+  const out={format:'bp-sprint-state',formatVersion:1,source:LS,exported:new Date().toISOString(),seedVersionInBrowser:localStorage.getItem(LS+':seedv'),keys};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));a.download='sprint-state.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);});
+ $('todayReset').addEventListener('click',()=>{$('today').value=localToday();render();});
 $('resetLink').addEventListener('click',e=>{e.preventDefault();if(!confirm('Сбросить данные команды «'+IDX.cur+'» в этом суперспринте к исходным?'))return;localStorage.removeItem(KEY());location.reload();});
 /* ===== шаблон XLSX ===== */
 const WD=['Пн','Вт','Ср','Чт','Пт'];
