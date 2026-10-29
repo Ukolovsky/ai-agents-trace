@@ -70,6 +70,8 @@ textarea{font-family:monospace;font-size:12px;width:100%;border:1px solid var(--
 .step b{font-size:16px}.step p{margin:8px 0 0;line-height:20px;color:var(--text)}
 h3.sec{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
 @media(max-width:1100px){.steps{grid-template-columns:1fr}}
+
+#settings{overflow-x:auto;max-width:100%}.paper{min-width:0;max-width:100%;box-sizing:border-box}.scroll{overflow-x:auto}svg{max-width:100%}
 </style></head><body>
 <div class="app-header"><span class="sec">Планирование · AI+CPQ и ML-команда</span><span class="note">Рабочий инструмент · данные хранятся только в этом браузере · не публиковать</span></div>
 <div class="page">
@@ -416,11 +418,20 @@ function drawGantt(P){const svg=$('gantt');while(svg.firstChild)svg.removeChild(
 
 /* ===== таблица бэклога ===== */
 const OPEN=new Set();
-function drawTable(P){{const ba=$('blAppr');if(ba)ba.innerHTML='<span class="sub" style="margin:0 10px 0 0">Утвердить план спринта:</span>'+apprBar();}const ts=visTasks().slice().sort((a,b)=>a.person.localeCompare(b.person)||a.prio-b.prio);$('chipRows').textContent=ts.length;
+function drawTable(P){{const ba=$('blAppr');if(ba)ba.innerHTML='<span class="sub" style="margin:0 10px 0 0">Утвердить план спринта:</span>'+apprBar();}const ts=visTasks().slice().sort((a,b)=>(!a.person)-(!b.person)||(a.person||'').localeCompare(b.person||'')||a.prio-b.prio);$('chipRows').textContent=ts.length;
  const pp=D.people.map(p=>[p.id,p.name]);let h='<tr><th>Задача (инкремент ≤ 3–5 дней до ревью)</th><th>Ответственный</th><th>Часы</th><th>Приоритет</th><th>Ревьюер</th><th>Зависит от (все должны быть приняты)</th><th></th></tr>';
- ts.forEach(t=>{const x=P.R[t.id];h+=`<tr data-id="${esc(t.id)}"><td><input data-f="title" value="${esc(t.title)}" placeholder="Что сделать" style="width:420px"></td><td><select data-f="person">${pp.map(o=>`<option value="${esc(o[0])}"${o[0]===t.person?' selected':''}>${esc(o[1])}</option>`).join('')}</select></td>
- <td><input type="number" min="0" step="0.5" data-f="est" value="${t.est}" style="width:70px">${x.durFlag==='bad'?' <span style="color:#FF5722" title="Больше 5 рабочих дней до ревью">⚠ разбить</span>':''}</td><td><input type="number" min="0" data-f="prio" value="${t.prio}" style="width:56px"></td><td><select data-f="reviewer">${revOpts(t.reviewer)}</select>${t.revSet?'':' <span class="sub" style="margin:0" title="по правилу ролей">авто</span>'}</td><td><select multiple size="2" data-f="dep" title="Ctrl/Cmd+клик — несколько" style="width:200px;font-size:11px">${D.tasks.filter(q=>q.id!==t.id).map(q=>`<option value="${esc(q.id)}"${deps(t).includes(q.id)?' selected':''}>${esc((q.id+' '+q.title).slice(0,40))}</option>`).join('')}</select></td><td><button class="ib" data-a="del" title="Удалить">✕</button></td></tr>`;});
+ ts.forEach(t=>{const x=P.R[t.id];h+=`<tr data-id="${esc(t.id)}"><td><input data-f="title" value="${esc(t.title)}" placeholder="Что сделать" style="width:420px"></td><td><select data-f="person">${t.person?'':'<option value="" selected>— выберите —</option>'}${pp.map(o=>`<option value="${esc(o[0])}"${o[0]===t.person?' selected':''}>${esc(o[1])}</option>`).join('')}</select></td>
+ <td><input type="number" min="0" step="0.5" data-f="est" value="${t.est}" style="width:70px">${x.durFlag==='bad'?' <span style="color:#FF5722" title="Больше 5 рабочих дней до ревью">⚠ разбить</span>':''}</td><td><input type="number" min="0" data-f="prio" value="${t.prio}" style="width:56px"></td><td><select data-f="reviewer">${revOpts(t.reviewer)}</select>${t.revSet?'':' <span class="sub" style="margin:0" title="по правилу ролей">авто</span>'}</td><td><div class="depc" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;max-width:260px">${deps(t).map(d=>{const q=task(d);return `<span style="background:#EEF0FB;border-radius:10px;padding:1px 4px 1px 8px;font-size:11px;white-space:nowrap" title="${esc(q?q.title:d)}">${esc((d+' '+(q?q.title:'')).slice(0,26))} <b data-a="depRm" data-d="${esc(d)}" style="cursor:pointer;color:#85868A;padding:0 3px">×</b></span>`;}).join('')}<button class="ib" data-a="depAdd" style="font-size:11px;padding:1px 6px">${deps(t).length?'＋':'＋ зависимость'}</button></div></td><td><button class="ib" data-a="del" title="Удалить">✕</button></td></tr>`;});
  $('tbl').innerHTML=h;}
+let DEPP=null;
+function depPopOpen(id,el){let d=document.getElementById('depPop');if(!d){d=document.createElement('div');d.id='depPop';d.style.cssText='position:absolute;z-index:60;background:#fff;border:1px solid #D5D7E0;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.15);padding:8px;width:340px;font-size:12px';document.body.appendChild(d);
+ d.addEventListener('input',e=>{if(e.target.id==='depQ')depPopList();});
+ d.addEventListener('change',e=>{const c=e.target;if(!c.dataset.dq)return;const t=task(DEPP.id);let L=deps(t);if(c.checked){const v=L.concat(c.dataset.dq).join(',');if(depCycle(t.id,v)){alert('Получится циклическая зависимость');c.checked=false;return;}L.push(c.dataset.dq);}else L=L.filter(x=>x!==c.dataset.dq);t.dep=L.join(',');render();});
+ document.addEventListener('mousedown',e=>{if(DEPP&&!d.contains(e.target)&&!(e.target.dataset&&e.target.dataset.a==='depAdd')){d.style.display='none';DEPP=null;}});}
+ DEPP={id};const r=el.getBoundingClientRect();d.style.left=Math.max(4,Math.min(r.left+scrollX,scrollX+innerWidth-350))+'px';d.style.top=(r.bottom+scrollY+4)+'px';
+ d.innerHTML='<div style="display:flex;gap:6px;margin-bottom:6px"><input id="depQ" placeholder="Поиск задачи" style="flex:1"><button class="ib" onclick="this.closest(\'#depPop\').style.display=\'none\'">✕</button></div><div id="depL" style="max-height:260px;overflow:auto"></div><div class="sub" style="margin:6px 0 0">Отметьте задачи, которые должны быть приняты раньше.</div>';d.style.display='block';depPopList();d.querySelector('#depQ').focus();}
+function depPopList(){const d=document.getElementById('depPop');if(!d||!DEPP)return;const t=task(DEPP.id);if(!t){d.style.display='none';return;}const q=(d.querySelector('#depQ').value||'').toLowerCase(),L=deps(t);
+ d.querySelector('#depL').innerHTML=D.tasks.filter(x=>x.id!==t.id&&(!q||(x.id+' '+x.title).toLowerCase().includes(q))).sort((a,b)=>L.includes(b.id)-L.includes(a.id)).map(x=>`<label style="display:flex;gap:6px;padding:3px 2px;align-items:flex-start;cursor:pointer"><input type="checkbox" data-dq="${esc(x.id)}"${L.includes(x.id)?' checked':''}><span><b>${esc(x.id)}</b> ${esc(x.title)}</span></label>`).join('')||'<div class="sub">Ничего не найдено</div>';}
 function renameTask(o,n){const t=task(o);t.id=n;if(D.hist[o]){D.hist[n]=D.hist[o];delete D.hist[o];}if(F.task===o)F.task=n;color[n]=color[o];if(OPEN.has(o)){OPEN.delete(o);OPEN.add(n);}}
 $('tbl').addEventListener('change',e=>{const f=e.target.dataset.f;if(!f)return;const t=task(e.target.closest('tr').dataset.id);let v=e.target.value;if(f==='reviewer')t.revSet=true;
  if(f==='dep'){v=[...e.target.selectedOptions].map(o=>o.value).join(',');if(v&&depCycle(t.id,v)){alert('Получится циклическая зависимость');setTimeout(render,0);return;}t.dep=v;setTimeout(render,0);return;}
@@ -431,6 +442,8 @@ $('tbl').addEventListener('change',e=>{const f=e.target.dataset.f;if(!f)return;c
  if(f==='person'&&(!t.reviewer||t.reviewer===v))t.reviewer=rotateRev(v);
  t[f]=v;if(f==='status'&&v==='Принята')t.rem=0;if(f==='blocker'){t.since=v?(t.since||D.sprint.today):'';}setTimeout(render,0);});
 $('tbl').addEventListener('click',e=>{const a=e.target.dataset.a;if(!a)return;const id=e.target.closest('tr').dataset.id,t=task(id);
+  if(a==='depRm'){t.dep=deps(t).filter(d=>d!==e.target.dataset.d).join(',');render();return;}
+  if(a==='depAdd'){depPopOpen(id,e.target);return;}
   if(a==='del'){if(!confirm('Удалить «'+(t.title||id)+'»?'))return;D.tasks=D.tasks.filter(x=>x!==t);delete D.hist[id];if(F.task===id)F.task='all';}
  normalize();render();});
 
@@ -860,7 +873,7 @@ $('fTpl').addEventListener('change',async e=>{const f=e.target.files[0];e.target
   const td=D.sprint.today;D=N;D.sprint.today=td;F.dir=F.person=F.wave=F.task='all';normalize();syncInputs();render();}catch(err){alert('Не удалось загрузить шаблон: '+err.message);}});
 /* ===== бэклог: добавление ===== */
 function rotateRev(pidv,people){people=people||D.people;if(people.length<2)return '';const i=people.findIndex(p=>p.id===pidv);return people[(i+1)%people.length].id;}
-$('addTask').addEventListener('click',()=>{let i=D.tasks.length+1;while(task('T'+i))i++;const id='T'+i;const pid=F.person!=='all'?F.person:(D.people[0]||{}).id;D.tasks.push({id,dir:'Продукт',title:'',person:pid,prio:9,est:16,spent:0,rem:16,status:'Запланировано',type:'План',blocker:'',since:'',reviewer:rotateRev(pid),revH:2,due:''});F.task='all';OPEN.delete(id);render();setTimeout(()=>{const x=document.querySelector(`#tbl tr[data-id="${id}"] input[data-f=title]`);if(x)x.focus();},50);});
+$('addTask').addEventListener('click',()=>{let i=D.tasks.length+1;while(task('T'+i))i++;const id='T'+i;const pid=F.person!=='all'?F.person:'';D.tasks.push({id,dep:'',dir:'Продукт',title:'',person:pid,prio:9,est:16,spent:0,rem:16,status:'Запланировано',type:'План',blocker:'',since:'',reviewer:pid?rotateRev(pid):'',revH:2,due:''});F.task='all';OPEN.delete(id);render();setTimeout(()=>{const x=document.querySelector(`#tbl tr[data-id="${id}"] input[data-f=title]`);if(x)x.focus();},50);});
 window.__dbg={get D(){return D;},get IDX(){return IDX;}};
 /* ===== команды и суперспринты ===== */
 function switchTo(sp,ss){saveNow();IDX.cur=sp;if(ss)ssOf(sp).cur=ss;else ssOf(sp);saveIdx();location.reload();}
