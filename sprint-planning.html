@@ -568,6 +568,9 @@ function honest0(P,T,days){const SP=days.length<DAYS.length?C.sprints.find(s=>s.
   if(t.blocker||t.status==='Пауза/Блокер'||x.blockDays)c.push((t.status==='Пауза/Блокер'&&!t.blocker?'пауза':'блокер')+(x.blockDays?' '+x.blockDays+' раб. дн.':''));
   if(ps&&ps<=today&&(!fs||fs>ps))c.push(fs?'начата '+ruS(fs)+' вместо '+ruS(ps):'не начата, по плану старт '+ruS(ps));
   if(x.overrun>0.5)c.push('+'+h1(x.overrun)+' ч сверх оценки');
+  const fcs=[...Object.keys(x.fc).filter(d=>x.fc[d]>EPS),...(fs?[fs]:[])].sort()[0];if(ps&&fcs&&fcs>ps&&!(ps<=today&&!fs))c.push('старт по прогнозу '+ruS(fcs)+' вместо '+ruS(ps));
+  const pre=T.filter(q=>q!==t&&q.person===t.person&&BL.hrs&&BL.hrs[q.id]&&ps&&Object.keys(BL.hrs[q.id]).sort()[0]<ps).map(q=>({q,l:lagOf(q,P,SP)})).filter(o=>o.l>=1);
+  if(pre.length)c.push('раньше в очереди не сделано по плану: '+pre.slice(0,2).map(o=>tnm(o.q)+' (−'+h1(o.l)+' ч)').join(', ')+(pre.length>2?' и ещё '+(pre.length-2):''));
   const pr=person(t.person);if(pr){const ad=days.filter(d=>absOf(pr,d)).length;if(ad)c.push('отсутствие '+ad+' раб. дн.');}
   const add=T.filter(q=>q.person===t.person&&addedAfter(q,SP));if(add.length)c.push('у исполнителя добавлено после утверждения: '+add.length+' '+zW(add.length)+' / '+h1(add.reduce((a,q)=>a+(+q.est||0),0))+' ч');
   const fc=x.accepted||x.endA;const head='📅 по плану '+SP.id+' приёмка '+(pd?ruS(pd):'—')+', прогноз '+(fc?ruS(fc):'за горизонтом');
