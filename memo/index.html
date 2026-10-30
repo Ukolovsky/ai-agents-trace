@@ -195,7 +195,7 @@ async function load(id,push){
   const m=MAN.find(x=>x.id==id)||MAN[0];if(!m)return;
   if(!cache[m.id]){const r=await fetch('data/'+m.id+'.json',{cache:'no-cache'});cache[m.id]=await r.json()}
   M=cache[m.id];cur='all';arch=false;fN.clear();fS.clear();
-  edits=ls('memo-edits:'+M.id)||{};PREV=ls('memo-prev:'+M.id)||{};rebuild();setTimeout(()=>{if(ls('memo-dirty:'+M.id))push();else pull()},0);
+  edits=ls('memo-edits:'+M.id)||{};PREV=ls('memo-prev:'+M.id)||{};rebuild();setTimeout(()=>{if(ls('memo-dirty:'+M.id))pushSrv();else pull()},0);
   const h='#'+M.id;if(location.hash!==h)history[push?'pushState':'replaceState'](null,'',h);
   document.title=M.title+' — мемо';draw()}
 function draw(){
@@ -288,29 +288,29 @@ function applyRemote(id,v,rev){
   let o={};try{o=v?JSON.parse(v):{}}catch(e){}
   ls('memo-edits:'+id,o.e&&Object.keys(o.e).length?o.e:null);ls('memo-prev:'+id,o.p&&Object.keys(o.p).length?o.p:null);ls('memo-srv:'+id,rev);
   if(M&&M.id==id){edits=o.e||{};PREV=o.p||{};rebuild();if(!(document.activeElement&&document.activeElement.closest('.ed'))&&!PD)render();else PEND=true}}
-function markDirty(){if(!M)return;ls('memo-dirty:'+M.id,1);sync('save');clearTimeout(ptimer);ptimer=setTimeout(push,700)}
+function markDirty(){if(!M)return;ls('memo-dirty:'+M.id,1);sync('save');clearTimeout(ptimer);ptimer=setTimeout(pushSrv,700)}
 function getJSON(url){return fetch(url,{cache:'no-store'}).then(r=>r.json()).catch(()=>new Promise((res,rej)=>{const cb='memoCb'+Date.now();const sc=document.createElement('script');
   window[cb]=d=>{res(d);delete window[cb];sc.remove()};sc.onerror=()=>{rej(new Error('jsonp'));sc.remove()};sc.src=url+'&callback='+cb;document.head.appendChild(sc)}))}
 async function pull(){
-  if(!M||busy)return;const id=M.id;if(ls('memo-dirty:'+id)){push();return}
+  if(!M||busy)return;const id=M.id;if(ls('memo-dirty:'+id)){pushSrv();return}
   try{const d=await getJSON(API+'?ns=memo&since=0&t='+Date.now());if(!d.ok)throw 0;
     const k=d.keys[KEYP+id];const have=ls('memo-srv:'+id)||0;
     if(k&&k.rev!=have&&!ls('memo-dirty:'+id))applyRemote(id,k.v,k.rev);
     if(!ls('memo-dirty:'+id))sync('ok')}catch(e){sync('bad')}}
-async function push(force){
-  if(!M)return;const id=M.id;if(busy){clearTimeout(ptimer);ptimer=setTimeout(push,500);return}
+async function pushSrv(force){
+  if(!M)return;const id=M.id;if(busy){clearTimeout(ptimer);ptimer=setTimeout(pushSrv,500);return}
   busy=true;sync('save');const key=KEYP+id,val=pack();
   try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({ns:'memo',keys:{[key]:val},base:{[key]:ls('memo-srv:'+id)||0},force:!!force})});
     const d=await r.json();if(!d.ok)throw 0;
-    if(d.conflicts&&d.conflicts.length&&!force){busy=false;return push(true)}
+    if(d.conflicts&&d.conflicts.length&&!force){busy=false;return pushSrv(true)}
     if(d.saved&&d.saved.includes(key))ls('memo-srv:'+id,d.rev);
     if(M.id==id&&pack()===val)ls('memo-dirty:'+id,null);busy=false;
-    if(ls('memo-dirty:'+id))push();else sync('ok')}
+    if(ls('memo-dirty:'+id))pushSrv();else sync('ok')}
   catch(e){busy=false;sync('bad')}}
 setInterval(pull,20000);
 window.addEventListener('focus',pull);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
-window.addEventListener('online',()=>{if(M&&ls('memo-dirty:'+M.id))push();else pull()});
+window.addEventListener('online',()=>{if(M&&ls('memo-dirty:'+M.id))pushSrv();else pull()});
 (async()=>{
   MAN=(await (await fetch('data/manifest.json',{cache:'no-cache'})).json()).sort((a,b)=>b.date.localeCompare(a.date)||a.title.localeCompare(b.title,'ru'));
   DATES=[...new Set(MAN.map(x=>x.date))];
