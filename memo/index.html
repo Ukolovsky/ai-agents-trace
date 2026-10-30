@@ -101,6 +101,15 @@ select.nb{appearance:auto;padding:0 10px}
 .ed:hover{background:var(--lav-soft)}
 .ed:hover::after{content:" ✎";color:var(--orange-ink)}
 .ed:focus::after{content:""}
+.st{display:block;width:100%;appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;padding:4px 22px 4px 8px;border-radius:999px;font:inherit;font-size:12px;line-height:1.4;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 12px) 50%,calc(100% - 8px) 50%;background-size:4px 4px;background-repeat:no-repeat}
+.st option,.st optgroup{background:var(--surface);color:var(--text)}
+.st-confirm{background-color:var(--surface);color:var(--navy);border:1px solid var(--navy)}
+.st-question{background-color:var(--orange);color:#FFFFFF;border:1px solid var(--orange)}
+.st-backlog{background-color:var(--grey);color:var(--text);border:1px solid var(--grey)}
+.st-progress{background-color:var(--lav-soft);color:var(--navy-ink);border:1px solid var(--lav)}
+.st-done{background-color:var(--navy);color:var(--on-navy);border:1px solid var(--navy)}
+.st-archive{background-color:transparent;color:var(--faint);border:1px dashed var(--faint)}
+.fb[aria-pressed="true"]{background:var(--lav-soft)}
 .ehint{display:flex;align-items:center;gap:6px;background:var(--lav-soft);color:var(--navy-ink);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:13px}
 .ed:focus{background:var(--lav-soft);box-shadow:0 0 0 2px var(--orange)}
 tr.chg td:first-child{box-shadow:inset 3px 0 0 var(--orange)}
@@ -132,6 +141,7 @@ button.chip{cursor:pointer;font-family:inherit}
   </section>
   <div class="top">
     <div class="tabs" id="nav" role="tablist" aria-label="Разделы"></div>
+    <button class="fb" id="ar" aria-pressed="false">Архив<span class="badge" id="ab" hidden></span></button>
     <button class="fb" id="fb" aria-expanded="false" aria-controls="side">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v2.2a2 2 0 0 1-.6 1.4L15 12v7l-6 2v-8.5L4.5 7.5A2 2 0 0 1 4 6.2z"/></svg>
       Фильтры<span class="badge" id="bd" hidden></span>
@@ -141,7 +151,7 @@ button.chip{cursor:pointer;font-family:inherit}
     <section class="card">
       <div class="hd"><span class="h" id="ttl">Все задачи</span><span class="n" id="cnt"></span>
         <span class="eb"><span class="n" id="ec"></span><button id="ex">Экспорт правок</button><button id="er">Сбросить правки</button></span></div>
-      <p class="ehint">✎ Щёлкните по тексту задачи или исполнителю, чтобы исправить; по статусу, чтобы сменить. Enter сохраняет, Esc отменяет.</p>
+      <p class="ehint">✎ Щёлкните по тексту задачи или исполнителю, чтобы исправить (Enter сохраняет, Esc отменяет). Статус выбирается из списка: разбор (Подтвердить, Есть вопросы, Отложить в бэклог), работа (В процессе, Выполнено) или «Удалить в архив». Галочка ставит «Выполнено», счётчик считает выполненные без архива.</p>
       <div class="tw"><table><colgroup id="cg"></colgroup><thead id="th"></thead><tbody id="tb"></tbody></table></div>
       <p class="hint">Правки видны только в этом браузере, пока их не опубликуют.</p>
     </section>
@@ -161,26 +171,27 @@ button.chip{cursor:pointer;font-family:inherit}
 </main>
 <div class="toast" id="toast" role="status"></div>
 <script>
-const S={a:['s1','Выполнить'],b:['s2','Решить'],c:['s3','Отложить']};
-const NEXT={a:'b',b:'c',c:'a'};
+const S={confirm:'Подтвердить',question:'Есть вопросы',backlog:'Отложить в бэклог',progress:'В процессе',done:'Выполнено',archive:'В архиве (не согласовано)'};
+const GR=[['Разбор',['confirm','question','backlog']],['Работа',['progress','done']],['Архив',['archive']]];
+const OLD={a:'confirm',b:'question',c:'backlog'};const ns=x=>OLD[x]||(S[x]?x:'confirm');
 const CK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
 const MN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>';
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const $=id=>document.getElementById(id);
 const fd=d=>d.split('-').reverse().join('.');
-let MAN=[],DATES=[],M=null,D=[],cur='all',open=false,done=new Set(),edits={};
+let MAN=[],DATES=[],M=null,D=[],cur='all',open=false,arch=false,done=new Set(),edits={};
 const fN=new Set(),fS=new Set(),cache={};
 const ls=(k,v)=>{try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),2000)}
-const row=i=>{const b=M.tasks[i],e=edits[i]||{};return[b[0],e.t??b[1],e.w??b[2],e.s??b[3]]};
+const row=i=>{const b=M.tasks[i],e=edits[i]||{};return[b[0],e.t??b[1],e.w??b[2],ns(e.s??b[3])]};
 function rebuild(){D=M.tasks.map((_,i)=>row(i))}
-function saveEd(){for(const k in edits){const b=M.tasks[k],e=edits[k];if(e.t===b[1])delete e.t;if(e.w===b[2])delete e.w;if(e.s===b[3])delete e.s;if(!Object.keys(e).length)delete edits[k]}
+function saveEd(){for(const k in edits){const b=M.tasks[k],e=edits[k];if(e.t===b[1])delete e.t;if(e.w===b[2])delete e.w;if(e.s!==undefined&&ns(e.s)===ns(b[3]))delete e.s;if(!Object.keys(e).length)delete edits[k]}
   ls('memo-edits:'+M.id,Object.keys(edits).length?edits:null);rebuild()}
 async function load(id,push){
   const m=MAN.find(x=>x.id==id)||MAN[0];if(!m)return;
   if(!cache[m.id]){const r=await fetch('data/'+m.id+'.json',{cache:'no-cache'});cache[m.id]=await r.json()}
-  M=cache[m.id];cur='all';fN.clear();fS.clear();
-  done=new Set(ls(M.id)||[]);edits=ls('memo-edits:'+M.id)||{};rebuild();
+  M=cache[m.id];cur='all';arch=false;fN.clear();fS.clear();
+  edits=ls('memo-edits:'+M.id)||{};rebuild();
   const h='#'+M.id;if(location.hash!==h)history[push?'pushState':'replaceState'](null,'',h);
   document.title=M.title+' — мемо';draw()}
 function draw(){
@@ -190,7 +201,7 @@ function draw(){
   $('h1').textContent=M.title;$('lead').textContent=M.lead||'';
   $('pp').innerHTML=(M.people||[]).map(p=>`<span class="p"><span class="av">${esc(p[0])}</span>${esc(p)}</span>`).join('');
   render()}
-const vis=()=>D.map((d,i)=>[d,i]).filter(([d])=>(cur=='all'||d[0]==cur)&&(!fN.size||d[2].split(', ').some(n=>fN.has(n)))&&(!fS.size||fS.has(d[3])));
+const vis=()=>D.map((d,i)=>[d,i]).filter(([d])=>(cur=='all'||d[0]==cur)&&(!fN.size||d[2].split(', ').some(n=>fN.has(n)))&&(arch?d[3]=='archive':d[3]!='archive'&&(!fS.size||fS.has(d[3]))));
 const box=on=>`<span class="cb ${on?'on':''}" aria-hidden="true">${on?CK:''}</span>`;
 function renderScn(){
   const el=$('scn'),SCN=M.scn||{},SEC=M.sec;
@@ -206,20 +217,24 @@ function render(){
   $('fb').setAttribute('aria-expanded',open);
   const k=fN.size+fS.size;$('bd').hidden=!k;$('bd').textContent=k;
   $('on').innerHTML=NAMES.map(n=>`<div class="row" role="checkbox" tabindex="0" aria-checked="${fN.has(n)}" data-n="${esc(n)}">${box(fN.has(n))}${esc(n)}</div>`).join('');
-  $('os').innerHTML=Object.entries(S).map(([x,v])=>`<div class="row" role="checkbox" tabindex="0" aria-checked="${fS.has(x)}" data-s="${x}">${box(fS.has(x))}${v[1]}</div>`).join('');
+  $('os').innerHTML=Object.entries(S).filter(([x])=>x!='archive').map(([x,v])=>`<div class="row" role="checkbox" tabindex="0" aria-checked="${fS.has(x)}" data-s="${x}">${box(fS.has(x))}${v}</div>`).join('');
   $('rs').style.visibility=k?'visible':'hidden';
   const ne=Object.keys(edits).length;$('ec').textContent=ne?'Изменено строк: '+ne:'';$('ex').disabled=$('er').disabled=!ne;
   const compact=open&&window.innerWidth<1100;
-  const rows=vis();const n=rows.filter(([,i])=>done.has(i)).length;
-  $('cnt').textContent=n+' из '+rows.length;
-  const full=n==rows.length&&n;
+  const rows=vis();const n=rows.filter(([d])=>d[3]=='done').length;const na=D.filter(d=>d[3]=='archive').length;
+  $('ab').hidden=!na;$('ab').textContent=na;$('ar').setAttribute('aria-pressed',arch);
+  if(arch)$('ttl').textContent='Архив: не согласовано';
+  $('cnt').textContent=arch?'задач: '+rows.length:n+' из '+rows.length+' выполнено';
+  const full=n==rows.length&&n;const dn=i=>D[i][3]=='done';
   const allBox=`<button class="cb ${full?'on':n?'part':''}" id="all" role="checkbox" aria-checked="${full?'true':n?'mixed':'false'}" aria-label="Отметить все">${full?CK:n?MN:''}</button>`;
-  $('cg').innerHTML=compact?'<col style="width:48px"><col><col style="width:116px">':'<col style="width:48px"><col><col style="width:170px"><col style="width:120px">';
+  $('cg').innerHTML=compact?'<col style="width:48px"><col><col style="width:160px">':'<col style="width:48px"><col><col style="width:170px"><col style="width:190px">';
   $('th').innerHTML=`<tr><th class="c">${allBox}</th><th>Задача</th>${compact?'':'<th>Кто</th>'}<th>Статус</th></tr>`;
   const ed=(i,f,v)=>`<span class="ed" contenteditable="plaintext-only" spellcheck="false" data-e="${f}" data-r="${i}" title="Щёлкните, чтобы исправить">${esc(v)}</span>`;
-  $('tb').innerHTML=rows.length?rows.map(([d,i])=>`<tr class="${done.has(i)?'done':''} ${edits[i]?'chg':''}"><td class="c"><button class="cb ${done.has(i)?'on':''}" data-i="${i}" role="checkbox" aria-checked="${done.has(i)}" aria-label="Выполнено">${done.has(i)?CK:''}</button></td><td class="t">${ed(i,'t',d[1])}${edits[i]?'<span class="mk">изменено</span>':''}${compact?`<span class="sub">${ed(i,'w',d[2])}</span>`:''}</td>${compact?'':`<td>${ed(i,'w',d[2])}</td>`}<td><button class="chip ${S[d[3]][0]}" data-st="${i}" title="Щёлкните, чтобы сменить статус">${S[d[3]][1]}</button></td></tr>`).join(''):`<tr><td colspan="${compact?3:4}" class="empty">Нет задач под эти фильтры</td></tr>`;
+  $('tb').innerHTML=rows.length?rows.map(([d,i])=>`<tr class="${dn(i)?'done':''} ${edits[i]?'chg':''}"><td class="c"><button class="cb ${dn(i)?'on':''}" data-i="${i}" role="checkbox" aria-checked="${dn(i)}" aria-label="Выполнено">${dn(i)?CK:''}</button></td><td class="t">${ed(i,'t',d[1])}${edits[i]?'<span class="mk">изменено</span>':''}${compact?`<span class="sub">${ed(i,'w',d[2])}</span>`:''}</td>${compact?'':`<td>${ed(i,'w',d[2])}</td>`}<td>${sel(i,d[3])}</td></tr>`).join(''):`<tr><td colspan="${compact?3:4}" class="empty">Нет задач под эти фильтры</td></tr>`;
   renderScn();
 }
+const sel=(i,v)=>`<select class="st st-${v}" data-sel="${i}" aria-label="Статус">`+GR.map(([g,xs])=>`<optgroup label="${g}">`+xs.map(x=>`<option value="${x}" ${x==v?'selected':''}>${x=='archive'&&v!='archive'?'Удалить в архив (не согласовано)':S[x]}</option>`).join('')+'</optgroup>').join('')+'</select>';
+const setSt=(i,v)=>{(edits[i]=edits[i]||{}).s=v;saveEd()};
 const tog=(set,v)=>set.has(v)?set.delete(v):set.add(v);
 function act(t){
   if(t.dataset.m){load(t.dataset.m,true);return}
@@ -229,9 +244,9 @@ function act(t){
   else if(t.id=='rs'){fN.clear();fS.clear()}
   else if(t.dataset.n){tog(fN,t.dataset.n)}
   else if(t.dataset.s){tog(fS,t.dataset.s)}
-  else if(t.dataset.st!==undefined){const i=+t.dataset.st;(edits[i]=edits[i]||{}).s=NEXT[D[i][3]];saveEd()}
-  else if(t.id=='all'){const r=vis();if(!r.length)return;const allOn=r.every(([,i])=>done.has(i));r.forEach(([,i])=>allOn?done.delete(i):done.add(i));ls(M.id,[...done])}
-  else if(t.dataset.i!==undefined){tog(done,+t.dataset.i);ls(M.id,[...done])}
+  else if(t.id=='ar'){arch=!arch}
+  else if(t.id=='all'){const r=vis();if(!r.length)return;const allOn=r.every(([,i])=>D[i][3]=='done');r.forEach(([,i])=>setSt(i,allOn?'progress':'done'))}
+  else if(t.dataset.i!==undefined){const i=+t.dataset.i;setSt(i,D[i][3]=='done'?'progress':'done')}
   else if(t.id=='dp'||t.id=='dn'){const di=DATES.indexOf(M.date)+(t.id=='dp'?1:-1);if(DATES[di]){load(MAN.find(x=>x.date==DATES[di]).id,true)}return}
   else if(t.id=='er'){if(!confirm('Сбросить все правки этой встречи?'))return;edits={};saveEd()}
   else if(t.id=='ex'){const out={id:M.id,exported:new Date().toISOString(),edits:Object.fromEntries(Object.entries(edits).map(([k,e])=>[k,{orig:M.tasks[k],text:e.t,who:e.w,status:e.s}]))};
@@ -243,12 +258,13 @@ async function share(){
   if(navigator.share&&matchMedia('(pointer:coarse)').matches){try{await navigator.share({title:M.title,url});return}catch(e){if(e.name=='AbortError')return}}
   try{await navigator.clipboard.writeText(url);toast('Ссылка скопирована')}
   catch(e){const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Ссылка скопирована')}}
-document.addEventListener('click',e=>{if(e.target.closest('.ed'))return;const t=e.target.closest('[data-m],[data-k],[data-i],[data-n],[data-s],[data-st],#all,#rs,#fb,#cl,#dp,#dn,#er,#ex,#sh');if(t&&!t.disabled)act(t)});
+document.addEventListener('click',e=>{if(e.target.closest('.ed'))return;const t=e.target.closest('[data-m],[data-k],[data-i],[data-n],[data-s],#ar,#all,#rs,#fb,#cl,#dp,#dn,#er,#ex,#sh');if(t&&!t.disabled)act(t)});
 document.addEventListener('keydown',e=>{const ed=e.target.closest('.ed');if(ed){if(e.key=='Enter'){e.preventDefault();ed.blur()}if(e.key=='Escape'){ed.textContent=D[+ed.dataset.r][ed.dataset.e=='t'?1:2];ed.blur()}return}
   if(e.key!==' '&&e.key!=='Enter')return;const t=e.target.closest('.row');if(t){e.preventDefault();act(t)}});
 document.addEventListener('focusout',e=>{const ed=e.target.closest&&e.target.closest('.ed');if(!ed)return;const i=+ed.dataset.r,f=ed.dataset.e;let v=ed.textContent.replace(/\s+/g,' ').trim();
   if(f=='w')v=v.split(/\s*,\s*/).filter(Boolean).join(', ');if(!v){render();return}
   if(v!==D[i][f=='t'?1:2]){(edits[i]=edits[i]||{})[f]=v;saveEd()}render()});
+document.addEventListener('change',e=>{const t=e.target.closest('[data-sel]');if(t){setSt(+t.dataset.sel,t.value);render()}});
 $('ds').addEventListener('change',e=>load(MAN.find(x=>x.date==e.target.value).id,true));
 window.addEventListener('resize',()=>{if(!document.activeElement.closest('.ed'))render()});
 window.addEventListener('hashchange',()=>{const id=decodeURIComponent(location.hash.slice(1));if(M&&id!==M.id)load(id,false)});
