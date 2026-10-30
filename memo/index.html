@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мемо встреч</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#2E3470;--navy-ink:#1F2460;--link:#3A4196;--lav:#A9AED6;--lav-soft:#E4E6F2;--grid:#D9DBE6;--orange:#FF5A1F;--page:#F4F4F6;--surface:#FFFFFF;--text:#2C2C2A;--muted:#5F5E5A;--on-navy:#FFFFFF}
+@media (prefers-color-scheme:dark){:root{--navy:#A9AED6;--navy-ink:#E4E6F2;--link:#C2C6EA;--lav:#3A4196;--lav-soft:#262A4F;--grid:#33365A;--page:#14152A;--surface:#1C1E38;--text:#E8E8EE;--muted:#B4B4C2;--on-navy:#14152A}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font-family:"Fira Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:960px;margin:0 auto;padding:24px 20px 40px}
+.card{background:var(--surface);border:1px solid var(--grid);border-radius:12px;padding:16px}
+h1{font-size:24px;font-weight:600;color:var(--navy-ink);margin:0 0 4px}
+.lead{color:var(--muted);margin:0}
+.list{display:grid;gap:12px;margin-top:16px}
+a.m{display:flex;gap:16px;align-items:center;text-decoration:none;color:inherit;transition:border-color .15s}
+a.m:hover{border-color:var(--navy)}
+a.m:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.d{flex:none;min-width:96px;text-align:center;padding:4px 10px;border-radius:999px;background:var(--navy);color:var(--on-navy);font-size:13px;font-weight:500}
+.t{color:var(--link);font-weight:500;font-size:15px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="card"><h1>Мемо встреч</h1><p class="lead">Задачи и договорённости по встречам, новые сверху.</p></section>
+  <div class="list" id="list"></div>
+</main>
+<script>
+const M=[
+/*MEMO-LIST*/
+["2026-10-30", "Аналитика и Дизайн: помощник по договору, загрузка эталона, Magic Pad, схема входов", "2026-10-30-analitika-dizain.html"],
+];
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fd=d=>d.split('-').reverse().join('.');
+document.getElementById('list').innerHTML=M.slice().sort((a,b)=>b[0].localeCompare(a[0])).map(m=>`<a class="card m" href="${esc(m[2])}"><span class="d">${fd(m[0])}</span><span class="t">${esc(m[1])}</span></a>`).join('');
+</script>
+</body>
+</html>
