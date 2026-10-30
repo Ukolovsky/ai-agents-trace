@@ -99,6 +99,9 @@ select.nb{appearance:auto;padding:0 10px}
 .mt button[aria-selected="true"]{background:var(--navy);color:var(--on-navy)}
 .ed{border-radius:4px;outline:none;cursor:text}
 .ed:hover{background:var(--lav-soft)}
+.ed:hover::after{content:" ✎";color:var(--orange-ink)}
+.ed:focus::after{content:""}
+.ehint{display:flex;align-items:center;gap:6px;background:var(--lav-soft);color:var(--navy-ink);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:13px}
 .ed:focus{background:var(--lav-soft);box-shadow:0 0 0 2px var(--orange)}
 tr.chg td:first-child{box-shadow:inset 3px 0 0 var(--orange)}
 .mk{display:inline-block;margin-left:6px;font-size:11px;color:var(--orange-ink);font-weight:500}
@@ -138,8 +141,9 @@ button.chip{cursor:pointer;font-family:inherit}
     <section class="card">
       <div class="hd"><span class="h" id="ttl">Все задачи</span><span class="n" id="cnt"></span>
         <span class="eb"><span class="n" id="ec"></span><button id="ex">Экспорт правок</button><button id="er">Сбросить правки</button></span></div>
+      <p class="ehint">✎ Щёлкните по тексту задачи или исполнителю, чтобы исправить; по статусу, чтобы сменить. Enter сохраняет, Esc отменяет.</p>
       <div class="tw"><table><colgroup id="cg"></colgroup><thead id="th"></thead><tbody id="tb"></tbody></table></div>
-      <p class="hint">Текст задачи и исполнителя можно исправить, щёлкнув по ним. Статус меняется щелчком по чипу. Правки видны только в этом браузере, пока их не опубликуют.</p>
+      <p class="hint">Правки видны только в этом браузере, пока их не опубликуют.</p>
     </section>
     <aside class="card side" id="side" aria-label="Фильтры">
       <div class="sin">
@@ -212,7 +216,7 @@ function render(){
   const allBox=`<button class="cb ${full?'on':n?'part':''}" id="all" role="checkbox" aria-checked="${full?'true':n?'mixed':'false'}" aria-label="Отметить все">${full?CK:n?MN:''}</button>`;
   $('cg').innerHTML=compact?'<col style="width:48px"><col><col style="width:116px">':'<col style="width:48px"><col><col style="width:170px"><col style="width:120px">';
   $('th').innerHTML=`<tr><th class="c">${allBox}</th><th>Задача</th>${compact?'':'<th>Кто</th>'}<th>Статус</th></tr>`;
-  const ed=(i,f,v)=>`<span class="ed" contenteditable="plaintext-only" spellcheck="false" data-e="${f}" data-r="${i}">${esc(v)}</span>`;
+  const ed=(i,f,v)=>`<span class="ed" contenteditable="plaintext-only" spellcheck="false" data-e="${f}" data-r="${i}" title="Щёлкните, чтобы исправить">${esc(v)}</span>`;
   $('tb').innerHTML=rows.length?rows.map(([d,i])=>`<tr class="${done.has(i)?'done':''} ${edits[i]?'chg':''}"><td class="c"><button class="cb ${done.has(i)?'on':''}" data-i="${i}" role="checkbox" aria-checked="${done.has(i)}" aria-label="Выполнено">${done.has(i)?CK:''}</button></td><td class="t">${ed(i,'t',d[1])}${edits[i]?'<span class="mk">изменено</span>':''}${compact?`<span class="sub">${ed(i,'w',d[2])}</span>`:''}</td>${compact?'':`<td>${ed(i,'w',d[2])}</td>`}<td><button class="chip ${S[d[3]][0]}" data-st="${i}" title="Щёлкните, чтобы сменить статус">${S[d[3]][1]}</button></td></tr>`).join(''):`<tr><td colspan="${compact?3:4}" class="empty">Нет задач под эти фильтры</td></tr>`;
   renderScn();
 }
