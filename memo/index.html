@@ -2,42 +2,259 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Мемо встреч</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#2E3470;--navy-ink:#1F2460;--link:#3A4196;--lav:#A9AED6;--lav-soft:#E4E6F2;--grid:#D9DBE6;--orange:#FF5A1F;--page:#F4F4F6;--surface:#FFFFFF;--text:#2C2C2A;--muted:#5F5E5A;--on-navy:#FFFFFF}
-@media (prefers-color-scheme:dark){:root{--navy:#A9AED6;--navy-ink:#E4E6F2;--link:#C2C6EA;--lav:#3A4196;--lav-soft:#262A4F;--grid:#33365A;--page:#14152A;--surface:#1C1E38;--text:#E8E8EE;--muted:#B4B4C2;--on-navy:#14152A}}
-*{box-sizing:border-box}
+:root{
+  --navy:#2E3470;--navy-ink:#1F2460;--link:#3A4196;--lav:#A9AED6;--lav-soft:#E4E6F2;--grid:#D9DBE6;
+  --orange:#FF5A1F;--orange-ink:#E8501A;--grey:#E3E3E3;
+  --page:#F4F4F6;--surface:#FFFFFF;--text:#2C2C2A;--muted:#5F5E5A;--faint:#8C90B8;--on-navy:#FFFFFF;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --navy:#A9AED6;--navy-ink:#E4E6F2;--link:#C2C6EA;--lav:#3A4196;--lav-soft:#262A4F;--grid:#33365A;
+  --page:#14152A;--surface:#1C1E38;--text:#E8E8EE;--muted:#B4B4C2;--faint:#7E82A8;--on-navy:#14152A;--grey:#3A3B4A;
+}}
+:root[data-theme="dark"]{
+  --navy:#A9AED6;--navy-ink:#E4E6F2;--link:#C2C6EA;--lav:#3A4196;--lav-soft:#262A4F;--grid:#33365A;
+  --page:#14152A;--surface:#1C1E38;--text:#E8E8EE;--muted:#B4B4C2;--faint:#7E82A8;--on-navy:#14152A;--grey:#3A3B4A;
+}
+*,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--page);color:var(--text);font-family:"Fira Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.45}
-.wrap{max-width:960px;margin:0 auto;padding:24px 20px 40px}
-.card{background:var(--surface);border:1px solid var(--grid);border-radius:12px;padding:16px}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 20px 40px}
+.card{background:var(--surface);border:1px solid var(--grid);border-radius:12px;padding:16px;min-width:0}
 h1{font-size:24px;font-weight:600;color:var(--navy-ink);margin:0 0 4px}
-.lead{color:var(--muted);margin:0}
-.list{display:grid;gap:12px;margin-top:16px}
-a.m{display:flex;gap:16px;align-items:center;text-decoration:none;color:inherit;transition:border-color .15s}
-a.m:hover{border-color:var(--navy)}
-a.m:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
-.d{flex:none;min-width:96px;text-align:center;padding:4px 10px;border-radius:999px;background:var(--navy);color:var(--on-navy);font-size:13px;font-weight:500}
-.t{color:var(--link);font-weight:500;font-size:15px}
+.lead{color:var(--muted);margin:0 0 14px}
+.lbl{font-size:13px;font-weight:500;color:var(--navy-ink);margin:0 0 8px}
+.pp{display:flex;flex-wrap:wrap;gap:8px}
+.p{display:inline-flex;align-items:center;gap:8px;padding:3px 12px 3px 3px;border-radius:999px;background:var(--lav-soft);color:var(--navy-ink);font-size:13px}
+.av{width:24px;height:24px;border-radius:50%;background:var(--navy);color:var(--on-navy);font-size:12px;font-weight:500;display:inline-flex;align-items:center;justify-content:center}
+.top{display:flex;gap:12px;align-items:center;margin:16px 0}
+.tabs{flex:1;min-width:0;display:flex;border:1px solid var(--navy);border-radius:8px;overflow:hidden;overflow-x:auto}
+.tabs button{flex:1 0 auto;padding:10px 14px;border:0;border-left:1px solid var(--navy);background:var(--surface);color:var(--navy);font:inherit;font-weight:500;cursor:pointer;white-space:nowrap}
+.tabs button:first-child{border-left:0}
+.tabs button[aria-selected="true"]{background:var(--navy);color:var(--on-navy)}
+.fb{flex:none;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border:1px solid var(--navy);border-radius:8px;background:var(--surface);color:var(--navy);font:inherit;font-weight:500;cursor:pointer}
+.fb[aria-expanded="true"]{background:var(--lav-soft)}
+.badge{background:var(--orange);color:#FFFFFF;border-radius:999px;font-size:12px;padding:0 7px;line-height:18px}
+button:focus-visible,.cb:focus-visible,.row:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.lay{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:stretch}
+.lay.open{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.hd{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.h{font-size:18px;font-weight:600;color:var(--navy-ink)}
+.n{color:var(--muted)}
+.tw{overflow-x:auto}
+table{width:100%;table-layout:fixed;border-collapse:collapse;min-width:420px}
+th{background:var(--lav);color:var(--navy-ink);font-weight:500;text-align:left;padding:10px;border:1px solid var(--lav)}
+td{padding:10px;border:1px solid var(--grid);vertical-align:middle;overflow-wrap:break-word}
+td.t{color:var(--link)}
+td.c,th.c{text-align:center}
+.sub{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.chip{display:block;width:100%;text-align:center;padding:3px 6px;border-radius:999px;font-size:12px;line-height:1.4;white-space:nowrap}
+.s1{background:var(--surface);color:var(--navy);border:1px solid var(--navy)}
+.s2{background:var(--orange);color:#FFFFFF;border:1px solid var(--orange)}
+.s3{background:var(--grey);color:var(--text);border:1px solid var(--grey)}
+.cb{display:inline-flex;flex:none;align-items:center;justify-content:center;width:18px;height:18px;border-radius:2px;border:1.5px solid var(--navy);background:var(--surface);color:var(--on-navy);cursor:pointer;vertical-align:middle;padding:0}
+.cb.on,.cb.part{background:var(--navy)}
+.cb svg{width:12px;height:12px}
+tr.done td.t{color:var(--faint);text-decoration:line-through}
+.empty{padding:32px 10px;text-align:center;color:var(--faint)}
+.side{display:none}
+.lay.open .side{display:block}
+.sin{position:sticky;top:16px}
+.sh{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.x{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--navy);border-radius:8px;background:var(--surface);color:var(--navy);cursor:pointer;padding:0}
+.x svg{width:16px;height:16px}
+.stt{font-size:18px;font-weight:600;color:var(--navy-ink)}
+.grp{font-size:15px;font-weight:500;color:var(--navy-ink);margin:0 0 6px}
+.sec{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--lav-soft)}
+.row{display:flex;align-items:center;gap:10px;padding:5px 0;cursor:pointer;user-select:none}
+.row .cb{pointer-events:none}
+.rs{border:0;background:none;padding:0;color:var(--orange-ink);font:inherit;cursor:pointer}
+@media (max-width:760px){
+  .lay.open{grid-template-columns:minmax(0,1fr)}
+  .lay.open .side{order:-1}
+  .top{flex-wrap:wrap}
+  .tabs{flex-basis:100%}
+}
+.scn{margin-top:16px}.scn:empty{display:none}
+.scn h2{font-size:18px;font-weight:600;color:var(--navy-ink);margin:0 0 4px}
+.scn h3{font-size:15px;font-weight:500;color:var(--navy-ink);margin:18px 0 8px}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.sc{background:var(--surface);border:1px solid var(--grid);border-radius:12px;padding:14px}
+.sc b{display:block;font-weight:500;color:var(--link);margin-bottom:6px}
+.sc p{margin:0;color:var(--text);font-size:13px;line-height:1.5}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 16px}
+.nb{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border:1px solid var(--navy);border-radius:8px;background:var(--surface);color:var(--navy);font:inherit;font-weight:500;cursor:pointer}
+.nb:disabled{opacity:.4;cursor:default}
+select.nb{appearance:auto;padding:0 10px}
+.sp{flex:1}
+.mt{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.mt button{border:1px solid var(--navy);border-radius:999px;background:var(--surface);color:var(--navy);font:inherit;font-weight:500;padding:6px 14px;cursor:pointer;text-align:left}
+.mt button[aria-selected="true"]{background:var(--navy);color:var(--on-navy)}
+.ed{border-radius:4px;outline:none;cursor:text}
+.ed:hover{background:var(--lav-soft)}
+.ed:focus{background:var(--lav-soft);box-shadow:0 0 0 2px var(--orange)}
+tr.chg td:first-child{box-shadow:inset 3px 0 0 var(--orange)}
+.mk{display:inline-block;margin-left:6px;font-size:11px;color:var(--orange-ink);font-weight:500}
+button.chip{cursor:pointer;font-family:inherit}
+.eb{display:flex;gap:16px;align-items:center;margin-left:auto}
+.eb button{border:0;background:none;padding:0;color:var(--orange-ink);font:inherit;cursor:pointer}
+.eb button:disabled{color:var(--faint);cursor:default}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:var(--on-navy);padding:8px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.hint{color:var(--faint);font-size:12px;margin:8px 0 0}
 </style>
 </head>
 <body>
 <main class="wrap">
-  <section class="card"><h1>Мемо встреч</h1><p class="lead">Задачи и договорённости по встречам, новые сверху.</p></section>
-  <div class="list" id="list"></div>
+  <div class="bar">
+    <button class="nb" id="dp" aria-label="Предыдущая дата">←</button>
+    <select class="nb" id="ds" aria-label="Дата"></select>
+    <button class="nb" id="dn" aria-label="Следующая дата">→</button>
+    <span class="sp"></span>
+    <button class="nb" id="sh">Поделиться ссылкой</button>
+  </div>
+  <div class="mt" id="mt" role="tablist" aria-label="Встречи"></div>
+  <section class="card">
+    <h1 id="h1">Мемо встреч</h1>
+    <p class="lead" id="lead"></p>
+    <p class="lbl">Присутствовали</p>
+    <div class="pp" id="pp"></div>
+  </section>
+  <div class="top">
+    <div class="tabs" id="nav" role="tablist" aria-label="Разделы"></div>
+    <button class="fb" id="fb" aria-expanded="false" aria-controls="side">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v2.2a2 2 0 0 1-.6 1.4L15 12v7l-6 2v-8.5L4.5 7.5A2 2 0 0 1 4 6.2z"/></svg>
+      Фильтры<span class="badge" id="bd" hidden></span>
+    </button>
+  </div>
+  <div class="lay" id="lay">
+    <section class="card">
+      <div class="hd"><span class="h" id="ttl">Все задачи</span><span class="n" id="cnt"></span>
+        <span class="eb"><span class="n" id="ec"></span><button id="ex">Экспорт правок</button><button id="er">Сбросить правки</button></span></div>
+      <div class="tw"><table><colgroup id="cg"></colgroup><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+      <p class="hint">Текст задачи и исполнителя можно исправить, щёлкнув по ним. Статус меняется щелчком по чипу. Правки видны только в этом браузере, пока их не опубликуют.</p>
+    </section>
+    <aside class="card side" id="side" aria-label="Фильтры">
+      <div class="sin">
+        <div class="sh">
+          <button class="x" id="cl" aria-label="Закрыть фильтры"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+          <span class="stt">Фильтры</span>
+        </div>
+        <div class="sec"><p class="grp">Исполнитель</p><div id="on"></div></div>
+        <div class="sec"><p class="grp">Статус</p><div id="os"></div></div>
+        <button class="rs" id="rs">Сбросить фильтры</button>
+      </div>
+    </aside>
+  </div>
+  <section class="scn" id="scn" aria-live="polite"></section>
 </main>
+<div class="toast" id="toast" role="status"></div>
 <script>
-const M=[
-/*MEMO-LIST*/
-["2026-10-30", "Аналитика и Дизайн: помощник по договору, загрузка эталона, Magic Pad, схема входов", "2026-10-30-analitika-dizain.html"],
-];
+const S={a:['s1','Выполнить'],b:['s2','Решить'],c:['s3','Отложить']};
+const NEXT={a:'b',b:'c',c:'a'};
+const CK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+const MN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>';
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=id=>document.getElementById(id);
 const fd=d=>d.split('-').reverse().join('.');
-document.getElementById('list').innerHTML=M.slice().sort((a,b)=>b[0].localeCompare(a[0])).map(m=>`<a class="card m" href="${esc(m[2])}"><span class="d">${fd(m[0])}</span><span class="t">${esc(m[1])}</span></a>`).join('');
+let MAN=[],DATES=[],M=null,D=[],cur='all',open=false,done=new Set(),edits={};
+const fN=new Set(),fS=new Set(),cache={};
+const ls=(k,v)=>{try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),2000)}
+const row=i=>{const b=M.tasks[i],e=edits[i]||{};return[b[0],e.t??b[1],e.w??b[2],e.s??b[3]]};
+function rebuild(){D=M.tasks.map((_,i)=>row(i))}
+function saveEd(){for(const k in edits){const b=M.tasks[k],e=edits[k];if(e.t===b[1])delete e.t;if(e.w===b[2])delete e.w;if(e.s===b[3])delete e.s;if(!Object.keys(e).length)delete edits[k]}
+  ls('memo-edits:'+M.id,Object.keys(edits).length?edits:null);rebuild()}
+async function load(id,push){
+  const m=MAN.find(x=>x.id==id)||MAN[0];if(!m)return;
+  if(!cache[m.id]){const r=await fetch('data/'+m.id+'.json',{cache:'no-cache'});cache[m.id]=await r.json()}
+  M=cache[m.id];cur='all';fN.clear();fS.clear();
+  done=new Set(ls(M.id)||[]);edits=ls('memo-edits:'+M.id)||{};rebuild();
+  const h='#'+M.id;if(location.hash!==h)history[push?'pushState':'replaceState'](null,'',h);
+  document.title=M.title+' — мемо';draw()}
+function draw(){
+  $('ds').innerHTML=DATES.map(d=>`<option value="${d}" ${d==M.date?'selected':''}>${fd(d)}</option>`).join('');
+  const di=DATES.indexOf(M.date);$('dp').disabled=di>=DATES.length-1;$('dn').disabled=di<=0;
+  $('mt').innerHTML=MAN.filter(x=>x.date==M.date).map(x=>`<button role="tab" data-m="${esc(x.id)}" aria-selected="${x.id==M.id}">${esc(x.title)}</button>`).join('');
+  $('h1').textContent=M.title;$('lead').textContent=M.lead||'';
+  $('pp').innerHTML=(M.people||[]).map(p=>`<span class="p"><span class="av">${esc(p[0])}</span>${esc(p)}</span>`).join('');
+  render()}
+const vis=()=>D.map((d,i)=>[d,i]).filter(([d])=>(cur=='all'||d[0]==cur)&&(!fN.size||d[2].split(', ').some(n=>fN.has(n)))&&(!fS.size||fS.has(d[3])));
+const box=on=>`<span class="cb ${on?'on':''}" aria-hidden="true">${on?CK:''}</span>`;
+function renderScn(){
+  const el=$('scn'),SCN=M.scn||{},SEC=M.sec;
+  const keys=cur=='all'?SEC.map(x=>x[0]).filter(k=>SCN[k]):(SCN[cur]?[cur]:[]);
+  if(!keys.length){el.innerHTML='';return}
+  el.innerHTML='<h2>'+esc(M.scn_title||'Сценарии пользователя')+'</h2>'+keys.map(k=>(cur=='all'?'<h3>'+esc(SEC.find(x=>x[0]==k)[1])+'</h3>':'')+'<div class="sg">'+SCN[k].map(([a,b])=>'<div class="sc"><b>'+esc(a)+'</b><p>'+esc(b)+'</p></div>').join('')+'</div>').join('');
+}
+function render(){
+  const SEC=M.sec,NAMES=[...new Set(D.flatMap(d=>d[2].split(', ')))].sort((x,y)=>x.localeCompare(y,'ru'));
+  $('nav').innerHTML=SEC.map(s=>`<button role="tab" aria-selected="${s[0]==cur}" data-k="${s[0]}">${esc(s[1])}</button>`).join('');
+  $('ttl').textContent=cur=='all'?'Все задачи':SEC.find(s=>s[0]==cur)[1];
+  $('lay').className='lay'+(open?' open':'');
+  $('fb').setAttribute('aria-expanded',open);
+  const k=fN.size+fS.size;$('bd').hidden=!k;$('bd').textContent=k;
+  $('on').innerHTML=NAMES.map(n=>`<div class="row" role="checkbox" tabindex="0" aria-checked="${fN.has(n)}" data-n="${esc(n)}">${box(fN.has(n))}${esc(n)}</div>`).join('');
+  $('os').innerHTML=Object.entries(S).map(([x,v])=>`<div class="row" role="checkbox" tabindex="0" aria-checked="${fS.has(x)}" data-s="${x}">${box(fS.has(x))}${v[1]}</div>`).join('');
+  $('rs').style.visibility=k?'visible':'hidden';
+  const ne=Object.keys(edits).length;$('ec').textContent=ne?'Изменено строк: '+ne:'';$('ex').disabled=$('er').disabled=!ne;
+  const compact=open&&window.innerWidth<1100;
+  const rows=vis();const n=rows.filter(([,i])=>done.has(i)).length;
+  $('cnt').textContent=n+' из '+rows.length;
+  const full=n==rows.length&&n;
+  const allBox=`<button class="cb ${full?'on':n?'part':''}" id="all" role="checkbox" aria-checked="${full?'true':n?'mixed':'false'}" aria-label="Отметить все">${full?CK:n?MN:''}</button>`;
+  $('cg').innerHTML=compact?'<col style="width:48px"><col><col style="width:116px">':'<col style="width:48px"><col><col style="width:170px"><col style="width:120px">';
+  $('th').innerHTML=`<tr><th class="c">${allBox}</th><th>Задача</th>${compact?'':'<th>Кто</th>'}<th>Статус</th></tr>`;
+  const ed=(i,f,v)=>`<span class="ed" contenteditable="plaintext-only" spellcheck="false" data-e="${f}" data-r="${i}">${esc(v)}</span>`;
+  $('tb').innerHTML=rows.length?rows.map(([d,i])=>`<tr class="${done.has(i)?'done':''} ${edits[i]?'chg':''}"><td class="c"><button class="cb ${done.has(i)?'on':''}" data-i="${i}" role="checkbox" aria-checked="${done.has(i)}" aria-label="Выполнено">${done.has(i)?CK:''}</button></td><td class="t">${ed(i,'t',d[1])}${edits[i]?'<span class="mk">изменено</span>':''}${compact?`<span class="sub">${ed(i,'w',d[2])}</span>`:''}</td>${compact?'':`<td>${ed(i,'w',d[2])}</td>`}<td><button class="chip ${S[d[3]][0]}" data-st="${i}" title="Щёлкните, чтобы сменить статус">${S[d[3]][1]}</button></td></tr>`).join(''):`<tr><td colspan="${compact?3:4}" class="empty">Нет задач под эти фильтры</td></tr>`;
+  renderScn();
+}
+const tog=(set,v)=>set.has(v)?set.delete(v):set.add(v);
+function act(t){
+  if(t.dataset.m){load(t.dataset.m,true);return}
+  if(t.dataset.k){cur=t.dataset.k}
+  else if(t.id=='fb'){open=!open}
+  else if(t.id=='cl'){open=false}
+  else if(t.id=='rs'){fN.clear();fS.clear()}
+  else if(t.dataset.n){tog(fN,t.dataset.n)}
+  else if(t.dataset.s){tog(fS,t.dataset.s)}
+  else if(t.dataset.st!==undefined){const i=+t.dataset.st;(edits[i]=edits[i]||{}).s=NEXT[D[i][3]];saveEd()}
+  else if(t.id=='all'){const r=vis();if(!r.length)return;const allOn=r.every(([,i])=>done.has(i));r.forEach(([,i])=>allOn?done.delete(i):done.add(i));ls(M.id,[...done])}
+  else if(t.dataset.i!==undefined){tog(done,+t.dataset.i);ls(M.id,[...done])}
+  else if(t.id=='dp'||t.id=='dn'){const di=DATES.indexOf(M.date)+(t.id=='dp'?1:-1);if(DATES[di]){load(MAN.find(x=>x.date==DATES[di]).id,true)}return}
+  else if(t.id=='er'){if(!confirm('Сбросить все правки этой встречи?'))return;edits={};saveEd()}
+  else if(t.id=='ex'){const out={id:M.id,exported:new Date().toISOString(),edits:Object.fromEntries(Object.entries(edits).map(([k,e])=>[k,{orig:M.tasks[k],text:e.t,who:e.w,status:e.s}]))};
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));a.download='memo-edits-'+M.id+'.json';a.click();toast('Файл правок скачан');return}
+  else if(t.id=='sh'){share();return}
+  render()}
+async function share(){
+  const url=location.href.split('#')[0]+'#'+M.id;
+  if(navigator.share&&matchMedia('(pointer:coarse)').matches){try{await navigator.share({title:M.title,url});return}catch(e){if(e.name=='AbortError')return}}
+  try{await navigator.clipboard.writeText(url);toast('Ссылка скопирована')}
+  catch(e){const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Ссылка скопирована')}}
+document.addEventListener('click',e=>{if(e.target.closest('.ed'))return;const t=e.target.closest('[data-m],[data-k],[data-i],[data-n],[data-s],[data-st],#all,#rs,#fb,#cl,#dp,#dn,#er,#ex,#sh');if(t&&!t.disabled)act(t)});
+document.addEventListener('keydown',e=>{const ed=e.target.closest('.ed');if(ed){if(e.key=='Enter'){e.preventDefault();ed.blur()}if(e.key=='Escape'){ed.textContent=D[+ed.dataset.r][ed.dataset.e=='t'?1:2];ed.blur()}return}
+  if(e.key!==' '&&e.key!=='Enter')return;const t=e.target.closest('.row');if(t){e.preventDefault();act(t)}});
+document.addEventListener('focusout',e=>{const ed=e.target.closest&&e.target.closest('.ed');if(!ed)return;const i=+ed.dataset.r,f=ed.dataset.e;let v=ed.textContent.replace(/\s+/g,' ').trim();
+  if(f=='w')v=v.split(/\s*,\s*/).filter(Boolean).join(', ');if(!v){render();return}
+  if(v!==D[i][f=='t'?1:2]){(edits[i]=edits[i]||{})[f]=v;saveEd()}render()});
+$('ds').addEventListener('change',e=>load(MAN.find(x=>x.date==e.target.value).id,true));
+window.addEventListener('resize',()=>{if(!document.activeElement.closest('.ed'))render()});
+window.addEventListener('hashchange',()=>{const id=decodeURIComponent(location.hash.slice(1));if(M&&id!==M.id)load(id,false)});
+(async()=>{
+  MAN=(await (await fetch('data/manifest.json',{cache:'no-cache'})).json()).sort((a,b)=>b.date.localeCompare(a.date)||a.title.localeCompare(b.title,'ru'));
+  DATES=[...new Set(MAN.map(x=>x.date))];
+  const q=new URLSearchParams(location.search);let id=decodeURIComponent(location.hash.slice(1))||q.get('m')||'';
+  if(!MAN.some(x=>x.id==id)){const d=q.get('d');id=(MAN.find(x=>x.date==d)||MAN[0]||{}).id}
+  if(id)load(id,false);else $('lead').textContent='Мемо пока нет.';
+})();
 </script>
 </body>
 </html>
