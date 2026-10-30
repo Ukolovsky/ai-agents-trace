@@ -191,7 +191,7 @@ async function load(id,push){
   const m=MAN.find(x=>x.id==id)||MAN[0];if(!m)return;
   if(!cache[m.id]){const r=await fetch('data/'+m.id+'.json',{cache:'no-cache'});cache[m.id]=await r.json()}
   M=cache[m.id];cur='all';arch=false;fN.clear();fS.clear();
-  edits=ls('memo-edits:'+M.id)||{};rebuild();
+  edits=ls('memo-edits:'+M.id)||{};PREV=ls('memo-prev:'+M.id)||{};rebuild();
   const h='#'+M.id;if(location.hash!==h)history[push?'pushState':'replaceState'](null,'',h);
   document.title=M.title+' — мемо';draw()}
 function draw(){
@@ -234,7 +234,9 @@ function render(){
   renderScn();
 }
 const sel=(i,v)=>`<select class="st st-${v}" data-sel="${i}" aria-label="Статус">`+GR.map(([g,xs])=>`<optgroup label="${g}">`+xs.map(x=>`<option value="${x}" ${x==v?'selected':''}>${x=='archive'&&v!='archive'?'Удалить в архив (не согласовано)':S[x]}</option>`).join('')+'</optgroup>').join('')+'</select>';
-const setSt=(i,v)=>{(edits[i]=edits[i]||{}).s=v;saveEd()};
+let PREV={};
+const setSt=(i,v)=>{const was=D[i][3];if(v=='done'&&was!='done'){PREV[i]=was}else if(v!='done'){delete PREV[i]}ls('memo-prev:'+M.id,Object.keys(PREV).length?PREV:null);(edits[i]=edits[i]||{}).s=v;saveEd()};
+const undone=i=>{const p=PREV[i];return p&&p!='done'&&p!='archive'?p:'confirm'};
 const tog=(set,v)=>set.has(v)?set.delete(v):set.add(v);
 function act(t){
   if(t.dataset.m){load(t.dataset.m,true);return}
@@ -245,10 +247,10 @@ function act(t){
   else if(t.dataset.n){tog(fN,t.dataset.n)}
   else if(t.dataset.s){tog(fS,t.dataset.s)}
   else if(t.id=='ar'){arch=!arch}
-  else if(t.id=='all'){const r=vis();if(!r.length)return;const allOn=r.every(([,i])=>D[i][3]=='done');r.forEach(([,i])=>setSt(i,allOn?'progress':'done'))}
-  else if(t.dataset.i!==undefined){const i=+t.dataset.i;setSt(i,D[i][3]=='done'?'progress':'done')}
+  else if(t.id=='all'){const r=vis();if(!r.length)return;const allOn=r.every(([,i])=>D[i][3]=='done');r.forEach(([,i])=>setSt(i,allOn?undone(i):'done'))}
+  else if(t.dataset.i!==undefined){const i=+t.dataset.i;setSt(i,D[i][3]=='done'?undone(i):'done')}
   else if(t.id=='dp'||t.id=='dn'){const di=DATES.indexOf(M.date)+(t.id=='dp'?1:-1);if(DATES[di]){load(MAN.find(x=>x.date==DATES[di]).id,true)}return}
-  else if(t.id=='er'){if(!confirm('Сбросить все правки этой встречи?'))return;edits={};saveEd()}
+  else if(t.id=='er'){if(!confirm('Сбросить все правки этой встречи?'))return;edits={};PREV={};ls('memo-prev:'+M.id,null);saveEd()}
   else if(t.id=='ex'){const out={id:M.id,exported:new Date().toISOString(),edits:Object.fromEntries(Object.entries(edits).map(([k,e])=>[k,{orig:M.tasks[k],text:e.t,who:e.w,status:e.s}]))};
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));a.download='memo-edits-'+M.id+'.json';a.click();toast('Файл правок скачан');return}
   else if(t.id=='sh'){share();return}
@@ -261,9 +263,14 @@ async function share(){
 document.addEventListener('click',e=>{if(e.target.closest('.ed'))return;const t=e.target.closest('[data-m],[data-k],[data-i],[data-n],[data-s],#ar,#all,#rs,#fb,#cl,#dp,#dn,#er,#ex,#sh');if(t&&!t.disabled)act(t)});
 document.addEventListener('keydown',e=>{const ed=e.target.closest('.ed');if(ed){if(e.key=='Enter'){e.preventDefault();ed.blur()}if(e.key=='Escape'){ed.textContent=D[+ed.dataset.r][ed.dataset.e=='t'?1:2];ed.blur()}return}
   if(e.key!==' '&&e.key!=='Enter')return;const t=e.target.closest('.row');if(t){e.preventDefault();act(t)}});
+let PD=false,PEND=false;
+const later=()=>{if(PD)PEND=true;else render()};
+document.addEventListener('pointerdown',()=>{PD=true},true);
+document.addEventListener('pointerup',()=>{PD=false;if(PEND){PEND=false;setTimeout(render,0)}},true);
+document.addEventListener('pointercancel',()=>{PD=false;if(PEND){PEND=false;setTimeout(render,0)}},true);
 document.addEventListener('focusout',e=>{const ed=e.target.closest&&e.target.closest('.ed');if(!ed)return;const i=+ed.dataset.r,f=ed.dataset.e;let v=ed.textContent.replace(/\s+/g,' ').trim();
-  if(f=='w')v=v.split(/\s*,\s*/).filter(Boolean).join(', ');if(!v){render();return}
-  if(v!==D[i][f=='t'?1:2]){(edits[i]=edits[i]||{})[f]=v;saveEd()}render()});
+  if(f=='w')v=v.split(/\s*,\s*/).filter(Boolean).join(', ');if(!v){later();return}
+  if(v!==D[i][f=='t'?1:2]){(edits[i]=edits[i]||{})[f]=v;saveEd()}later()});
 document.addEventListener('change',e=>{const t=e.target.closest('[data-sel]');if(t){setSt(+t.dataset.sel,t.value);render()}});
 $('ds').addEventListener('change',e=>load(MAN.find(x=>x.date==e.target.value).id,true));
 window.addEventListener('resize',()=>{if(!document.activeElement.closest('.ed'))render()});
