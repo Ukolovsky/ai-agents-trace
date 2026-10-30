@@ -978,5 +978,40 @@ $('sideB').addEventListener('click',e=>{const b=e.target;
   saveNow();o.list.push({id,name:nm,start:st});localStorage.setItem(LS+':'+IDX.cur+':'+id,JSON.stringify(N));switchTo(IDX.cur,id);}});
 
 normalize();syncInputs();render();
+ /* ===== общий state через Google Sheets (Apps Script Web App). SYNC_URL пуст — работает как раньше ===== */
+ const SYNC_URL=window.SYNC_URL_OVERRIDE||'https://script.google.com/macros/s/AKfycbzZiK4Y-TGfcfFkVDOLACTMQQfNeN3IXo8z2KY_ORrih24GyAuxvR0rTcB2Gmt5EE5JlA/exec';
+ (function(){if(!SYNC_URL)return;
+  const P=LS+':',own=k=>!k.startsWith('memo:')&&/^(idx|[^:]+:ss\d+)$/.test(k),skip=k=>!own(k);
+  const loc=()=>{const o={};Object.keys(localStorage).forEach(k=>{if(k.startsWith(P)){const r=k.slice(P.length);if(!skip(r))o[r]=localStorage.getItem(k);}});return o;};
+  let base={},known={},rev=+(localStorage.getItem(P+'sync:rev')||0),busy=false,tmr=null,off=false;
+  try{known=JSON.parse(localStorage.getItem(P+'sync:known')||'{}');base=JSON.parse(localStorage.getItem(P+'sync:base')||'{}');}catch(e){}
+  const persist=()=>{localStorage.setItem(P+'sync:rev',rev);localStorage.setItem(P+'sync:known',JSON.stringify(known));localStorage.setItem(P+'sync:base',JSON.stringify(base));};
+  const tb=$('saved').parentNode,el=document.createElement('span');el.id='syncSt';el.style.cssText='font-size:12px;margin-left:8px;padding:2px 8px;border-radius:10px;border:1px solid #D9D9DE;color:#85868A';tb.insertBefore(el,$('saved').nextSibling);
+  const hm=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+  const stat=(t,c)=>{el.textContent=t;el.style.color=c||'#85868A';el.style.borderColor=c||'#D9D9DE';};
+  const ok=()=>{off=false;stat('Синхронизировано · '+hm(),'#599C16');},bad=()=>{off=true;stat('Офлайн','#F32A16');};
+  const note=m=>{const n=document.createElement('div');n.style.cssText='position:fixed;right:16px;bottom:16px;z-index:9999;background:#FFF8E1;border:1px solid #FCCA25;border-radius:8px;padding:10px 14px;font-size:13px;max-width:380px;box-shadow:0 4px 12px rgba(0,0,0,.12)';n.textContent=m;document.body.appendChild(n);setTimeout(()=>n.remove(),8000);};
+  const get=since=>fetch(SYNC_URL+(SYNC_URL.includes('?')?'&':'?')+'since='+since+'&t='+Date.now()).then(r=>r.json()).catch(()=>new Promise((res,rej)=>{const cb='__sync'+Date.now(),s=document.createElement('script');window[cb]=d=>{delete window[cb];s.remove();res(d);};s.onerror=()=>{delete window[cb];s.remove();rej(new Error('jsonp'));};s.src=SYNC_URL+(SYNC_URL.includes('?')?'&':'?')+'since='+since+'&callback='+cb;document.head.appendChild(s);}));
+  const post=b=>fetch(SYNC_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)}).then(r=>r.json());
+  function reloadView(){try{IDX=JSON.parse(localStorage.getItem(LS+':idx')||'null')||IDX;}catch(e){}ssOf(IDX.cur);D=loadData(IDX.cur,ssOf(IDX.cur).cur);D.sprint.today=localToday();C=D.config.superSprint;normalize();syncInputs();render();}
+  function applyRemote(keys,first){const L=loc();let ch=false,conf=[];Object.entries(keys).forEach(([k,o])=>{if(!own(k))return;base[k]=o.rev;if(L[k]===o.v){known[k]=o.v;return;}
+    if(!first&&L[k]!==undefined&&L[k]!==known[k])conf.push(k);
+    localStorage.setItem(P+k,o.v);known[k]=o.v;ch=true;});persist();
+    if(conf.length)note('Кто-то изменил те же данные ('+conf.join(', ')+'). Применена последняя сохранённая версия — проверьте свои правки.');
+    if(ch)reloadView();}
+  function pull(first){if(busy)return Promise.resolve();busy=true;return get(first?0:rev).then(d=>{if(!d||!d.ok)throw 0;applyRemote(d.keys||{},first);rev=Math.max(rev,d.rev||0);persist();ok();}).catch(bad).finally(()=>{busy=false;});}
+  function push(force){const L=loc(),keys={};Object.keys(L).forEach(k=>{if(L[k]!==known[k])keys[k]=L[k];});if(!Object.keys(keys).length)return Promise.resolve();
+    if(busy){sched();return Promise.resolve();}busy=true;stat('Сохраняю…');
+    const b={keys,base,force:!!force,code:localStorage.getItem(P+'ui:editCode')||''};
+    return post(b).then(d=>{busy=false;
+      if(d&&d.error==='code'){const c=prompt('Код редактирования общей страницы:');if(c){localStorage.setItem(P+'ui:editCode',c);return push(force);}stat('Только чтение','#B88A00');return;}
+      if(!d||!d.ok)throw 0;(d.saved||[]).forEach(k=>{known[k]=keys[k];base[k]=d.rev;});rev=Math.max(rev,d.rev||0);persist();
+      if(d.conflicts&&d.conflicts.length){note('Пока вы редактировали, данные изменил кто-то ещё ('+d.conflicts.map(c=>c.key).join(', ')+'). Сохранена ваша версия (последняя запись выигрывает).');d.conflicts.forEach(c=>base[c.key]=c.rev);return push(true);}
+      ok();}).catch(()=>{busy=false;bad();});}
+  function sched(){clearTimeout(tmr);tmr=setTimeout(()=>push(false),1500);}
+  const _sn=saveNow,_si=saveIdx;saveNow=function(){_sn.apply(this,arguments);sched();};saveIdx=function(){_si.apply(this,arguments);sched();};
+  window.__sync={pull,push,state:()=>({rev,off})};
+  stat('Синхронизация…');pull(true).then(()=>push(false));setInterval(()=>{if(document.hidden)return;pull(false).then(()=>push(false));},20000);
+ })();
 })();
 </script></body></html>
