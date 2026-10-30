@@ -110,6 +110,9 @@ select.nb{appearance:auto;padding:0 10px}
 .st-done{background-color:var(--navy);color:var(--on-navy);border:1px solid var(--navy)}
 .st-archive{background-color:transparent;color:var(--faint);border:1px dashed var(--faint)}
 .fb[aria-pressed="true"]{background:var(--lav-soft)}
+.sync{font-size:13px;color:var(--muted)}
+.sync.ok{color:var(--navy)}
+.sync.bad{color:var(--orange-ink)}
 .ehint{display:flex;align-items:center;gap:6px;background:var(--lav-soft);color:var(--navy-ink);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:13px}
 .ed:focus{background:var(--lav-soft);box-shadow:0 0 0 2px var(--orange)}
 tr.chg td:first-child{box-shadow:inset 3px 0 0 var(--orange)}
@@ -130,6 +133,7 @@ button.chip{cursor:pointer;font-family:inherit}
     <select class="nb" id="ds" aria-label="Дата"></select>
     <button class="nb" id="dn" aria-label="Следующая дата">→</button>
     <span class="sp"></span>
+    <span class="sync" id="sy" title="Статус сохранения"></span>
     <button class="nb" id="sh">Поделиться ссылкой</button>
   </div>
   <div class="mt" id="mt" role="tablist" aria-label="Встречи"></div>
@@ -153,7 +157,7 @@ button.chip{cursor:pointer;font-family:inherit}
         <span class="eb"><span class="n" id="ec"></span><button id="ex">Экспорт правок</button><button id="er">Сбросить правки</button></span></div>
       <p class="ehint">✎ Щёлкните по тексту задачи или исполнителю, чтобы исправить (Enter сохраняет, Esc отменяет). Статус выбирается из списка: разбор (Подтвердить, Есть вопросы, Отложить в бэклог), работа (В процессе, Выполнено) или «Удалить в архив». Галочка ставит «Выполнено», счётчик считает выполненные без архива.</p>
       <div class="tw"><table><colgroup id="cg"></colgroup><thead id="th"></thead><tbody id="tb"></tbody></table></div>
-      <p class="hint">Правки видны только в этом браузере, пока их не опубликуют.</p>
+      <p class="hint">Правки сохраняются для всех, кто открывает эту страницу. Без связи они хранятся в браузере и отправятся позже.</p>
     </section>
     <aside class="card side" id="side" aria-label="Фильтры">
       <div class="sin">
@@ -186,12 +190,12 @@ function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clear
 const row=i=>{const b=M.tasks[i],e=edits[i]||{};return[b[0],e.t??b[1],e.w??b[2],ns(e.s??b[3])]};
 function rebuild(){D=M.tasks.map((_,i)=>row(i))}
 function saveEd(){for(const k in edits){const b=M.tasks[k],e=edits[k];if(e.t===b[1])delete e.t;if(e.w===b[2])delete e.w;if(e.s!==undefined&&ns(e.s)===ns(b[3]))delete e.s;if(!Object.keys(e).length)delete edits[k]}
-  ls('memo-edits:'+M.id,Object.keys(edits).length?edits:null);rebuild()}
+  ls('memo-edits:'+M.id,Object.keys(edits).length?edits:null);rebuild();markDirty()}
 async function load(id,push){
   const m=MAN.find(x=>x.id==id)||MAN[0];if(!m)return;
   if(!cache[m.id]){const r=await fetch('data/'+m.id+'.json',{cache:'no-cache'});cache[m.id]=await r.json()}
   M=cache[m.id];cur='all';arch=false;fN.clear();fS.clear();
-  edits=ls('memo-edits:'+M.id)||{};PREV=ls('memo-prev:'+M.id)||{};rebuild();
+  edits=ls('memo-edits:'+M.id)||{};PREV=ls('memo-prev:'+M.id)||{};rebuild();setTimeout(()=>{if(ls('memo-dirty:'+M.id))push();else pull()},0);
   const h='#'+M.id;if(location.hash!==h)history[push?'pushState':'replaceState'](null,'',h);
   document.title=M.title+' — мемо';draw()}
 function draw(){
@@ -250,7 +254,7 @@ function act(t){
   else if(t.id=='all'){const r=vis();if(!r.length)return;const allOn=r.every(([,i])=>D[i][3]=='done');r.forEach(([,i])=>setSt(i,allOn?undone(i):'done'))}
   else if(t.dataset.i!==undefined){const i=+t.dataset.i;setSt(i,D[i][3]=='done'?undone(i):'done')}
   else if(t.id=='dp'||t.id=='dn'){const di=DATES.indexOf(M.date)+(t.id=='dp'?1:-1);if(DATES[di]){load(MAN.find(x=>x.date==DATES[di]).id,true)}return}
-  else if(t.id=='er'){if(!confirm('Сбросить все правки этой встречи?'))return;edits={};PREV={};ls('memo-prev:'+M.id,null);saveEd()}
+  else if(t.id=='er'){if(!confirm('Сбросить правки этой встречи для всех? Это удалит общие правки на сервере.'))return;edits={};PREV={};ls('memo-prev:'+M.id,null);saveEd()}
   else if(t.id=='ex'){const out={id:M.id,exported:new Date().toISOString(),edits:Object.fromEntries(Object.entries(edits).map(([k,e])=>[k,{orig:M.tasks[k],text:e.t,who:e.w,status:e.s}]))};
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));a.download='memo-edits-'+M.id+'.json';a.click();toast('Файл правок скачан');return}
   else if(t.id=='sh'){share();return}
@@ -275,6 +279,38 @@ document.addEventListener('change',e=>{const t=e.target.closest('[data-sel]');if
 $('ds').addEventListener('change',e=>load(MAN.find(x=>x.date==e.target.value).id,true));
 window.addEventListener('resize',()=>{if(!document.activeElement.closest('.ed'))render()});
 window.addEventListener('hashchange',()=>{const id=decodeURIComponent(location.hash.slice(1));if(M&&id!==M.id)load(id,false)});
+/* ---- общее хранилище правок (Apps Script, ns=memo) ---- */
+const API='https://script.google.com/macros/s/AKfycbzZiK4Y-TGfcfFkVDOLACTMQQfNeN3IXo8z2KY_ORrih24GyAuxvR0rTcB2Gmt5EE5JlA/exec';
+const KEYP='memo:';let ptimer=null,busy=false;
+function sync(st){const e=$('sy');e.className='sync '+(st=='ok'?'ok':st=='bad'?'bad':'');e.textContent=st=='ok'?'✓ Сохранено для всех':st=='bad'?'Нет связи, сохранено локально':st=='load'?'Загружаю…':'Сохраняю…'}
+const pack=()=>{const o={};if(Object.keys(edits).length)o.e=edits;if(Object.keys(PREV).length)o.p=PREV;return Object.keys(o).length?JSON.stringify(o):''};
+function applyRemote(id,v,rev){
+  let o={};try{o=v?JSON.parse(v):{}}catch(e){}
+  ls('memo-edits:'+id,o.e&&Object.keys(o.e).length?o.e:null);ls('memo-prev:'+id,o.p&&Object.keys(o.p).length?o.p:null);ls('memo-srv:'+id,rev);
+  if(M&&M.id==id){edits=o.e||{};PREV=o.p||{};rebuild();if(!(document.activeElement&&document.activeElement.closest('.ed'))&&!PD)render();else PEND=true}}
+function markDirty(){if(!M)return;ls('memo-dirty:'+M.id,1);sync('save');clearTimeout(ptimer);ptimer=setTimeout(push,700)}
+function getJSON(url){return fetch(url,{cache:'no-store'}).then(r=>r.json()).catch(()=>new Promise((res,rej)=>{const cb='memoCb'+Date.now();const sc=document.createElement('script');
+  window[cb]=d=>{res(d);delete window[cb];sc.remove()};sc.onerror=()=>{rej(new Error('jsonp'));sc.remove()};sc.src=url+'&callback='+cb;document.head.appendChild(sc)}))}
+async function pull(){
+  if(!M||busy)return;const id=M.id;if(ls('memo-dirty:'+id)){push();return}
+  try{const d=await getJSON(API+'?ns=memo&since=0&t='+Date.now());if(!d.ok)throw 0;
+    const k=d.keys[KEYP+id];const have=ls('memo-srv:'+id)||0;
+    if(k&&k.rev!=have&&!ls('memo-dirty:'+id))applyRemote(id,k.v,k.rev);
+    if(!ls('memo-dirty:'+id))sync('ok')}catch(e){sync('bad')}}
+async function push(force){
+  if(!M)return;const id=M.id;if(busy){clearTimeout(ptimer);ptimer=setTimeout(push,500);return}
+  busy=true;sync('save');const key=KEYP+id,val=pack();
+  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({ns:'memo',keys:{[key]:val},base:{[key]:ls('memo-srv:'+id)||0},force:!!force})});
+    const d=await r.json();if(!d.ok)throw 0;
+    if(d.conflicts&&d.conflicts.length&&!force){busy=false;return push(true)}
+    if(d.saved&&d.saved.includes(key))ls('memo-srv:'+id,d.rev);
+    if(M.id==id&&pack()===val)ls('memo-dirty:'+id,null);busy=false;
+    if(ls('memo-dirty:'+id))push();else sync('ok')}
+  catch(e){busy=false;sync('bad')}}
+setInterval(pull,20000);
+window.addEventListener('focus',pull);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
+window.addEventListener('online',()=>{if(M&&ls('memo-dirty:'+M.id))push();else pull()});
 (async()=>{
   MAN=(await (await fetch('data/manifest.json',{cache:'no-cache'})).json()).sort((a,b)=>b.date.localeCompare(a.date)||a.title.localeCompare(b.title,'ru'));
   DATES=[...new Set(MAN.map(x=>x.date))];
