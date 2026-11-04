@@ -1,5 +1,10 @@
 [
  {
+  "id": "2026-11-03-product-ai-sink",
+  "date": "2026-11-03",
+  "title": "Product AI: баги нового стенда, поиск через BFF, логика Magic Pad, вики и генерация КП"
+ },
+ {
   "id": "2026-11-02-tech-design-review",
   "date": "2026-11-02",
   "title": "Tech Design Review BP: BP Meet, автор записи, служебная учётка, стандартная загрузка файлов"
