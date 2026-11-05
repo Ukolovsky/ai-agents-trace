@@ -303,7 +303,16 @@ function period(P,days,pids,tids){const ds=new Set(days);const o={cap:0,meet:0,p
 
 /* ===== фильтры ===== */
 const visTasks=()=>D.tasks.filter(t=>(F.dir==='all'||t.dir===F.dir)&&(F.person==='all'||t.person===F.person)&&(F.task==='all'||t.id===F.task));
-function visPeople(){let ps=D.people;if(F.person!=='all')ps=ps.filter(p=>p.id===F.person);if(F.task!=='all'){const t=task(F.task);ps=ps.filter(p=>p.id===t.person);}return ps;}
+const DEPT_ORDER=['AI','Frontend','Аналитик','Дизайнер','DevOps','Тестировщик','Прочие'];
+const DEPT_ALIAS={ai:'AI','ai-команда':'AI',frontend:'Frontend',front:'Frontend','фронт':'Frontend','аналитик':'Аналитик','аналитика':'Аналитик',analyst:'Аналитик','дизайнер':'Дизайнер','дизайн':'Дизайнер',design:'Дизайнер',designer:'Дизайнер',devops:'DevOps',qa:'Тестировщик','тестировщик':'Тестировщик','тестирование':'Тестировщик',tester:'Тестировщик'};
+const DEPT_BY_NAME=[[/^(Эдуард|Камиль|Влад)/i,'Frontend'],[/^(Понарин|Сергей П)/i,'Аналитик'],[/^(Беатрис|Леонид)/i,'Дизайнер'],[/^Василий/i,'DevOps'],[/^(Анастасия|Дмитрий Б)/i,'Тестировщик'],[/^(Уколов|Алексей$)/i,'Прочие']];
+const DEPT_AI_IDS=new Set(['АК','СА','ДК','АД','АШ','AK','AD','DK','ASH']);
+function deptOf(p){if(!p)return 'Прочие';for(const k of ['dept','team','department']){const v=String(p[k]||'').trim().toLowerCase();if(v&&DEPT_ALIAS[v])return DEPT_ALIAS[v];}const r=String(p.role||'').trim().toLowerCase();if(DEPT_ALIAS[r])return DEPT_ALIAS[r];const n=String(p.name||'');for(const [re,d] of DEPT_BY_NAME)if(re.test(n))return d;if(DEPT_AI_IDS.has(p.id))return 'AI';if(r==='разработчик'||r==='лид')return 'AI';return 'Прочие';}
+const deptRank=p=>{const i=DEPT_ORDER.indexOf(deptOf(p));return i<0?DEPT_ORDER.length:i;};
+const cmpPeople=(a,b)=>deptRank(a)-deptRank(b)||String(a&&a.name||'').localeCompare(String(b&&b.name||''),'ru')||String(a&&a.id||'').localeCompare(String(b&&b.id||''));
+const cmpTasksInPerson=(a,b)=>(+a.prio||99)-(+b.prio||99)||String(a.id).localeCompare(String(b.id));
+const cmpTasks=(a,b)=>(!a.person)-(!b.person)||cmpPeople(person(a.person)||{id:a.person||''},person(b.person)||{id:b.person||''})||cmpTasksInPerson(a,b);
+function visPeople(){let ps=D.people.slice().sort(cmpPeople);if(F.person!=='all')ps=ps.filter(p=>p.id===F.person);if(F.task!=='all'){const t=task(F.task);ps=ps.filter(p=>p.id===t.person);}return ps;}
 function visDays(){if(F.wave==='all')return DAYS;const w=D.waves.find(w=>w.id===F.wave);if(w)return DAYS.filter(d=>d>=w.start&&d<=w.end);const s=C.sprints.find(s=>s.id===F.wave);return DAYS.filter(d=>d>=s.start&&d<=s.end);}
 function fillSelects(){const o=(v,l,s)=>`<option value="${esc(v)}"${s?' selected':''}>${esc(l)}</option>`;
  $('fDir').innerHTML=o('all','Все: Продукт AI+CPQ и ML',F.dir==='all')+o('Продукт','Продукт AI+CPQ',F.dir==='Продукт')+o('ML','ML-команда',F.dir==='ML');
@@ -355,7 +364,7 @@ function drawGantt(P){const svg=$('gantt');while(svg.firstChild)svg.removeChild(
  const RH=26,BAR=14,PH=34,HEAD=74;
  const trunc=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
  // группы
- const POS={};const groups=ps.map(p=>{const ts=D.tasks.filter(t=>t.person===p.id&&ids.has(t.id)).sort((a,b)=>a.prio-b.prio||a.id.localeCompare(b.id));
+ const POS={};const groups=ps.map(p=>{const ts=D.tasks.filter(t=>t.person===p.id&&ids.has(t.id)).sort(cmpTasksInPerson);
   const rows=ts.map(t=>{const days=[];DAYS.forEach(d=>{if(!xs[d])return;P.cap[p.id][d].items.filter(a=>a.t===t.id&&!a.rv).forEach(a=>days.push({d,h:a.h,fact:!!a.fact}));});
    const runs=[];let cur=null;days.forEach(s=>{const prev=cur&&cur.days[cur.days.length-1];if(prev&&prev.d===s.d){prev.h+=s.h;prev.fact=prev.fact||s.fact;return;}const contig=prev&&DAYS.indexOf(s.d)===DAYS.indexOf(prev.d)+1;if(cur&&contig)cur.days.push(s);else{cur={days:[s]};runs.push(cur);}});
    if(t.blocker&&t.status!=='Принята'){const s=t.since||S.today;const bd=DAYS.filter(d=>d>=s&&d<S.today&&xs[d]);if(bd.length)runs.push({blk:true,days:bd.map(d=>({d,h:0}))});}
@@ -428,7 +437,7 @@ function drawGantt(P){const svg=$('gantt');while(svg.firstChild)svg.removeChild(
 
 /* ===== таблица бэклога ===== */
 const OPEN=new Set();
-function drawTable(P){{const ba=$('blAppr');if(ba)ba.innerHTML='<span class="sub" style="margin:0 10px 0 0">Утвердить план спринта:</span>'+apprBar();}const ts=visTasks().slice().sort((a,b)=>(!a.person)-(!b.person)||(a.person||'').localeCompare(b.person||'')||a.prio-b.prio);$('chipRows').textContent=ts.length;
+function drawTable(P){{const ba=$('blAppr');if(ba)ba.innerHTML='<span class="sub" style="margin:0 10px 0 0">Утвердить план спринта:</span>'+apprBar();}const ts=visTasks().slice().sort(cmpTasks);$('chipRows').textContent=ts.length;
  const pp=D.people.map(p=>[p.id,p.name]);let h='<tr><th>Задача (инкремент ≤ 3–5 дней до ревью)</th><th>Статус</th><th>Ответственный</th><th>Часы</th><th>Приоритет</th><th>Ревьюер</th><th>Зависит от (все должны быть приняты)</th><th></th></tr>';
  ts.forEach(t=>{const x=P.R[t.id];h+=`<tr data-id="${esc(t.id)}"><td><input data-f="title" value="${esc(t.title)}" placeholder="Что сделать" style="width:420px"></td><td>${stCell(t)}</td><td><select data-f="person">${t.person?'':'<option value="" selected>— выберите —</option>'}${pp.map(o=>`<option value="${esc(o[0])}"${o[0]===t.person?' selected':''}>${esc(o[1])}</option>`).join('')}</select></td>
  <td><input type="number" min="0" step="0.5" data-f="est" value="${t.est}" style="width:70px">${x.durFlag==='bad'?' <span style="color:#FF5722" title="Больше 5 рабочих дней до ревью">⚠ разбить</span>':''}</td><td><input type="number" min="0" data-f="prio" value="${t.prio}" style="width:56px"></td><td><select data-f="reviewer" style="max-width:130px"${t.revSet?'':' title="назначен по правилу ролей"'}>${revOpts(t.reviewer)}</select></td><td><div class="depc" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;max-width:260px">${deps(t).map(d=>{const q=task(d);return `<span style="background:#EEF0FB;border-radius:10px;padding:1px 4px 1px 8px;font-size:11px;white-space:nowrap" title="${esc(q?q.title:d)}">${esc((d+' '+(q?q.title:'')).slice(0,26))} <b data-a="depRm" data-d="${esc(d)}" style="cursor:pointer;color:#85868A;padding:0 3px">×</b></span>`;}).join('')}<button class="ib" data-a="depAdd" style="font-size:11px;padding:1px 6px">${deps(t).length?'＋':'＋ зависимость'}</button></div></td><td><button class="ib" data-a="del" title="Удалить">✕</button></td></tr>`;});
