@@ -89,11 +89,13 @@ h3.sec{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
 #gWrap{position:relative;height:740px;border:1px solid #EBEBEB;border-radius:8px;overflow:hidden;background:#FBFBFD}
 #gsvg{display:block;cursor:grab;user-select:none;max-width:none}
 #gsvg .ge{stroke:#D9DADF;stroke-width:1;transition:opacity 150ms}
-#gsvg .grf{stroke:#C5C8DA;stroke-width:1.4}
+#gsvg .grp{stroke:#C5C8DA;stroke-width:1.8}
+#gsvg .gpf{stroke:#D0D2E0;stroke-width:1.3}
 #gsvg .gdep{stroke:#8E92BC;stroke-width:1.3;stroke-dasharray:5 4}
 #gsvg .gn{cursor:pointer;transition:opacity 150ms}
 #gsvg .glt{font-size:10px;fill:#5F6068;paint-order:stroke;stroke:#FBFBFD;stroke-width:3px;stroke-linejoin:round;pointer-events:none}
 #gsvg .glf{font-size:12.5px;font-weight:600;fill:#050819;paint-order:stroke;stroke:#FBFBFD;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+#gsvg .glp{font-size:13.5px;font-weight:600;fill:#050819;paint-order:stroke;stroke:#FBFBFD;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
 #gsvg .glr{font-size:14px;font-weight:600;fill:#343A7E;paint-order:stroke;stroke:#FBFBFD;stroke-width:4px;pointer-events:none}
 #gsvg .gls{font-size:11px;fill:#85868A;paint-order:stroke;stroke:#FBFBFD;stroke-width:3px;pointer-events:none}
 #gsvg.lowz .glt{display:none}
@@ -107,9 +109,13 @@ h3.sec{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
 .gtool .btn{padding:4px 10px;font-size:12px;background:#fff}
 .ghint{position:absolute;left:12px;bottom:10px;font-size:11px;color:#85868A;pointer-events:none}
 #gList{border:1px solid #EBEBEB;border-radius:8px;max-height:740px;overflow-y:auto;padding:4px 0}
-#gList .gl-h{display:flex;justify-content:space-between;gap:8px;padding:10px 14px 8px;font-size:13px;border-bottom:1px solid #EBEBEB;position:sticky;top:-4px;background:#fff}
+#gList .gl-h{display:flex;justify-content:space-between;gap:8px;padding:10px 14px 8px;font-size:13px;border-bottom:1px solid #EBEBEB;position:sticky;top:-4px;background:#fff;z-index:1}
 #gList .gl-h span{color:var(--text2);font-size:12px}
-#gList .gl-r{padding:8px 14px;cursor:pointer;border-left:3px solid transparent}
+#gList .gl-p{padding:10px 14px 8px;cursor:pointer;border-left:3px solid transparent;background:#FAFBFE;margin-top:2px}
+#gList .gl-p:hover{background:rgba(0,0,0,.04)}
+#gList .gl-p.on{background:var(--primaryLight);border-left-color:var(--primary)}
+#gList .gl-p .gl-n{font-size:14px;font-weight:600}
+#gList .gl-r{padding:8px 14px 8px 22px;cursor:pointer;border-left:3px solid transparent}
 #gList .gl-r:hover{background:rgba(0,0,0,.03)}
 #gList .gl-r.on{background:var(--primaryLight);border-left-color:var(--primary)}
 #gList .gl-n{display:flex;justify-content:space-between;gap:8px;font-size:13px;line-height:16px}
@@ -148,7 +154,7 @@ h3.sec{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
 <div class="paper" id="emptyBox" style="display:none"><h2>Пустое пространство</h2><div class="sub" style="font-size:14px">В этой команде ещё нет данных. Скачайте шаблон, заполните листы «Люди», «Календарь», «Бэклог» и загрузите. Или добавьте людей и задачи в блоках выше.</div></div>
 <div class="paper" id="ganttBox"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px"><h2 id="gvT" style="margin:0">2. Гант: задачи по дням, факт и план</h2><div class="seg" id="gvSeg" role="tablist"><button data-v="gantt" class="on">Гант</button><button data-v="graph">Граф</button></div></div><div id="gvGantt">
 <div class="sub">Строка = задача, у каждой своя линия. Задачи сгруппированы по людям (клик по имени сворачивает группу), внутри — по приоритету. В строке человека — дневная загрузка: встречи, буфер, задачи, свободно. Сплошная заливка = факт, полупрозрачная = прогноз; штриховка = блокер; пунктир = плановый срок; справа часы, которые не войдут. Подробности — в подсказке.</div>
-<div class="legend" id="legG"></div><div class="scroll"><svg id="gantt"></svg></div></div><div id="gvGraph" style="display:none"><div class="sub">Сеть релиза: в центре релиз, вокруг фичи (агенты), у каждой фичи её задачи. Цвет задачи: статус, размер: оценка в часах, кольцо у фичи: готовность к релизу. Наведите на узел, чтобы увидеть подробности, клик по задаче открывает её карточку, клик по фиче подсвечивает её задачи. Колесо мыши: масштаб, перетаскивание фона: сдвиг, узлы можно двигать.</div><div class="legend" id="gLeg"></div><div class="gGrid"><div id="gWrap"><svg id="gsvg"></svg><div class="gtool"><button class="btn" id="gFitB" title="Вписать граф в окно">Вписать</button><button class="btn" id="gReB" title="Заново разложить узлы">Перестроить</button></div><div class="ghint">Подписи задач появляются при приближении колесом и при наведении на фичу</div></div><div id="gList"></div></div></div></div>
+<div class="legend" id="legG"></div><div class="scroll"><svg id="gantt"></svg></div></div><div id="gvGraph" style="display:none"><div class="sub">Сеть релиза: в центре релиз, вокруг три проекта (AI стенд, Биллинг, CPQ). У проекта его фичи, у фичи её задачи. Цвет задачи: статус, размер: оценка в часах, кольцо: готовность к релизу. Наведите на узел, чтобы увидеть подробности, клик по задаче открывает её карточку, клик по фиче или проекту подсвечивает связанные узлы. Колесо мыши: масштаб, перетаскивание фона: сдвиг, узлы можно двигать.</div><div class="legend" id="gLeg"></div><div class="gGrid"><div id="gWrap"><svg id="gsvg"></svg><div class="gtool"><button class="btn" id="gFitB" title="Вписать граф в окно">Вписать</button><button class="btn" id="gReB" title="Заново разложить узлы">Перестроить</button></div><div class="ghint">Подписи задач появляются при приближении колесом и при наведении на фичу</div></div><div id="gList"></div></div></div></div>
 
 <div class="paper"><h2>3. Итоги спринта</h2>
 <div class="filters" style="margin-bottom:8px"><div class="field"><label>Спринт (связан с фильтром периода на Ганте)</label><select id="selSpr"></select></div><h3 class="sec" id="hSpr" style="margin:0 0 8px"></h3></div>
@@ -806,24 +812,59 @@ function drawCharts(P){const ps=visPeople().map(p=>p.id),tids=new Set(visTasks()
    el('text',{x:cx,y:cy+9,'text-anchor':'middle','font-size':26,'font-weight':600,fill:'#050819'},s,pct(vv));el('text',{x:cx,y:cy+r+30,'text-anchor':'middle','font-size':13,'font-weight':500},s,l);el('text',{x:cx,y:cy+r+46,'text-anchor':'middle','font-size':11,fill:'#85868A'},s,sub);});}
 }
 
-/* ===== Граф: релиз, фичи (агенты), задачи ===== */
+/* ===== Граф: релиз, проекты, фичи, задачи ===== */
 const GV_KEY=LS+':ui:ganttView';
 let GV=(()=>{try{return localStorage.getItem(GV_KEY)==='graph'?'graph':'gantt';}catch(e){return 'gantt';}})();
 const GPOS={};let GS={k:1,tx:0,ty:0,sel:null,hov:null,sig:'',N:[],L:[],A:{},drag:null,pan:null,raf:0,W:0,H:0};
-const gNorm=s=>String(s||'').toLowerCase().replace(/ё/g,'е').replace(/[«»"'`]/g,'').replace(/^\s*сервис\s*[-–—:]?\s*/,'').replace(/[\s\-–—_]+/g,' ').replace(/[.,;:!?()]+$/,'').trim();
+const G_PROJ={ai:{id:'ai',name:'AI стенд',col:'#5D6198',colD:'#343A7E'},bill:{id:'bill',name:'Биллинг',col:'#00897B',colD:'#00695C'},cpq:{id:'cpq',name:'CPQ',col:'#1565C0',colD:'#0D47A1'}};
+const G_PROJ_ORDER=['ai','bill','cpq'];
+/* Правила по порядку, первое совпадение побеждает. Поиск по всему названию, без учёта регистра. */
+const G_RULES=[
+  {re:/помощник по вики/,key:'wiki-agent',name:'Агент-Помощник по Вики',proj:'ai',how:'wiki-agent'},
+  {re:/(^|[^а-яa-z])вики([^а-яa-z]|$)/,key:'wiki',name:'Вики',proj:'ai',how:'wiki'},
+  {re:/настройщик|bpmcp|agent[\s-]*bp[\s-]*creator/,key:'tuner',name:'Настройщик',proj:'ai',how:'tuner'},
+  {re:/langfuse\.|encryption_key|(?:^|\s)langfuse(?:\.|\s|$)/,key:'tuner',name:'Настройщик',proj:'ai',how:'langfuse'},
+  {re:/контрагент/,key:'counterparty',name:'Помощник оценки контрагентов',proj:'ai',how:'counterparty'},
+  {re:/файл\s*индекс[а-яa-z]*[\s\S]*реализац|реализац[\s\S]*файл\s*индекс/,key:'indexer',name:'Файл-индексер',proj:'ai',how:'indexer'},
+  {re:/договор/,key:'contract',name:'Помощник работы с Договором',proj:'ai',how:'contract'},
+  {re:/развернуть сервисы/,key:'stand',name:'AI стенд',proj:'ai',how:'deploy'},
+  {re:/^ai стенд/,key:'stand',name:'AI стенд',proj:'ai',how:'stand'},
+  {re:/(^|[^а-яa-z0-9])(1с|1c)([^а-яa-z0-9]|$)/,key:'1c',name:'1С',proj:'cpq',how:'1c'},
+  {re:/конфигуратор/,key:'cfg',name:'Конфигуратор',proj:'cpq',how:'cfg'},
+  {re:/генерац[а-я]*\s+кп|(^|[^а-яa-z])cpq([^а-яa-z]|$)/,key:'kp',name:'Генерация КП',proj:'cpq',how:'kp'},
+  {re:/онбординг/,key:'onb',name:'Онбординг',proj:'bill',how:'onb'},
+  {re:/пресет\w*[\s\S]*биллинг|биллинг[\s\S]*пресет/,key:'presets',name:'Пресеты в Биллинге BP3',proj:'bill',how:'presets'}
+];
+const G_HOW={
+  'wiki-agent':'по названию помощника по вики','wiki':'по слову вики','tuner':'по слову настройщик',
+  'langfuse':'по задаче langfuse','counterparty':'по слову контрагент','indexer':'файл-индексер, реализация',
+  'contract':'по слову договор','deploy':'развернуть сервисы','stand':'по названию AI стенд',
+  '1c':'по слову 1С','cfg':'по слову конфигуратор','kp':'генерация КП / CPQ','onb':'онбординг',
+  'presets':'пресеты в биллинге','prefix':'по префиксу названия','parent':'по родительской задаче',
+  'inc':'по соседнему инкременту','name':'по совпадению названия','other':'без правила'
+};
+const gNorm=s=>String(s||'').toLowerCase().replace(/ё/g,'е').replace(/[«»"'`]/g,'').replace(/[\s\-–—_]+/g,' ').replace(/[.,;:!?()]+$/,'').trim();
 function gPrefix(t){const s=String(t.title||'').replace(/https?:\/\/\S+/g,'');const i=s.indexOf(':');if(i<=0)return null;const p=s.slice(0,i).replace(/\s+/g,' ').trim();return p&&p.length<=70?p:null;}
 function gShort(t){const s=String(t.title||'').trim(),p=gPrefix(t);let r=p?s.slice(s.indexOf(':')+1).replace(/^[\s\-–]+/,'').trim():s;r=r.replace(/\s*·\s*инкр\.\s*/,' · ');if(!r)r=s;return r.length>34?r.slice(0,33).trim()+'…':r;}
 const gCut=(s,n)=>s.length>n?s.slice(0,n-1).trim()+'…':s;
-function gGroups(){const G={},by={},how={},names={};
- D.tasks.forEach(t=>{const p=gPrefix(t);if(!p)return;const k=gNorm(p);if(!k)return;by[t.id]=k;how[t.id]='prefix';(names[k]=names[k]||{})[p]=(names[k][p]||0)+1;});
- const keys=Object.keys(names).sort((a,b)=>b.length-a.length);
- D.tasks.forEach(t=>{if(by[t.id])return;
-  if(t.parent&&by[t.parent]){by[t.id]=by[t.parent];how[t.id]='parent';return;}
-  const m=String(t.id).match(/^(.*\d.*)-\d+$/);if(m){const sib=D.tasks.find(q=>q.id!==t.id&&by[q.id]&&how[q.id]==='prefix'&&String(q.id).replace(/-\d+$/,'')===m[1]);if(sib){by[t.id]=by[sib.id];how[t.id]='inc';return;}}
-  const n=gNorm(t.title),k=keys.find(k=>k.length>=4&&(' '+n+' ').includes(' '+k+' '));if(k){by[t.id]=k;how[t.id]='name';return;}
-  by[t.id]='@other';how[t.id]='other';});
- Object.entries(names).forEach(([k,o])=>{G[k]=Object.entries(o).sort((a,b)=>b[1]-a[1]||a[0].length-b[0].length)[0][0];});G['@other']='Прочее';
- return {by,how,name:G};}
+function gClassify(title){const n=gNorm(title);for(let i=0;i<G_RULES.length;i++){const r=G_RULES[i];if(r.re.test(n))return {key:r.key,name:r.name,proj:r.proj,how:r.how};}return null;}
+function gGroups(){const by={},how={},proj={},name={},vote={};
+ function set(id,key,nm,pr,h){by[id]=key;how[id]=h;proj[id]=pr;if(!name[key])name[key]=nm;}
+ D.tasks.forEach(t=>{const c=gClassify(t.title);if(c){set(t.id,c.key,c.name,c.proj,c.how);return;}
+  const p=gPrefix(t);if(!p)return;
+  const raw=p.replace(/^\s*Сервис\s*[-–—:]?\s*/i,'').trim()||p;
+  const c2=gClassify(raw);if(c2){set(t.id,c2.key,c2.name,c2.proj,c2.how);return;}
+  const k='pfx:'+gNorm(raw);set(t.id,k,raw,'ai','prefix');(vote[k]=vote[k]||{})[raw]=(vote[k][raw]||0)+1;});
+ Object.entries(vote).forEach(([k,o])=>{name[k]=Object.entries(o).sort((a,b)=>b[1]-a[1]||a[0].length-b[0].length)[0][0];});
+ D.tasks.forEach(t=>{if(by[t.id])return;if(t.parent&&by[t.parent])set(t.id,by[t.parent],name[by[t.parent]],proj[t.parent],'parent');});
+ D.tasks.forEach(t=>{if(by[t.id])return;const m=String(t.id).match(/^(.*\d.*)-\d+$/);if(!m)return;
+  const sib=D.tasks.find(q=>q.id!==t.id&&by[q.id]&&how[q.id]!=='other'&&how[q.id]!=='inc'&&how[q.id]!=='parent'&&String(q.id).replace(/-\d+$/,'')===m[1]);
+  if(sib)set(t.id,by[sib.id],name[by[sib.id]],proj[sib.id],'inc');});
+ const keys=Object.keys(name).filter(k=>k!=='@other').map(k=>({k,n:gNorm(name[k])})).filter(x=>x.n.length>=4).sort((a,b)=>b.n.length-a.n.length);
+ D.tasks.forEach(t=>{if(by[t.id])return;const n=' '+gNorm(t.title)+' ';const hit=keys.find(x=>n.includes(' '+x.n+' '));if(!hit)return;
+  let prj='ai';for(const id of Object.keys(by)){if(by[id]===hit.k){prj=proj[id];break;}}set(t.id,hit.k,name[hit.k],prj,'name');});
+ D.tasks.forEach(t=>{if(!by[t.id])set(t.id,'@other','Прочее','ai','other');});
+ name['@other']='Прочее';return {by,how,name,proj};}
 function gProg(t){if(t.status==='Принята')return 1;const e=+t.est||0,s=+t.spent||0;if(t.status==='На ревью')return 0.9;return e>0?Math.min(s/e,0.9):0;}
 const gW=t=>Math.max(+t.est||0,1);
 function gInPeriod(t,P){if(F.wave==='all')return true;const vd=visDays();if(!vd.length)return true;const a=vd[0],b=vd[vd.length-1],x=P.R[t.id];
@@ -831,46 +872,58 @@ function gInPeriod(t,P){if(F.wave==='all')return true;const vd=visDays();if(!vd.
  return !!x&&Object.keys(x.fact||{}).filter(d=>x.fact[d]>EPS).concat(Object.keys(x.fc||{}).filter(d=>x.fc[d]>EPS)).some(d=>d>=a&&d<=b);}
 const G_ST=[['Запланировано','#D9DADF','#85868A',1],['Активна','#1E88E5','#1565C0'],['Пауза','#BDBDBD','#757575'],['Блокер','#FFD4D8','#F32A16'],['На ревью','#7B1FA2','#7B1FA2'],['Принята','#599C16','#3E7A0E']];
 function gRootName(){if(F.wave==='all')return C.name;const s=C.sprints.find(s=>s.id===F.wave);if(s)return 'Спринт '+s.id;return 'Волна '+F.wave;}
+function gWeighted(ts){let w=0,s=0;ts.forEach(t=>{w+=gW(t);s+=gW(t)*gProg(t);});return {w,p:w?s/w:0};}
 function gBuild(P){const gr=gGroups(),ts=visTasks().filter(t=>gInPeriod(t,P)),ids=new Set(ts.map(t=>t.id));
- const FE={};ts.forEach(t=>{const k=gr.by[t.id];(FE[k]=FE[k]||{key:k,name:gr.name[k]||k,tasks:[]}).tasks.push(t);});
- const feats=Object.values(FE);feats.forEach(f=>{let w=0,s=0;f.tasks.forEach(t=>{w+=gW(t);s+=gW(t)*gProg(t);});f.w=w;f.p=w?s/w:0;f.tasks.sort(cmpTasks);});
- feats.sort((a,b)=>(a.key==='@other')-(b.key==='@other')||b.tasks.length-a.tasks.length||a.name.localeCompare(b.name,'ru'));
- let W=0,S=0;ts.forEach(t=>{W+=gW(t);S+=gW(t)*gProg(t);});
+ const FE={};ts.forEach(t=>{const k=gr.by[t.id];(FE[k]=FE[k]||{key:k,name:gr.name[k]||k,proj:gr.proj[t.id]||'ai',tasks:[]}).tasks.push(t);});
+ const feats=Object.values(FE);feats.forEach(f=>{const x=gWeighted(f.tasks);f.w=x.w;f.p=x.p;f.tasks.sort(cmpTasks);});
+ const PO={};G_PROJ_ORDER.forEach(id=>{PO[id]={id,name:G_PROJ[id].name,feats:[],tasks:[]};});
+ feats.forEach(f=>{(PO[f.proj]||PO.ai).feats.push(f);(PO[f.proj]||PO.ai).tasks.push(...f.tasks);});
+ const projs=G_PROJ_ORDER.map(id=>PO[id]).filter(p=>p.tasks.length);
+ projs.forEach(p=>{const x=gWeighted(p.tasks);p.w=x.w;p.p=x.p;p.feats.sort((a,b)=>(a.key==='@other')-(b.key==='@other')||b.tasks.length-a.tasks.length||a.name.localeCompare(b.name,'ru'));});
+ const rel=gWeighted(ts);
  const N=[],L=[],A={};const add=(a,b)=>{(A[a]=A[a]||new Set()).add(b);(A[b]=A[b]||new Set()).add(a);};
- const root={id:'@R',kind:'root',r:30,ch:-900,p:W?S/W:0,n:ts.length,bw:150,bh:110};N.push(root);
- feats.forEach(f=>{const n={id:'@F:'+f.key,kind:'feat',f,r:Math.min(13+Math.sqrt(f.w)*0.8,28),ch:-260-f.tasks.length*22};n.bw=Math.max(2*n.r+10,(Math.min(f.name.length,30)+6)*6.9);n.bh=2*n.r+30;N.push(n);L.push({s:'@R',t:n.id,kind:'rf',len:110+n.r+f.tasks.length*5,k:0.3});add('@R',n.id);
-  f.tasks.forEach(t=>{const m={id:t.id,kind:'task',t,f,r:4+Math.sqrt(+t.est||1)*1.05,ch:-45};N.push(m);L.push({s:n.id,t:t.id,kind:'ft',len:34+n.r+m.r+Math.min(f.tasks.length,12)*1.5,k:0.6});add(n.id,t.id);});});
+ const root={id:'@R',kind:'root',r:30,ch:-900,p:rel.p,n:ts.length,bw:150,bh:110};N.push(root);
+ projs.forEach(p=>{const n={id:'@P:'+p.id,kind:'proj',pr:p,r:24,ch:-520-p.feats.length*18};n.bw=Math.max(2*n.r+16,(p.name.length+8)*7.2);n.bh=2*n.r+40;N.push(n);
+  L.push({s:'@R',t:n.id,kind:'rp',len:175+n.r,k:0.28});add('@R',n.id);
+  p.feats.forEach(f=>{const fn={id:'@F:'+f.key,kind:'feat',f,r:Math.min(13+Math.sqrt(f.w)*0.8,28),ch:-260-f.tasks.length*22};fn.bw=Math.max(2*fn.r+10,(Math.min(f.name.length,30)+6)*6.9);fn.bh=2*fn.r+30;N.push(fn);
+   L.push({s:n.id,t:fn.id,kind:'pf',len:100+fn.r+Math.min(p.feats.length,14)*3,k:0.32});add(n.id,fn.id);
+   f.tasks.forEach(t=>{const m={id:t.id,kind:'task',t,f,r:4+Math.sqrt(+t.est||1)*1.05,ch:-45};N.push(m);
+    L.push({s:fn.id,t:t.id,kind:'ft',len:34+fn.r+m.r+Math.min(f.tasks.length,12)*1.5,k:0.6});add(fn.id,t.id);});});});
  ts.forEach(t=>deps(t).forEach(d=>{if(ids.has(d)&&d!==t.id){L.push({s:d,t:t.id,kind:'dep',len:160,k:0.02});add(d,t.id);}}));
  const M={};N.forEach(n=>M[n.id]=n);L.forEach(l=>{l.a=M[l.s];l.b=M[l.t];});
- return {N,L,A,M,feats,gr,root};}
+ return {N,L,A,M,feats,projs,gr,root};}
 /* лёгкий force-layout (как d3-force: many-body, link, collide, слабое притяжение к центру) */
 function gRand(seed){let s=seed>>>0||1;return ()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
-function gInit(B){const rnd=gRand(7),nf=B.feats.length;
+function gInit(B){const rnd=gRand(7);
  B.N.forEach(n=>{const o=GPOS[n.id];if(o){n.x=o.x;n.y=o.y;}});
- B.feats.forEach((f,i)=>{const n=B.M['@F:'+f.key];const a=i/Math.max(nf,1)*Math.PI*2-Math.PI/2,R=170+(i%2)*60;
-  if(n.x==null){n.x=Math.cos(a)*R;n.y=Math.sin(a)*R;}
-  f.tasks.forEach((t,j)=>{const m=B.M[t.id];if(m.x!=null)return;const b=a+(j/Math.max(f.tasks.length,1)-0.5)*Math.PI*1.2,r2=n.r+40+rnd()*20;m.x=n.x+Math.cos(b)*r2;m.y=n.y+Math.sin(b)*r2;});});
+ const place={ai:{a:0.12,R:290},bill:{a:Math.PI*0.82,R:270},cpq:{a:-Math.PI*0.68,R:270}};
+ B.projs.forEach(p=>{const n=B.M['@P:'+p.id],pl=place[p.id]||{a:0,R:200};
+  n.tx=Math.cos(pl.a)*pl.R;n.ty=Math.sin(pl.a)*pl.R;
+  if(n.x==null){n.x=n.tx;n.y=n.ty;}
+  n.fx=n.x;n.fy=n.y;
+  const nf=p.feats.length,spread=Math.min(Math.PI*1.4,0.55+nf*0.2);
+  p.feats.forEach((f,i)=>{const fn=B.M['@F:'+f.key],fa=pl.a+(nf<=1?0:(i/(nf-1)-0.5)*spread),R2=150+(i%2)*30;
+   if(fn.x==null){fn.x=n.x+Math.cos(fa)*R2;fn.y=n.y+Math.sin(fa)*R2;}
+   f.tasks.forEach((t,j)=>{const m=B.M[t.id];if(m.x!=null)return;const b=fa+(j/Math.max(f.tasks.length,1)-0.5)*Math.PI*1.2,r2=fn.r+40+rnd()*20;m.x=fn.x+Math.cos(b)*r2;m.y=fn.y+Math.sin(b)*r2;});});});
  B.N.forEach(n=>{if(n.x==null){n.x=(rnd()-.5)*50;n.y=(rnd()-.5)*50;}n.vx=0;n.vy=0;});const r=B.M['@R'];r.x=0;r.y=0;r.fx=0;r.fy=0;}
 function gTick(B,alpha){const N=B.N,n=N.length;
  for(let i=0;i<n;i++){const a=N[i];for(let j=i+1;j<n;j++){const b=N[j];let dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;if(d2<1){dx=0.5+i%3;dy=0.5+j%3;d2=dx*dx+dy*dy;}
   const d=Math.sqrt(d2),dd=Math.max(d2,400);const fa=b.ch*alpha/dd,fb=a.ch*alpha/dd;a.vx+=dx*fa;a.vy+=dy*fa;b.vx-=dx*fb;b.vy-=dy*fb;
   if(a.kind!=='task'&&b.kind!=='task'){const ox=(a.bw+b.bw)/2+10-Math.abs(dx),oy=(a.bh+b.bh)/2+8-Math.abs(dy);if(ox>0&&oy>0){if(ox*0.6<oy){const o=ox*0.5*0.5*(dx<0?-1:1);a.x-=o;b.x+=o;}else{const o=oy*0.5*0.5*(dy<0?-1:1);a.y-=o;b.y+=o;}}}
   else{const mn=a.r+b.r+(a.kind==='task'&&b.kind==='task'?6:18);if(d<mn){const o=(mn-d)/d*0.5*0.8;a.x-=dx*o;a.y-=dy*o;b.x+=dx*o;b.y+=dy*o;}}}}
- B.L.forEach(l=>{const a=l.a,b=l.b;let dx=b.x+b.vx-a.x-a.vx,dy=b.y+b.vy-a.y-a.vy,d=Math.sqrt(dx*dx+dy*dy)||1;const f=(d-l.len)/d*alpha*l.k;const ba=l.kind==='rf'?0.85:0.5;b.vx-=dx*f*ba;b.vy-=dy*f*ba;a.vx+=dx*f*(1-ba);a.vy+=dy*f*(1-ba);});
- N.forEach(m=>{m.vx-=m.x*0.03*alpha;m.vy-=m.y*0.03*alpha*1.35;});
+ B.L.forEach(l=>{const a=l.a,b=l.b;let dx=b.x+b.vx-a.x-a.vx,dy=b.y+b.vy-a.y-a.vy,d=Math.sqrt(dx*dx+dy*dy)||1;const f=(d-l.len)/d*alpha*l.k;const ba=l.kind==='rp'?0.85:l.kind==='pf'?0.65:0.5;b.vx-=dx*f*ba;b.vy-=dy*f*ba;a.vx+=dx*f*(1-ba);a.vy+=dy*f*(1-ba);});
+ N.forEach(m=>{if(m.kind==='proj'&&m.tx!=null){m.vx+=(m.tx-m.x)*0.02*alpha;m.vy+=(m.ty-m.y)*0.02*alpha;return;}if(m.kind==='proj')return;m.vx-=m.x*0.025*alpha;m.vy-=m.y*0.025*alpha*1.25;});
  N.forEach(m=>{if(m.fx!=null){m.x=m.fx;m.y=m.fy;m.vx=m.vy=0;return;}m.vx*=0.6;m.vy*=0.6;m.x+=m.vx;m.y+=m.vy;});}
 function gRun(B,ticks,a0){let a=a0==null?1:a0;const dec=1-Math.pow(0.001,1/ticks);for(let i=0;i<ticks;i++){gTick(B,a);a+=(0-a)*dec;}}
 function gSave(B){B.N.forEach(n=>{GPOS[n.id]={x:n.x,y:n.y};});}
-/* --- отрисовка --- */
-function gDone(t,P){const x=P.R[t.id]||{};return x;}
 function gPeople(ids){return [...new Set(ids)].map(id=>person(id)||{id,name:id}).sort(cmpPeople);}
 function gTaskTip(t,P,B){const x=P.R[t.id]||{},c=curSt(t)||'Запланировано',p=person(t.person),pl=planOf(t);
  const dep=deps(t).map(d=>{const q=task(d);return q?`${esc(q.title)} <span style="color:#B9BAC4">(${esc(d)}, ${esc(curSt(q))})</span>`:esc(d);});
  const need=D.tasks.filter(q=>deps(q).includes(t.id)).map(q=>`${esc(q.title)} <span style="color:#B9BAC4">(${esc(q.id)})</span>`);
- const how={parent:'по родительской задаче',inc:'по соседнему инкременту',name:'по совпадению названия',other:'без префикса'}[B.gr.how[t.id]];
+ const feat=B.gr.name[B.gr.by[t.id]]||'Прочее',prj=(G_PROJ[B.gr.proj[t.id]]||G_PROJ.ai).name,how=G_HOW[B.gr.how[t.id]];
  const fc=x.accepted?'принята '+ru(x.accepted):x.endA?ru(x.endA):'за горизонтом';
  return `<div style="font-weight:600;font-size:13px;line-height:17px;margin-bottom:4px">${esc(t.title)}</div>`+
- `<div style="color:#B9BAC4;margin-bottom:6px">${esc(t.id)} · фича: ${esc(B.gr.name[B.gr.by[t.id]]||'Прочее')}${how?' ('+how+')':''}</div>`+
+ `<div style="color:#B9BAC4;margin-bottom:6px">${esc(t.id)} · проект: ${esc(prj)} · фича: ${esc(feat)}${how?' ('+how+')':''}</div>`+
  `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${stCol(t).f};border:1px solid #fff;margin-right:5px"></span><b>${esc(c)}</b>`+(c==='Блокер'||c==='Пауза'?(t.blocker&&t.blocker!=='Блокер'&&t.blocker!=='Пауза'?', причина: '+esc(t.blocker):'')+(t.since?', с '+ru(t.since):''):'')+
  `<br>Ответственный: ${esc(p?p.name:(t.person||'не назначен'))}`+(t.needRev?`<br>Ревьюер: ${esc(revName(t.reviewer))}`:'<br>Без ревью')+
  `<br>Часы: факт ${h1(+t.spent||0)} / оценка ${h1(+t.est||0)} / остаток ${h1(+t.rem||0)}`+
@@ -882,41 +935,64 @@ function gFeatTip(f,P){const cnt={};f.tasks.forEach(t=>{const c=curSt(t)||'За�
  const open=f.tasks.filter(t=>t.status!=='Принята');let late=null,hor=false;open.forEach(t=>{const e=(P.R[t.id]||{}).endA;if(!e)hor=true;else if(!late||e>late)late=e;});
  const bl=f.tasks.filter(t=>curSt(t)==='Блокер');let est=0,sp=0,rem=0;f.tasks.forEach(t=>{est+=+t.est||0;sp+=+t.spent||0;rem+=+t.rem||0;});
  return `<div style="font-weight:600;font-size:13px;line-height:17px;margin-bottom:4px">${esc(f.name)}: ${Math.round(f.p*100)}% к релизу</div>`+
+ `Проект: ${esc((G_PROJ[f.proj]||G_PROJ.ai).name)}<br>`+
  `Задач: ${f.tasks.length} · `+G_ST.filter(s=>cnt[s[0]]).map(s=>`${esc(s[0].toLowerCase())} ${cnt[s[0]]}`).join(', ')+
  `<br>Часы: факт ${h1(sp)} / оценка ${h1(est)} / остаток ${h1(rem)}`+
  `<br>Участники: ${gPeople(f.tasks.map(t=>t.person).filter(Boolean)).map(p=>esc(p.name)).join(', ')||'нет'}`+
  `<br>Последняя приёмка (прогноз): ${!open.length?'все задачи приняты':hor?'за горизонтом':ru(late)}`+
  (bl.length?`<div style="margin-top:6px;color:#FFB4B4"><b>Блокеры:</b><br>${bl.map(t=>esc(t.title)+(t.blocker&&t.blocker!=='Блокер'?': '+esc(t.blocker):'')).join('<br>')}</div>`:'');}
-function gRootTip(B,P){const ts=B.feats.flatMap(f=>f.tasks),acc=ts.filter(t=>t.status==='Принята').length;
- return `<div style="font-weight:600;font-size:13px;margin-bottom:4px">${esc(gRootName())}: ${Math.round(B.root.p*100)}% к релизу</div>Релиз ${ru(C.release)}<br>Фич: ${B.feats.length} · задач: ${ts.length} · принято: ${acc}`;}
+function gProjTip(p){const acc=p.tasks.filter(t=>t.status==='Принята').length,cnt={};p.tasks.forEach(t=>{const c=curSt(t)||'Запланировано';cnt[c]=(cnt[c]||0)+1;});
+ let est=0,sp=0,rem=0;p.tasks.forEach(t=>{est+=+t.est||0;sp+=+t.spent||0;rem+=+t.rem||0;});
+ const bl=p.tasks.filter(t=>curSt(t)==='Блокер');
+ return `<div style="font-weight:600;font-size:13px;line-height:17px;margin-bottom:4px">${esc(p.name)}: ${Math.round(p.p*100)}% к релизу</div>`+
+ `Фич: ${p.feats.length} · задач: ${p.tasks.length} · принято: ${acc}<br>`+
+ G_ST.filter(s=>cnt[s[0]]).map(s=>`${esc(s[0].toLowerCase())} ${cnt[s[0]]}`).join(', ')+
+ `<br>Часы: факт ${h1(sp)} / оценка ${h1(est)} / остаток ${h1(rem)}`+
+ (bl.length?`<div style="margin-top:6px;color:#FFB4B4"><b>Блокеры:</b><br>${bl.map(t=>esc(t.title)+(t.blocker&&t.blocker!=='Блокер'?': '+esc(t.blocker):'')).join('<br>')}</div>`:'');}
+function gRootTip(B){const ts=B.projs.flatMap(p=>p.tasks),acc=ts.filter(t=>t.status==='Принята').length;
+ return `<div style="font-weight:600;font-size:13px;margin-bottom:4px">${esc(gRootName())}: ${Math.round(B.root.p*100)}% к релизу</div>Релиз ${ru(C.release)}<br>Проектов: ${B.projs.length} · фич: ${B.feats.length} · задач: ${ts.length} · принято: ${acc}<br>`+B.projs.map(p=>`${esc(p.name)} ${Math.round(p.p*100)}%`).join(', ');}
 function gTipShow(h,ev){const g=$('gtip');g.innerHTML=h;g.style.display='block';const w=g.offsetWidth,hh=g.offsetHeight;let x=ev.clientX+14,y=ev.clientY+14;if(x+w>innerWidth-8)x=ev.clientX-w-14;if(y+hh>innerHeight-8)y=Math.max(8,innerHeight-hh-8);g.style.left=x+'px';g.style.top=y+'px';}
 function gTipHide(){const g=$('gtip');if(g)g.style.display='none';}
-function gFit(){const B=GS.B;if(!B||!B.N.length)return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;B.N.forEach(n=>{const lw=n.kind==='feat'?95:n.kind==='root'?80:60;x0=Math.min(x0,n.x-n.r-lw);x1=Math.max(x1,n.x+n.r+lw);y0=Math.min(y0,n.y-n.r-8);y1=Math.max(y1,n.y+n.r+(n.kind==='task'?18:34));});
+function gFit(){const B=GS.B;if(!B||!B.N.length)return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;B.N.forEach(n=>{const lw=n.kind==='proj'?110:n.kind==='feat'?95:n.kind==='root'?80:60;x0=Math.min(x0,n.x-n.r-lw);x1=Math.max(x1,n.x+n.r+lw);y0=Math.min(y0,n.y-n.r-8);y1=Math.max(y1,n.y+n.r+(n.kind==='task'?18:36));});
  const W=GS.W,H=GS.H,k=Math.min(W/(x1-x0),H/(y1-y0),1.6);GS.k=k;GS.tx=W/2-(x0+x1)/2*k;GS.ty=H/2-(y0+y1)/2*k;gView();}
 function gView(){const v=$('gvp');if(!v)return;v.setAttribute('transform',`translate(${GS.tx},${GS.ty}) scale(${GS.k})`);$('gsvg').classList.toggle('lowz',GS.k<1.15);}
 function gPos(){const B=GS.B;if(!B)return;B.N.forEach(n=>{const g=n.el;if(g)g.setAttribute('transform',`translate(${n.x},${n.y})`);});
  B.L.forEach(l=>{if(!l.el)return;if(l.kind==='dep'){const dx=l.b.x-l.a.x,dy=l.b.y-l.a.y,d=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/d,uy=dy/d;l.el.setAttribute('x1',l.a.x+ux*(l.a.r+2));l.el.setAttribute('y1',l.a.y+uy*(l.a.r+2));l.el.setAttribute('x2',l.b.x-ux*(l.b.r+4));l.el.setAttribute('y2',l.b.y-uy*(l.b.r+4));}
   else{l.el.setAttribute('x1',l.a.x);l.el.setAttribute('y1',l.a.y);l.el.setAttribute('x2',l.b.x);l.el.setAttribute('y2',l.b.y);}});}
-function gHL(){const B=GS.B,svg=$('gsvg');if(!B||!svg)return;const c=GS.hov||GS.sel;svg.classList.toggle('dim',!!c);B.N.forEach(n=>n.el&&n.el.classList.remove('on'));B.L.forEach(l=>l.el&&l.el.classList.remove('on'));if(!c)return;
- let on=new Set([c]);if(GS.hov){(B.A[c]||[]).forEach(x=>on.add(x));}else{const f=B.M[c];if(f&&f.kind==='feat'){on.add('@R');f.f.tasks.forEach(t=>on.add(t.id));}}
- B.N.forEach(n=>{if(on.has(n.id))n.el.classList.add('on');});B.L.forEach(l=>{if(GS.hov?(l.s===c||l.t===c):(on.has(l.s)&&on.has(l.t)&&l.kind!=='dep'||(l.kind==='dep'&&on.has(l.s)&&on.has(l.t))))l.el.classList.add('on');});
- document.querySelectorAll('#gList [data-gf]').forEach(r=>r.classList.toggle('on',r.dataset.gf===GS.sel));}
-function gList(B){const fs=B.feats.slice().sort((a,b)=>b.p-a.p||a.name.localeCompare(b.name,'ru'));
- $('gList').innerHTML=`<div class="gl-h"><b>Готовность фич к релизу</b><span>${esc(gRootName())}: ${Math.round(B.root.p*100)}%</span></div>`+fs.map(f=>{const bl=f.tasks.some(t=>curSt(t)==='Блокер');const pc=Math.round(f.p*100);
-  return `<div class="gl-r" data-gf="${esc('@F:'+f.key)}" title="${esc(f.name)}"><div class="gl-n"><span>${esc(f.name)}${bl?' <b style="color:#F32A16">⛔</b>':''}</span><b>${pc}%</b></div><div class="gl-b"><i style="width:${pc}%;background:${pc>=100?'#599C16':pc>=60?'#7CB342':pc>=30?'#1E88E5':'#B1B6D4'}"></i></div><div class="gl-s">${f.tasks.length} ${f.tasks.length%10===1&&f.tasks.length%100!==11?'задача':f.tasks.length%10>=2&&f.tasks.length%10<=4&&(f.tasks.length%100<10||f.tasks.length%100>=20)?'задачи':'задач'} · ${h1(f.w)} ч</div></div>`;}).join('');}
+function gOn(id){const B=GS.B,on=new Set([id]),n=B&&B.M[id];if(!n)return on;
+ if(n.kind==='task'){(B.A[id]||[]).forEach(x=>on.add(x));}
+ else if(n.kind==='feat'){on.add('@R');on.add('@P:'+n.f.proj);n.f.tasks.forEach(t=>on.add(t.id));}
+ else if(n.kind==='proj'){on.add('@R');n.pr.feats.forEach(f=>{on.add('@F:'+f.key);f.tasks.forEach(t=>on.add(t.id));});}
+ else if(n.kind==='root'){B.N.forEach(x=>on.add(x.id));}
+ return on;}
+function gHL(){const B=GS.B,svg=$('gsvg');if(!B||!svg)return;const c=GS.hov||GS.sel;svg.classList.toggle('dim',!!c);B.N.forEach(n=>n.el&&n.el.classList.remove('on'));B.L.forEach(l=>l.el&&l.el.classList.remove('on'));
+ if(c){const on=gOn(c);B.N.forEach(n=>{if(on.has(n.id))n.el.classList.add('on');});B.L.forEach(l=>{if(on.has(l.s)&&on.has(l.t))l.el.classList.add('on');});}
+ document.querySelectorAll('#gList [data-gf]').forEach(r=>r.classList.toggle('on',r.dataset.gf===GS.sel));
+ document.querySelectorAll('#gList [data-gp]').forEach(r=>r.classList.toggle('on',r.dataset.gp===GS.sel));}
+function gNum(n,a,b,c){return n%10===1&&n%100!==11?a:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?b:c;}
+function gBar(pc){return `<div class="gl-b"><i style="width:${pc}%;background:${pc>=100?'#599C16':pc>=60?'#7CB342':pc>=30?'#1E88E5':'#B1B6D4'}"></i></div>`;}
+function gList(B){const rows=B.projs.map(p=>{const pc=Math.round(p.p*100),col=G_PROJ[p.id].colD;
+  const head=`<div class="gl-p" data-gp="${esc('@P:'+p.id)}"><div class="gl-n"><span style="color:${col}">${esc(p.name)}</span><b>${pc}%</b></div>${gBar(pc)}<div class="gl-s">${p.feats.length} ${gNum(p.feats.length,'фича','фичи','фич')} · ${p.tasks.length} ${gNum(p.tasks.length,'задача','задачи','задач')} · ${h1(p.w)} ч</div></div>`;
+  const fs=p.feats.slice().sort((a,b)=>(a.key==='@other')-(b.key==='@other')||b.p-a.p||a.name.localeCompare(b.name,'ru'));
+  return head+fs.map(f=>{const bl=f.tasks.some(t=>curSt(t)==='Блокер'),fpc=Math.round(f.p*100);
+   return `<div class="gl-r" data-gf="${esc('@F:'+f.key)}" title="${esc(f.name)}"><div class="gl-n"><span>${esc(f.name)}${bl?' <b style="color:#F32A16">⛔</b>':''}</span><b>${fpc}%</b></div>${gBar(fpc)}<div class="gl-s">${f.tasks.length} ${gNum(f.tasks.length,'задача','задачи','задач')} · ${h1(f.w)} ч</div></div>`;}).join('');}).join('');
+ $('gList').innerHTML=`<div class="gl-h"><b>Готовность к релизу</b><span>${esc(gRootName())}: ${Math.round(B.root.p*100)}%</span></div>`+rows;}
 function drawGraph(P){if(GV!=='graph')return;const box=$('gWrap');if(!box)return;const svg=$('gsvg');GS.W=box.clientWidth||1000;GS.H=box.clientHeight||720;svg.setAttribute('width',GS.W);svg.setAttribute('height',GS.H);
  const B=gBuild(P);const sig=B.N.map(n=>n.id).join('|')+'#'+B.L.filter(l=>l.kind==='dep').map(l=>l.s+'>'+l.t).join('|');const fresh=sig!==GS.sig;
- if(GS.B)gSave(GS.B);gInit(B);if(fresh){const known=B.N.filter(n=>GPOS[n.id]).length;gRun(B,known>B.N.length*0.8?120:400,known>B.N.length*0.8?0.3:1);}
+ if(GS.B)gSave(GS.B);gInit(B);if(fresh){const known=B.N.filter(n=>GPOS[n.id]).length;gRun(B,known>B.N.length*0.8?140:450,known>B.N.length*0.8?0.3:1);}
  GS.B=B;GS.sig=sig;if(GS.sel&&!B.M[GS.sel])GS.sel=null;
  while(svg.firstChild)svg.removeChild(svg.firstChild);
  const defs=el('defs',{},svg);const mk=el('marker',{id:'gArr',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},defs);el('path',{d:'M0,0 L10,5 L0,10 z',fill:'#8E92BC'},mk);
  const bg=el('rect',{x:0,y:0,width:GS.W,height:GS.H,fill:'#FBFBFD',class:'gbg'},svg);const vp=el('g',{id:'gvp'},svg);
  const gE=el('g',{},vp),gD=el('g',{},vp),gN=el('g',{},vp);
- B.L.forEach(l=>{l.el=l.kind==='dep'?el('line',{class:'ge gdep','marker-end':'url(#gArr)'},gD):el('line',{class:'ge '+(l.kind==='rf'?'grf':'gft')},gE);});
- const ORD={task:0,feat:1,root:2};B.N.slice().sort((a,b)=>ORD[a.kind]-ORD[b.kind]).forEach(n=>{const g=el('g',{class:'gn g'+n.kind,'data-id':n.id},gN);n.el=g;
+ B.L.forEach(l=>{l.el=l.kind==='dep'?el('line',{class:'ge gdep','marker-end':'url(#gArr)'},gD):el('line',{class:'ge '+(l.kind==='rp'?'grp':l.kind==='pf'?'gpf':'gft')},gE);});
+ const ORD={task:0,feat:1,proj:2,root:3};B.N.slice().sort((a,b)=>ORD[a.kind]-ORD[b.kind]).forEach(n=>{const g=el('g',{class:'gn g'+n.kind,'data-id':n.id},gN);n.el=g;
   if(n.kind==='root'){el('circle',{r:n.r,fill:'#343A7E'},g);el('circle',{r:n.r+5,fill:'none',stroke:'#E7E7F0','stroke-width':4},g);const C2=2*Math.PI*(n.r+5);el('circle',{r:n.r+5,fill:'none',stroke:'#599C16','stroke-width':4,'stroke-dasharray':`${C2*n.p} ${C2}`,transform:'rotate(-90)'},g);
    el('text',{y:6,'text-anchor':'middle','font-size':17,'font-weight':600,fill:'#fff'},g,Math.round(n.p*100)+'%');el('text',{y:n.r+24,'text-anchor':'middle',class:'glr'},g,gRootName());el('text',{y:n.r+39,'text-anchor':'middle',class:'gls'},g,'релиз '+ru(C.release));}
-  else if(n.kind==='feat'){const f=n.f,C2=2*Math.PI*(n.r+4),bl=f.tasks.some(t=>curSt(t)==='Блокер');el('circle',{r:n.r,fill:'#5D6198',stroke:bl?'#F32A16':'#fff','stroke-width':bl?2.5:1.5},g);el('circle',{r:n.r+4,fill:'none',stroke:'#E7E7F0','stroke-width':3.5},g);
+  else if(n.kind==='proj'){const p=n.pr,C2=2*Math.PI*(n.r+5),col=G_PROJ[p.id].colD,bl=p.tasks.some(t=>curSt(t)==='Блокер');el('circle',{r:n.r,fill:col,stroke:bl?'#F32A16':'#fff','stroke-width':bl?2.5:2},g);el('circle',{r:n.r+5,fill:'none',stroke:'#E7E7F0','stroke-width':4},g);
+   el('circle',{r:n.r+5,fill:'none',stroke:'#599C16','stroke-width':4,'stroke-dasharray':`${C2*p.p} ${C2}`,transform:'rotate(-90)'},g);
+   el('text',{y:6,'text-anchor':'middle','font-size':14,'font-weight':600,fill:'#fff'},g,Math.round(p.p*100)+'%');el('text',{y:n.r+22,'text-anchor':'middle',class:'glp'},g,p.name+' · '+Math.round(p.p*100)+'%');}
+  else if(n.kind==='feat'){const f=n.f,C2=2*Math.PI*(n.r+4),bl=f.tasks.some(t=>curSt(t)==='Блокер'),col=(G_PROJ[f.proj]||G_PROJ.ai).col;el('circle',{r:n.r,fill:col,stroke:bl?'#F32A16':'#fff','stroke-width':bl?2.5:1.5},g);el('circle',{r:n.r+4,fill:'none',stroke:'#E7E7F0','stroke-width':3.5},g);
    el('circle',{r:n.r+4,fill:'none',stroke:'#599C16','stroke-width':3.5,'stroke-dasharray':`${C2*f.p} ${C2}`,transform:'rotate(-90)'},g);
    el('text',{y:4,'text-anchor':'middle','font-size':10.5,'font-weight':600,fill:'#fff'},g,Math.round(f.p*100));el('text',{y:n.r+19,'text-anchor':'middle',class:'glf'},g,gCut(f.name,30)+' · '+Math.round(f.p*100)+'%');}
   else{const t=n.t,s=stCol(t),c=curSt(t);const ca={r:n.r,fill:s.f,stroke:c==='Блокер'?'#F32A16':s.s,'stroke-width':c==='Блокер'?2.5:1};if(s.dash)ca['stroke-dasharray']='3 2';el('circle',ca,g);
@@ -924,14 +1000,18 @@ function drawGraph(P){if(GV!=='graph')return;const box=$('gWrap');if(!box)return
    el('text',{y:n.r+11,'text-anchor':'middle',class:'glt'},g,gShort(t));}});
  gPos();gList(B);if(fresh||!GS.fitted){gFit();GS.fitted=true;}else gView();gHL();
  $('gLeg').innerHTML=G_ST.map(s=>`<span><i style="background:${s[1]};border:${s[0]==='Блокер'?'2px solid #F32A16':'1px '+(s[3]?'dashed ':'solid ')+s[2]}"></i>${s[0]}</span>`).join('')+
-  `<span><i style="background:#5D6198;border:2px solid #599C16"></i>фича (агент), кольцо: готовность</span><span><svg width="34" height="10" style="vertical-align:-1px;margin-right:4px"><line x1="1" y1="5" x2="26" y2="5" stroke="#8E92BC" stroke-dasharray="4 3" stroke-width="1.5"/><path d="M25,1 L33,5 L25,9 z" fill="#8E92BC"/></svg>зависимость, стрелка к зависящей задаче</span>`+
-  `<span style="flex-basis:100%">Готовность фичи = среднее по задачам, взвешенное по оценке в часах: Принята 100%, На ревью 90%, остальные факт/оценка, но не выше 90%. Размер узла задачи = оценка в часах.</span>`;}
+  `<span><i style="background:#343A7E;border:2px solid #599C16"></i>проект (AI стенд, Биллинг, CPQ)</span>`+
+  `<span><i style="background:#5D6198;border:2px solid #599C16"></i>фича, кольцо: готовность</span>`+
+  `<span><svg width="34" height="10" style="vertical-align:-1px;margin-right:4px"><line x1="1" y1="5" x2="26" y2="5" stroke="#8E92BC" stroke-dasharray="4 3" stroke-width="1.5"/><path d="M25,1 L33,5 L25,9 z" fill="#8E92BC"/></svg>зависимость, стрелка к зависящей задаче</span>`+
+  `<span style="flex-basis:100%">Готовность на каждом уровне считается одинаково, как среднее по задачам, взвешенное по оценке в часах: Принята 100%, На ревью 90%, остальные факт/оценка, но не выше 90%. Размер узла задачи = оценка в часах.</span>`;}
 function gLoop(){cancelAnimationFrame(GS.raf);let a=0.35,i=0;const step=()=>{const B=GS.B;if(!B)return;gTick(B,a);gTick(B,a);a*=0.96;gPos();if((GS.drag||a>0.01)&&i++<600)GS.raf=requestAnimationFrame(step);else gSave(B);};GS.raf=requestAnimationFrame(step);}
 function gPt(ev){const r=$('gsvg').getBoundingClientRect();return {x:(ev.clientX-r.left-GS.tx)/GS.k,y:(ev.clientY-r.top-GS.ty)/GS.k};}
 function gSetView(v){GV=v;try{localStorage.setItem(GV_KEY,v);}catch(e){}gApplyView();}
-function gApplyView(){const g=GV==='graph';$('gvGantt').style.display=g?'none':'';$('gvGraph').style.display=g?'':'none';$('gvT').textContent=g?'2. Граф релиза: фичи, задачи, готовность':'2. Гант: задачи по дням, факт и план';
+function gApplyView(){const g=GV==='graph';$('gvGantt').style.display=g?'none':'';$('gvGraph').style.display=g?'':'none';$('gvT').textContent=g?'2. Граф релиза: проекты, фичи и готовность':'2. Гант: задачи по дням, факт и план';
  document.querySelectorAll('#gvSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===GV));gTipHide();const P=(window.__state||{}).P;if(!P)return;if(g){GS.fitted=false;drawGraph(P);}else drawGantt(P);}
-window.__graph={get GS(){return GS;},get tasks(){return D.tasks.length;}};
+window.__graph={get GS(){return GS;},get tasks(){return D.tasks.length;},
+ map(){const gr=gGroups();return D.tasks.map(t=>({id:t.id,title:t.title,feature:gr.name[gr.by[t.id]],project:(G_PROJ[gr.proj[t.id]]||G_PROJ.ai).name,how:gr.how[t.id],key:gr.by[t.id]}));},
+ rules:G_RULES.map(r=>({key:r.key,name:r.name,proj:r.proj,how:r.how,re:String(r.re)}))};
 (function gWire(){document.querySelectorAll('#gvSeg button').forEach(b=>b.addEventListener('click',()=>gSetView(b.dataset.v)));
  const svg=$('gsvg');
  svg.addEventListener('wheel',ev=>{ev.preventDefault();const r=svg.getBoundingClientRect(),mx=ev.clientX-r.left,my=ev.clientY-r.top,k0=GS.k,k=Math.max(0.2,Math.min(4,k0*Math.exp(-ev.deltaY*0.0015)));GS.tx=mx-(mx-GS.tx)*k/k0;GS.ty=my-(my-GS.ty)*k/k0;GS.k=k;gView();},{passive:false});
@@ -940,16 +1020,16 @@ window.__graph={get GS(){return GS;},get tasks(){return D.tasks.length;}};
   else{GS.pan={x0:ev.clientX,y0:ev.clientY,tx:GS.tx,ty:GS.ty,moved:false};svg.style.cursor='grabbing';ev.preventDefault();}});
  window.addEventListener('mousemove',ev=>{if(GS.drag){const d=GS.drag;if(!d.moved&&Math.hypot(ev.clientX-d.x0,ev.clientY-d.y0)<4)return;if(!d.moved){d.moved=true;gLoop();}const p=gPt(ev);d.n.fx=p.x;d.n.fy=p.y;d.n.x=p.x;d.n.y=p.y;gPos();return;}
   if(GS.pan){const p=GS.pan;GS.tx=p.tx+ev.clientX-p.x0;GS.ty=p.ty+ev.clientY-p.y0;if(Math.hypot(ev.clientX-p.x0,ev.clientY-p.y0)>3)p.moved=true;gView();}});
- window.addEventListener('mouseup',ev=>{if(GS.drag){const d=GS.drag;GS.drag=null;if(d.n.id!=='@R'){delete d.n.fx;delete d.n.fy;}
-   if(!d.moved){if(d.n.kind==='task')openPop(d.n.id,ev);else if(d.n.kind==='feat'){GS.sel=GS.sel===d.n.id?null:d.n.id;gHL();}}else gSave(GS.B);return;}
+ window.addEventListener('mouseup',ev=>{if(GS.drag){const d=GS.drag;GS.drag=null;if(d.n.id==='@R'){}else if(d.n.kind==='proj'){d.n.fx=d.n.x;d.n.fy=d.n.y;d.n.tx=d.n.x;d.n.ty=d.n.y;}else{delete d.n.fx;delete d.n.fy;}
+   if(!d.moved){if(d.n.kind==='task')openPop(d.n.id,ev);else if(d.n.kind==='feat'||d.n.kind==='proj'){GS.sel=GS.sel===d.n.id?null:d.n.id;gHL();}}else gSave(GS.B);return;}
   if(GS.pan){const p=GS.pan;GS.pan=null;svg.style.cursor='';if(!p.moved&&GS.sel){GS.sel=null;gHL();}}});
  svg.addEventListener('mouseover',ev=>{if(GS.drag||GS.pan)return;const g=ev.target.closest('.gn');if(!g)return;GS.hov=g.dataset.id;gHL();});
  svg.addEventListener('mousemove',ev=>{if(GS.drag||GS.pan){gTipHide();return;}const g=ev.target.closest('.gn');if(!g){if(GS.hov){GS.hov=null;gHL();}gTipHide();return;}
-  const n=GS.B.M[g.dataset.id],P=(window.__state||{}).P;if(!n||!P)return;gTipShow(n.kind==='task'?gTaskTip(n.t,P,GS.B):n.kind==='feat'?gFeatTip(n.f,P):gRootTip(GS.B,P),ev);});
+  const n=GS.B.M[g.dataset.id],P=(window.__state||{}).P;if(!n||!P)return;gTipShow(n.kind==='task'?gTaskTip(n.t,P,GS.B):n.kind==='feat'?gFeatTip(n.f,P):n.kind==='proj'?gProjTip(n.pr):gRootTip(GS.B),ev);});
  svg.addEventListener('mouseleave',()=>{GS.hov=null;gHL();gTipHide();});
- $('gList').addEventListener('click',ev=>{const r=ev.target.closest('[data-gf]');if(!r)return;GS.sel=GS.sel===r.dataset.gf?null:r.dataset.gf;gHL();});
- $('gList').addEventListener('mouseover',ev=>{const r=ev.target.closest('[data-gf]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf];if(n)n.el.classList.add('pulse');});
- $('gList').addEventListener('mouseout',ev=>{const r=ev.target.closest('[data-gf]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf];if(n)n.el.classList.remove('pulse');});
+ $('gList').addEventListener('click',ev=>{const r=ev.target.closest('[data-gf],[data-gp]');if(!r)return;const id=r.dataset.gf||r.dataset.gp;GS.sel=GS.sel===id?null:id;gHL();});
+ $('gList').addEventListener('mouseover',ev=>{const r=ev.target.closest('[data-gf],[data-gp]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf||r.dataset.gp];if(n)n.el.classList.add('pulse');});
+ $('gList').addEventListener('mouseout',ev=>{const r=ev.target.closest('[data-gf],[data-gp]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf||r.dataset.gp];if(n)n.el.classList.remove('pulse');});
  $('gFitB').addEventListener('click',gFit);
  $('gReB').addEventListener('click',()=>{Object.keys(GPOS).forEach(k=>delete GPOS[k]);GS.sig='';const P=(window.__state||{}).P;if(P)drawGraph(P);});
  let rt=0;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(GV==='graph'&&window.__state){GS.fitted=false;drawGraph(window.__state.P);}},200);});
