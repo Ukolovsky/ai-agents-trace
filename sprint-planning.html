@@ -1248,7 +1248,7 @@ $('selSS').addEventListener('change',e=>switchTo(IDX.cur,e.target.value));
 $('bNextSS').addEventListener('click',()=>{const st=fd(new Date(pd(C.end).getTime()+3*864e5));const m=String(C.name).match(/(\d+)\s*$/);const nm=m?String(C.name).replace(/(\d+)\s*$/,String(+m[1]+1)):C.name+' (след.)';
  const und=D.tasks.filter(t=>t.status!=='Принята').length;
  openSide('Следующий суперспринт',fld('Название',`<input id="nsName" value="${esc(nm)}" style="width:100%">`)+fld('Начало (первый рабочий день после '+ru(C.end)+')',`<input id="nsStart" type="date" value="${st}">`)+
- `<div class="sub" style="margin-bottom:12px">Команда копируется: ${D.people.length} чел., ёмкость и шаблон встреч. Незавершённые задачи переносятся в бэклог с пометкой «перенесено». Структура: 3 спринта × 2 волны, спринты с №${C.sprintNo+3}.</div>
+ `<div class="sub" style="margin-bottom:12px">Команда копируется: ${D.people.length} чел., ёмкость и шаблон встреч. Незавершённые задачи переносятся с пометкой «перенесено»: статус и блокер сохраняются, срок очищается, оценка равна остатку. Принятые не переносятся. Структура: 3 спринта × 2 волны, спринты с №${C.sprintNo+3}.</div>
  <label style="display:flex;gap:8px;align-items:center;margin-bottom:16px"><input type="checkbox" id="nsCarry" checked> Перенести незавершённые задачи (${und}) с остатком часов</label><button class="btn contained" id="nsCreate">Создать</button>`);});
 $('sideB').addEventListener('click',e=>{const b=e.target;
  if(b.id==='createTeam'){const n=$('newTeam').value.trim();if(!n)return;if(IDX.spaces.includes(n)){alert('Такая команда уже есть');return;}IDX.spaces.push(n);switchTo(n);}
@@ -1260,7 +1260,7 @@ $('sideB').addEventListener('click',e=>{const b=e.target;
  if(b.id==='nsCreate'){const st=$('nsStart').value,nm=$('nsName').value.trim()||'Суперспринт';const o=ssOf(IDX.cur);let k=o.list.length+1;while(o.list.some(x=>x.id==='ss'+k))k++;const id='ss'+k;
   const N=emptyData(st,nm);N.config.superSprint.sprintNo=C.sprintNo+3;N.sprint.buffer=D.sprint.buffer;N.sprint.dayHours=D.sprint.dayHours;N.sprint.revSla=D.sprint.revSla;
   N.people=D.people.map(p=>{const q=JSON.parse(JSON.stringify(p));if(q.meetSrc==='calendar'&&q.meet){const v=[1,2,3,4,5].map(w=>{const a=DAYS.filter(d=>pd(d).getUTCDay()===w).map(d=>q.meet[d]||0);return Math.round(a.reduce((x,y)=>x+y,0)/Math.max(1,a.length)*2)/2;});q.meetWeek=v;q.meetSrc='manual';}delete q.meet;return q;});
-  if($('nsCarry').checked)N.tasks=D.tasks.filter(t=>t.status!=='Принята').map(t=>Object.assign(JSON.parse(JSON.stringify(t)),{est:Math.max(1,+t.rem||+t.est),spent:0,rem:Math.max(1,+t.rem||+t.est),status:'Запланировано',blocker:'',since:'',due:'',carried:C.name}));
+  if($('nsCarry').checked)N.tasks=D.tasks.filter(t=>t.status!=='Принята').map(t=>Object.assign(JSON.parse(JSON.stringify(t)),{est:Math.max(1,+t.rem||+t.est),spent:0,rem:Math.max(1,+t.rem||+t.est),status:STATUSES.includes(t.status)?t.status:'Запланировано',blocker:t.blocker||'',since:t.since||'',due:'',carried:C.name}));
   saveNow();o.list.push({id,name:nm,start:st});localStorage.setItem(LS+':'+IDX.cur+':'+id,JSON.stringify(N));switchTo(IDX.cur,id);}});
 
 normalize();syncInputs();render();
