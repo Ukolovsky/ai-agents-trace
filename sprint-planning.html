@@ -142,18 +142,19 @@ h3.sec{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
 #gMatrix table.gm td.gm-none b{font-size:11px;font-weight:600;color:#85868A}
 #artsBox input{margin:0}
 
-#grSeg{margin-left:0;margin-bottom:2px}
-#gMatrix{margin-top:16px}
-#gMatrix .gm-leg{font-size:12px;line-height:16px;color:#5F6068;margin:0 0 10px}
-#gMatrix .gm-wrap{overflow-x:auto;border:1px solid #EBEBEB;border-radius:8px}
-#gMatrix table.gm{border-collapse:collapse;width:100%;min-width:720px;font-size:12px}
-#gMatrix table.gm th,#gMatrix table.gm td{border:1px solid #EBEBEB;padding:6px 8px;text-align:center;vertical-align:middle}
-#gMatrix table.gm thead th{background:#FAFBFE;font-weight:600}
-#gMatrix table.gm tbody th{text-align:left;white-space:nowrap;background:#fff;font-weight:600}
-#gMatrix table.gm th.gm-k,#gMatrix table.gm td.gm-k{width:28px;padding:4px 2px;background:#F4F4F8;color:#85868A;font-size:11px;font-weight:600}
-#gMatrix table.gm td.gm-empty{background:#FBFBFD}
-#gMatrix table.gm td.gm-c b{display:block;font-size:14px}
-#gMatrix table.gm td.gm-c div{font-size:11px;color:#85868A}
+#gList .gl-caret{display:inline-block;width:0;height:0;border-style:solid;border-width:4px 0 4px 6px;border-color:transparent transparent transparent #5F6068;margin-right:6px;vertical-align:middle}
+#gList .gl-r.open .gl-caret{border-width:6px 4px 0 4px;border-color:#5F6068 transparent transparent transparent;position:relative;top:-1px}
+#gList .gl-dod{display:none;padding:6px 0 2px;margin-top:4px;border-top:1px solid #EFF0F6}
+#gList .gl-r.open .gl-dod{display:block}
+#gList .gl-dod-h{font-size:11px;font-weight:600;color:#5F6068;margin:0 0 4px}
+#gList .gl-art{display:flex;align-items:flex-start;gap:8px;padding:5px 4px;margin:0 -4px;cursor:pointer;border-radius:4px;font-size:12px;line-height:16px}
+#gList .gl-art:hover{background:rgba(0,0,0,.04)}
+#gList .gl-art.on{background:var(--primaryLight)}
+#gList .gl-art-n{flex:1;min-width:0;white-space:normal}
+#gList .gl-art-c{flex:0 0 auto;color:#85868A;font-size:11px;white-space:nowrap}
+#gList .gl-chk{flex:0 0 14px;width:14px;height:14px;box-sizing:border-box;border:1.5px solid #8E92BC;border-radius:3px;background:#fff;position:relative;margin-top:1px}
+#gList .gl-chk.on{background:#599C16;border-color:#599C16}
+#gList .gl-chk.on:after{content:"";position:absolute;left:3px;top:0px;width:5px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
 </style></head><body>
 <div class="app-header"><span class="sec">Планирование · AI+CPQ и ML-команда</span><span class="note">Рабочий инструмент · данные хранятся только в этом браузере · не публиковать</span></div>
 <div class="page">
@@ -885,7 +886,7 @@ const GV_KEY=LS+':ui:ganttView';
 let GV=(()=>{try{return localStorage.getItem(GV_KEY)==='graph'?'graph':'gantt';}catch(e){return 'gantt';}})();
 const GR_KEY=LS+':ui:graphReady';
 let GR=(()=>{try{return localStorage.getItem(GR_KEY)==='arts'?'arts':'hours';}catch(e){return 'hours';}})();
-const GPOS={};let GS={k:1,tx:0,ty:0,sel:null,hov:null,sig:'',N:[],L:[],A:{},drag:null,pan:null,raf:0,W:0,H:0};
+const GPOS={};let GS={k:1,tx:0,ty:0,sel:null,hov:null,sig:'',N:[],L:[],A:{},drag:null,pan:null,raf:0,W:0,H:0,openF:{},artHL:null,artKey:null};
 const G_PROJ={ai:{id:'ai',name:'AI стенд',col:'#5D6198',colD:'#343A7E'},bill:{id:'bill',name:'Биллинг',col:'#00897B',colD:'#00695C'},cpq:{id:'cpq',name:'CPQ',col:'#1565C0',colD:'#0D47A1'}};
 const G_PROJ_ORDER=['ai','bill','cpq'];
 /* Правила по порядку, первое совпадение побеждает. Поиск по всему названию, без учёта регистра. */
@@ -1041,11 +1042,30 @@ function gOn(id){const B=GS.B,on=new Set([id]),n=B&&B.M[id];if(!n)return on;
  else if(n.kind==='proj'){on.add('@R');n.pr.feats.forEach(f=>{on.add('@F:'+f.key);f.tasks.forEach(t=>on.add(t.id));});}
  else if(n.kind==='root'){B.N.forEach(x=>on.add(x.id));}
  return on;}
-function gHL(){const B=GS.B,svg=$('gsvg');if(!B||!svg)return;const c=GS.hov||GS.sel;svg.classList.toggle('dim',!!c);B.N.forEach(n=>n.el&&n.el.classList.remove('on'));B.L.forEach(l=>l.el&&l.el.classList.remove('on'));
- if(c){const on=gOn(c);B.N.forEach(n=>{if(on.has(n.id))n.el.classList.add('on');});B.L.forEach(l=>{if(on.has(l.s)&&on.has(l.t))l.el.classList.add('on');});}
+function gHL(){const B=GS.B,svg=$('gsvg');if(!B||!svg)return;
+ const arts=GS.artHL&&GS.artHL.length&&!GS.hov,c=GS.hov||(arts?null:GS.sel);
+ svg.classList.toggle('dim',!!(c||arts));B.N.forEach(n=>n.el&&n.el.classList.remove('on'));B.L.forEach(l=>l.el&&l.el.classList.remove('on'));
+ if(arts){const on=new Set(GS.artHL);if(GS.sel)on.add(GS.sel);B.N.forEach(n=>{if(on.has(n.id))n.el.classList.add('on');});B.L.forEach(l=>{if(on.has(l.s)&&on.has(l.t))l.el.classList.add('on');});}
+ else if(c){const on=gOn(c);B.N.forEach(n=>{if(on.has(n.id))n.el.classList.add('on');});B.L.forEach(l=>{if(on.has(l.s)&&on.has(l.t))l.el.classList.add('on');});}
  document.querySelectorAll('#gList [data-gf]').forEach(r=>r.classList.toggle('on',r.dataset.gf===GS.sel));
- document.querySelectorAll('#gList [data-gp]').forEach(r=>r.classList.toggle('on',r.dataset.gp===GS.sel));}
+ document.querySelectorAll('#gList [data-gp]').forEach(r=>r.classList.toggle('on',r.dataset.gp===GS.sel));
+ document.querySelectorAll('#gList [data-ga]').forEach(r=>r.classList.toggle('on',!!GS.artKey&&GS.artKey===(r.dataset.gf||'')+'|'+r.dataset.ga));}
 function gNum(n,a,b,c){return n%10===1&&n%100!==11?a:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?b:c;}
+
+function gFeatDod(f){const ts=f.tasks||[],marked=ts.filter(streamHasMarks);
+ if(!marked.length)return {none:true,items:[]};
+ const roleUsed=new Set(ts.map(t=>streamRole(t))),order=[],seen=new Set();
+ STREAM_ROLES.forEach(r=>{if(!roleUsed.has(r))return;streamCellArts('Ф2',r).forEach(n=>{if(!seen.has(n)){seen.add(n);order.push(n);}});});
+ const need=new Set(),done=new Set(),cover={};
+ marked.forEach(t=>{streamNeedSet(t).forEach(n=>need.add(n));streamDoneNames(t).forEach(n=>done.add(n));
+  const names=new Set(streamNeedSet(t).concat(streamDoneNames(t)));
+  names.forEach(n=>{if(!cover[n])cover[n]=[];cover[n].push(t.id);});});
+ need.forEach(n=>{if(!seen.has(n)){seen.add(n);order.push(n);}});
+ return {none:false,items:order.filter(n=>need.has(n)).map(n=>({name:n,done:done.has(n),count:(cover[n]||[]).length,ids:cover[n]||[]}))};}
+function gDodHtml(f,fid,dod){return '<div class="gl-dod"><div class="gl-dod-h">DoD</div>'+dod.items.map(it=>{
+ const cnt=it.count+' '+gNum(it.count,'задача','задачи','задач');
+ return `<div class="gl-art" data-ga="${esc(it.name)}" data-gf="${esc(fid)}" data-gids="${esc(it.ids.join(','))}"><i class="gl-chk${it.done?' on':''}" aria-hidden="true"></i><span class="gl-art-n">${esc(it.name)}</span><span class="gl-art-c">${cnt}</span></div>`;
+}).join('')+'</div>';}
 function gBar(pc){return `<div class="gl-b"><i style="width:${pc}%;background:${pc>=100?'#599C16':pc>=60?'#7CB342':pc>=30?'#1E88E5':'#B1B6D4'}"></i></div>`;}
 function gList(B){const rows=B.projs.map(p=>{const pc=Math.round((p.p||0)*100),pcLbl=GR==='arts'?gArtsTxt(p.artsX,'pct'):pc+'%',col=G_PROJ[p.id].colD;
   const pSub=GR==='arts'?`${p.feats.length} ${gNum(p.feats.length,'фича','фичи','фич')} · ${p.tasks.length} ${gNum(p.tasks.length,'задача','задачи','задач')} · ${gArtsTxt(p.artsX,'sub')}`:`${p.feats.length} ${gNum(p.feats.length,'фича','фичи','фич')} · ${p.tasks.length} ${gNum(p.tasks.length,'задача','задачи','задач')} · ${h1(p.w)} ч`;
@@ -1054,7 +1074,10 @@ function gList(B){const rows=B.projs.map(p=>{const pc=Math.round((p.p||0)*100),p
   return head+fs.map(f=>{const bl=f.tasks.some(t=>curSt(t)==='Блокер'),fpc=Math.round(f.p*100);
    const fSub=GR==='arts'?`${f.tasks.length} ${gNum(f.tasks.length,'задача','задачи','задач')} · ${gArtsTxt(f.artsX,'sub')}`:`${f.tasks.length} ${gNum(f.tasks.length,'задача','задачи','задач')} · ${h1(f.w)} ч`;
    const fLbl=GR==='arts'?gArtsTxt(f.artsX,'pct'):fpc+'%';
-   return `<div class="gl-r" data-gf="${esc('@F:'+f.key)}" title="${esc(f.name)}"><div class="gl-n"><span>${esc(f.name)}${bl?' <b style="color:#F32A16">⛔</b>':''}</span><b>${fLbl}</b></div>${gBar(fpc)}<div class="gl-s">${fSub}</div></div>`;}).join('');}).join('');
+   if(GR!=='arts')return `<div class="gl-r" data-gf="${esc('@F:'+f.key)}" title="${esc(f.name)}"><div class="gl-n"><span>${esc(f.name)}${bl?' <b style="color:#F32A16">⛔</b>':''}</span><b>${fLbl}</b></div>${gBar(fpc)}<div class="gl-s">${fSub}</div></div>`;
+   const fid='@F:'+f.key,dod=gFeatDod(f),has=!dod.none&&dod.items.length,open=has&&GS.openF&&GS.openF[fid];
+   const caret=has?`<i class="gl-caret" data-gtog="${esc(fid)}"></i>`:'';
+   return `<div class="gl-r${has?' has-dod':''}${open?' open':''}" data-gf="${esc(fid)}" title="${esc(f.name)}"><div class="gl-n"><span>${caret}${esc(f.name)}${bl?' <b style="color:#F32A16">⛔</b>':''}</span><b>${fLbl}</b></div>${gBar(fpc)}<div class="gl-s">${fSub}</div>${has?gDodHtml(f,fid,dod):''}</div>`;}).join('');}).join('');
  const readyTitle=GR==='arts'?'Готовность по артефактам':'Готовность к релизу';
  const readySub=GR==='arts'?`${esc(gRootName())}: ${gArtsTxt(B.root.artsX)}`:`${esc(gRootName())}: ${Math.round(B.root.p*100)}%`;
  $('gList').innerHTML=`<div class="gl-h"><b>${readyTitle}</b><span>${readySub}</span></div>`+rows;
@@ -1110,13 +1133,13 @@ function gSetView(v){GV=v;try{localStorage.setItem(GV_KEY,v);}catch(e){}gApplyVi
 function gSetReady(v){GR=v==='arts'?'arts':'hours';try{localStorage.setItem(GR_KEY,GR);}catch(e){}
  document.querySelectorAll('#grSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.gr||'hours')===GR));
  const mx=$('gMatrix');if(mx&&GR!=='arts'){mx.style.display='none';}
- gTipHide();const P=(window.__state||{}).P;if(P&&GV==='graph')drawGraph(P);}
+ GS.artHL=null;GS.artKey=null;gTipHide();const P=(window.__state||{}).P;if(P&&GV==='graph')drawGraph(P);}
 function gApplyView(){const g=GV==='graph';$('gvGantt').style.display=g?'none':'';$('gvGraph').style.display=g?'':'none';$('gvT').textContent=g?'2. Граф релиза: проекты, фичи и готовность':'2. Гант: задачи по дням, факт и план';
  document.querySelectorAll('#gvSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===GV));
  document.querySelectorAll('#grSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.gr||'hours')===GR));
  gTipHide();const P=(window.__state||{}).P;if(!P)return;if(g){GS.fitted=false;drawGraph(P);}else drawGantt(P);}
 window.__graph={get GS(){return GS;},get GR(){return GR;},get tasks(){return D.tasks.length;},
- arts(){const ts=visTasks();return {mode:GR,release:gArtsProg(ts),roles:gMatrixRoles(ts)};},
+ arts(){const ts=visTasks();return {mode:GR,release:gArtsProg(ts),roles:gMatrixRoles(ts)};}, featDod:gFeatDod,
  map(){const gr=gGroups();return D.tasks.map(t=>({id:t.id,title:t.title,feature:gr.name[gr.by[t.id]],project:(G_PROJ[gr.proj[t.id]]||G_PROJ.ai).name,how:gr.how[t.id],key:gr.by[t.id]}));},
  rules:G_RULES.map(r=>({key:r.key,name:r.name,proj:r.proj,how:r.how,re:String(r.re)}))};
 (function gWire(){document.querySelectorAll('#gvSeg button').forEach(b=>b.addEventListener('click',()=>gSetView(b.dataset.v)));
@@ -1130,14 +1153,26 @@ window.__graph={get GS(){return GS;},get GR(){return GR;},get tasks(){return D.t
   if(GS.pan){const p=GS.pan;GS.tx=p.tx+ev.clientX-p.x0;GS.ty=p.ty+ev.clientY-p.y0;if(Math.hypot(ev.clientX-p.x0,ev.clientY-p.y0)>3)p.moved=true;gView();}});
  window.addEventListener('mouseup',ev=>{if(GS.drag){const d=GS.drag;GS.drag=null;if(d.n.id==='@R'){}else if(d.n.kind==='proj'){d.n.fx=d.n.x;d.n.fy=d.n.y;d.n.tx=d.n.x;d.n.ty=d.n.y;}else{delete d.n.fx;delete d.n.fy;}
    if(!d.moved){if(d.n.kind==='task')openPop(d.n.id,ev);else if(d.n.kind==='feat'||d.n.kind==='proj'){GS.sel=GS.sel===d.n.id?null:d.n.id;gHL();}}else gSave(GS.B);return;}
-  if(GS.pan){const p=GS.pan;GS.pan=null;svg.style.cursor='';if(!p.moved&&GS.sel){GS.sel=null;gHL();}}});
+  if(GS.pan){const p=GS.pan;GS.pan=null;svg.style.cursor='';if(!p.moved&&(GS.sel||GS.artHL)){GS.sel=null;GS.artHL=null;GS.artKey=null;gHL();}}});
  svg.addEventListener('mouseover',ev=>{if(GS.drag||GS.pan)return;const g=ev.target.closest('.gn');if(!g)return;GS.hov=g.dataset.id;gHL();});
  svg.addEventListener('mousemove',ev=>{if(GS.drag||GS.pan){gTipHide();return;}const g=ev.target.closest('.gn');if(!g){if(GS.hov){GS.hov=null;gHL();}gTipHide();return;}
   const n=GS.B.M[g.dataset.id],P=(window.__state||{}).P;if(!n||!P)return;gTipShow(n.kind==='task'?gTaskTip(n.t,P,GS.B):n.kind==='feat'?gFeatTip(n.f,P):n.kind==='proj'?gProjTip(n.pr):gRootTip(GS.B),ev);});
  svg.addEventListener('mouseleave',()=>{GS.hov=null;gHL();gTipHide();});
- $('gList').addEventListener('click',ev=>{const r=ev.target.closest('[data-gf],[data-gp]');if(!r)return;const id=r.dataset.gf||r.dataset.gp;GS.sel=GS.sel===id?null:id;gHL();});
- $('gList').addEventListener('mouseover',ev=>{const r=ev.target.closest('[data-gf],[data-gp]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf||r.dataset.gp];if(n)n.el.classList.add('pulse');});
- $('gList').addEventListener('mouseout',ev=>{const r=ev.target.closest('[data-gf],[data-gp]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf||r.dataset.gp];if(n)n.el.classList.remove('pulse');});
+ $('gList').addEventListener('click',ev=>{
+  const art=ev.target.closest('[data-ga]');
+  if(art){ev.preventDefault();ev.stopPropagation();const ids=(art.dataset.gids||'').split(',').filter(Boolean),key=(art.dataset.gf||'')+'|'+art.dataset.ga;
+   if(GS.artKey===key){GS.artKey=null;GS.artHL=null;}else{GS.artKey=key;GS.artHL=ids;if(art.dataset.gf)GS.sel=art.dataset.gf;}gHL();return;}
+  const caret=ev.target.closest('[data-gtog]');
+  if(caret){ev.preventDefault();ev.stopPropagation();const id=caret.dataset.gtog;GS.openF=GS.openF||{};GS.openF[id]=!GS.openF[id];const box=caret.closest('.gl-r');if(box)box.classList.toggle('open',GS.openF[id]);return;}
+  const r=ev.target.closest('[data-gf],[data-gp]');if(!r)return;const id=r.dataset.gf||r.dataset.gp;
+  if(r.classList.contains('has-dod')){GS.openF=GS.openF||{};if(GS.sel!==id){GS.openF[id]=true;r.classList.add('open');}}
+  GS.sel=GS.sel===id?null:id;GS.artHL=null;GS.artKey=null;gHL();});
+ $('gList').addEventListener('mouseover',ev=>{const art=ev.target.closest('[data-ga]');
+  if(art&&GS.B){(art.dataset.gids||'').split(',').filter(Boolean).forEach(id=>{const n=GS.B.M[id];if(n&&n.el)n.el.classList.add('pulse');});return;}
+  const r=ev.target.closest('[data-gf],[data-gp]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf||r.dataset.gp];if(n)n.el.classList.add('pulse');});
+ $('gList').addEventListener('mouseout',ev=>{const art=ev.target.closest('[data-ga]');
+  if(art&&GS.B){(art.dataset.gids||'').split(',').filter(Boolean).forEach(id=>{const n=GS.B.M[id];if(n&&n.el)n.el.classList.remove('pulse');});return;}
+  const r=ev.target.closest('[data-gf],[data-gp]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf||r.dataset.gp];if(n)n.el.classList.remove('pulse');});
  $('gFitB').addEventListener('click',gFit);
  $('gReB').addEventListener('click',()=>{Object.keys(GPOS).forEach(k=>delete GPOS[k]);GS.sig='';const P=(window.__state||{}).P;if(P)drawGraph(P);});
  let rt=0;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(GV==='graph'&&window.__state){GS.fitted=false;drawGraph(window.__state.P);}},200);});
