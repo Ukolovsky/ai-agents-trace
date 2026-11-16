@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="noindex"/>
+<title>AI Products · Отчёт суперспринта 4 · черновик · BusinessPad</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj4KICA8cGF0aCBmaWxsPSIjMjQyOTJFIiBkPSJNNSA0aDcuNHYxMy4yYzAgMi4xNSAxLjA1IDMuNDUgMy42IDMuNDVzMy42LTEuMyAzLjYtMy40NVY0SDI3djEzLjZDMjcgMjQuNyAyMi40IDI5IDE2IDI5UzUgMjQuNyA1IDE3LjZWNHoiLz4KPC9zdmc+Cg=="/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+    :root {
+      --primary: #343A7E;
+      --primary-dark: #5D6198;
+      --primary-light: #E7E7F0;
+      --secondary: #FF5722;
+      --secondary-light: #FFEBE4;
+      --text-primary: #050819;
+      --text-secondary: #85868A;
+      --text-disabled: #CCCCCC;
+      --grey-300: #D9DADF;
+      --grey-800: #424242;
+      --bg-default: #F5F5F5;
+      --bg-paper: #FFFFFF;
+      --success: #599C16;
+      --success-light: #EDF7ED;
+      --info: #0B79D0;
+      --info-light: #E0EDFF;
+      --warning: #FCCA25;
+      --warning-light: #FFF2D2;
+      --magic-800: #4D59FA;
+      --magic-600: #749EF2;
+      --magic-100: #EBF2FF;
+      --magic-50: #F6F8FE;
+      --magic-gradient: linear-gradient(290deg, #4D59FA 0%, #749EF2 100%);
+      --magic-bg: linear-gradient(290deg, #F6F8FE 0%, #EBF2FF 100%);
+      --shadow-card: 0 2px 8px rgba(5, 8, 25, 0.06), 0 1px 2px rgba(5, 8, 25, 0.04);
+      --shadow-hover: 0 8px 24px rgba(52, 58, 126, 0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --maxw: 1080px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Fira Sans", sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-default);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--secondary); }
+
+    /* Header */
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg-paper);
+      border-bottom: 1px solid var(--grey-300);
+      box-shadow: 0 1px 0 rgba(5, 8, 25, 0.04);
+    }
+    .app-header-in {
+      max-width: none; margin: 0;
+      padding: 10px 24px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: nowrap;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 16px; color: var(--primary);
+      flex: none; white-space: nowrap;
+    }
+    .brand-mark {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--magic-gradient);
+      display: grid; place-items: center;
+      color: #fff; font-size: 14px; font-weight: 700;
+    }
+    .header-navs {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: nowrap; margin-left: auto;
+    }
+    .nav { display: flex; gap: 2px; flex-wrap: nowrap; }
+    .nav a {
+      font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      padding: 6px 10px; border-radius: var(--radius-sm);
+      transition: 0.15s;
+      white-space: nowrap;
+    }
+    .nav a:hover { background: var(--primary-light); color: var(--primary); }
+    .nav-docs {
+      padding: 4px;
+      background: var(--magic-50);
+      border: 1px solid var(--primary-light);
+      border-radius: 10px;
+    }
+    .nav-docs a {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .nav-docs a.is-current {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-docs a.is-current:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-page a {
+      border: 1.5px solid transparent;
+    }
+    .nav-page a.is-current {
+      color: var(--primary);
+      font-weight: 600;
+      border-color: var(--primary);
+      background: var(--bg-paper);
+    }
+
+    /* Layout */
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+    section { padding: 48px 0; }
+
+    /* Hero */
+    .hero {
+      background: var(--magic-bg);
+      border-bottom: 1px solid var(--grey-300);
+      padding: 56px 0 48px;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--primary);
+      background: var(--bg-paper);
+      border: 1px solid var(--primary-light);
+      padding: 6px 12px; border-radius: 999px;
+      margin-bottom: 20px;
+    }
+    .eyebrow-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--secondary);
+    }
+    h1 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700; line-height: 1.15;
+      color: var(--text-primary); margin-bottom: 12px;
+      max-width: 18ch;
+    }
+    .lede {
+      font-size: 17px; color: var(--text-secondary);
+      max-width: 62ch; margin-bottom: 28px;
+    }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 500;
+      padding: 8px 14px; border-radius: 999px;
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      color: var(--text-primary);
+    }
+    .chip b { color: var(--primary); font-weight: 600; }
+    .chip-accent {
+      background: var(--secondary-light);
+      border-color: transparent;
+      color: var(--secondary);
+    }
+
+    /* Section heads */
+    .sec-head {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 10px;
+    }
+    .sec-num {
+      flex: none;
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--magic-gradient);
+      color: #fff; font-weight: 700; font-size: 15px;
+      display: grid; place-items: center;
+    }
+    h2 {
+      font-size: clamp(22px, 2.5vw, 28px);
+      font-weight: 700; color: var(--text-primary);
+    }
+    .sec-sub {
+      color: var(--text-secondary); font-size: 15px;
+      margin: 0 0 28px; max-width: 72ch; padding-left: 50px;
+    }
+
+    /* Cards */
+    .grid { display: grid; gap: 16px; }
+    .g-3 { grid-template-columns: repeat(3, 1fr); }
+    .g-2 { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 860px) {
+      .g-3, .g-2 { grid-template-columns: 1fr; }
+      .sec-sub { padding-left: 0; }
+    }
+
+    .paper {
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-card);
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .paper:hover {
+      box-shadow: var(--shadow-hover);
+      border-color: var(--primary-light);
+    }
+    .paper-kicker {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+    .paper h3 {
+      font-size: 17px; font-weight: 600;
+      margin-bottom: 10px; color: var(--text-primary);
+    }
+    .paper-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .paper-head h3 { margin-bottom: 0; flex: 1; min-width: 0; }
+    .paper-head .link-btn { margin-top: 0; flex: none; white-space: nowrap; }
+    .paper p {
+      font-size: 14.5px; color: var(--text-secondary);
+      margin: 0;
+    }
+    .paper p + p { margin-top: 10px; }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .tag-demo {
+      background: var(--success-light); color: var(--success);
+    }
+    .tag-list {
+      background: var(--info-light); color: var(--info);
+    }
+    .tag-next {
+      background: var(--warning-light); color: #8a6d00;
+    }
+    .tag-plan {
+      background: var(--primary-light); color: var(--primary);
+    }
+    .tag-live {
+      background: var(--secondary-light);
+      color: var(--secondary);
+    }
+
+    .demo-focus {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      margin-top: 16px;
+    }
+    .demo-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600;
+      padding: 9px 14px; border-radius: var(--radius-sm);
+      background: var(--secondary);
+      color: #FFFFFF;
+      border: none;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .demo-pill-soft {
+      background: var(--secondary-light);
+      color: var(--secondary);
+      border: 1px solid #FFD0C2;
+    }
+    .demo-pill .who {
+      font-weight: 700;
+    }
+    .demo-pill .sep {
+      opacity: 0.55; font-weight: 400;
+    }
+
+    a.link-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 14px;
+      font-size: 13px; font-weight: 600;
+      color: #FFFFFF !important;
+      background: var(--primary);
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      transition: background 0.15s;
+    }
+    a.link-btn:hover {
+      background: var(--primary-dark);
+      color: #FFFFFF !important;
+    }
+    a.link-btn.link-btn-sec {
+      background: transparent;
+      color: var(--primary) !important;
+      border: 1px solid var(--primary-light);
+    }
+    a.link-btn.link-btn-sec:hover {
+      background: var(--primary-light);
+      color: var(--primary) !important;
+    }
+    .paper a.link-btn + a.link-btn {
+      margin-left: 8px;
+    }
+
+    /* Prose block */
+    .prose {
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+    }
+    .prose p {
+      font-size: 15px; color: var(--grey-800);
+      margin: 0 0 12px;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .prose ul li {
+      font-size: 15px;
+      color: var(--grey-800);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--grey-300);
+    }
+    .prose ul li:last-child { border-bottom: none; padding-bottom: 0; }
+    .prose ul li:first-child { padding-top: 0; }
+    .prose ul li strong {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-right: 6px;
+    }
+
+    /* List cards for "cannot demo" */
+    .list-stack { display: flex; flex-direction: column; gap: 12px; }
+    .list-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+    }
+    .list-item .ico {
+      flex: none; width: 28px; height: 28px; border-radius: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 700;
+    }
+    .list-item .body { flex: 1; }
+    .list-item .body strong {
+      display: block; font-size: 14.5px; font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .list-item .body span {
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+
+    /* Track banners */
+    .track {
+      display: grid; grid-template-columns: 140px 1fr;
+      gap: 20px; align-items: start;
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 16px;
+    }
+    @media (max-width: 640px) {
+      .track { grid-template-columns: 1fr; }
+    }
+    .track-label {
+      font-size: 13px; font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .track-label span {
+      display: block;
+      font-size: 11px; font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: none; letter-spacing: 0;
+      margin-top: 4px;
+    }
+    .track p {
+      font-size: 14.5px; color: var(--grey-800);
+      margin: 0 0 10px;
+    }
+    .track p:last-child { margin-bottom: 0; }
+    .track ul {
+      list-style: none; display: flex; flex-wrap: wrap; gap: 8px;
+      margin: 12px 0 0;
+    }
+    .track ul li {
+      font-size: 12.5px; font-weight: 500;
+      padding: 5px 11px; border-radius: 999px;
+      background: var(--magic-50);
+      border: 1px solid var(--primary-light);
+      color: var(--primary);
+    }
+
+    /* Plans */
+    .plan-block {
+      background: var(--bg-paper);
+      border: 1px solid var(--grey-300);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-card);
+    }
+    .plan-block.billing { border-left-color: var(--secondary); }
+    .plan-block.cpq { border-left-color: var(--magic-600); }
+    .plan-block h3 {
+      font-size: 16px; font-weight: 600; margin-bottom: 10px;
+    }
+    .plan-block p {
+      font-size: 14.5px; color: var(--grey-800); margin: 0 0 10px;
+    }
+    .plan-block p:last-child { margin-bottom: 0; }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--grey-300);
+      background: var(--bg-paper);
+      padding: 28px 0 40px;
+      text-align: center;
+    }
+    .footer p {
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .footer a { font-weight: 600; }
+
+    /* Divider label */
+    .divider-label {
+      display: flex; align-items: center; gap: 12px;
+      margin: 28px 0 16px;
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .divider-label::before,
+    .divider-label::after {
+      content: ""; flex: 1; height: 1px; background: var(--grey-300);
+    }
+
+    /* Print / PDF: блок с новой страницы, карточки без разрыва */
+    @media print {
+      @page {
+        size: A4;
+        margin: 14mm 12mm;
+      }
+
+      html, body {
+        background: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .app-header {
+        position: static;
+        box-shadow: none;
+      }
+      .app-header .nav { display: none; }
+
+      .hero {
+        page-break-after: always;
+        break-after: page;
+        padding: 28px 0 24px;
+      }
+
+      section {
+        page-break-before: always;
+        break-before: page;
+        page-break-inside: auto;
+        break-inside: auto;
+        padding: 20px 0 12px;
+        border: none !important;
+        background: #fff !important;
+      }
+
+      .footer {
+        page-break-before: always;
+        break-before: page;
+      }
+
+      .paper,
+      .track,
+      .plan-block,
+      .list-item,
+      .prose,
+      .grid > article,
+      .list-stack > .list-item {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        box-shadow: none;
+      }
+
+      .divider-label {
+        page-break-after: avoid;
+        break-after: avoid;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .sec-head {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      .sec-sub {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      a.link-btn {
+        color: #FFFFFF !important;
+        background: var(--primary) !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      a.link-btn.link-btn-sec {
+        color: var(--primary) !important;
+        background: transparent !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .demo-pill {
+        color: #FFFFFF !important;
+        background: var(--secondary) !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .demo-pill-soft {
+        color: var(--secondary) !important;
+        background: var(--secondary-light) !important;
+      }
+
+      .paper:hover,
+      .track:hover,
+      .plan-block:hover {
+        box-shadow: none;
+      }
+    }
+  
+    .wbs { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 8px; }
+    .wbs th, .wbs td { border: 1px solid var(--grey-300); padding: 10px 12px; vertical-align: top; text-align: left; }
+    .wbs th { background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 600; }
+    .wbs td.who { white-space: nowrap; font-weight: 600; color: var(--primary); }
+    .contour { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-right: 6px; }
+    .c-demo { background: var(--success-light); color: var(--success); }
+    .c-local { background: var(--secondary-light); color: var(--secondary); }
+    .c-video { background: var(--warning-light); color: #8a6d00; }
+    .c-no { background: #FFEBEE; color: #C62828; }
+    .c-dev { background: var(--info-light); color: var(--info); }
+    .plan-block ul {
+      list-style: none; display: flex; flex-wrap: wrap; gap: 8px;
+      margin: 12px 0 0;
+    }
+    .plan-block ul.stack {
+      display: block;
+      list-style: decimal;
+      padding-left: 22px;
+      margin: 12px 0 4px;
+    }
+    .plan-block ul.stack li {
+      display: list-item;
+      font-size: 14.5px;
+      font-weight: 400;
+      color: var(--grey-800);
+      padding: 4px 0;
+      border: none;
+      background: none;
+      border-radius: 0;
+    }
+    .plan-block .link-btn + .link-btn {
+      margin-left: 8px;
+    }
+    .c-new { background: var(--magic-100); color: var(--magic-800); }
+    .c-draft { background: var(--warning-light); color: #8a6d00; }
+
+    .pbar { margin: 0 0 14px; }
+    .pbar-meta {
+      display: flex; align-items: baseline;
+      gap: 10px; margin-bottom: 6px;
+    }
+    .pbar-meta b {
+      font-size: 13px; font-weight: 600; color: var(--primary);
+    }
+    .pbar-over {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      min-height: 26px;
+      margin-bottom: 4px;
+      align-items: center;
+    }
+    .pbar-eta {
+      justify-self: center;
+      white-space: nowrap;
+      font-size: 11px; font-weight: 700;
+      color: var(--secondary);
+      background: var(--secondary-light);
+      padding: 3px 10px; border-radius: 999px;
+    }
+    .pbar-track {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      height: 8px;
+      margin-bottom: 8px;
+    }
+    .pbar-track i {
+      display: block; height: 100%;
+      box-sizing: border-box;
+      background: transparent;
+      border: 2px solid var(--primary);
+      border-radius: 99px;
+    }
+    .pbar-track i.is-done {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .pbar-track i.is-now {
+      --pbar-fill: 100%;
+      background: linear-gradient(to right, var(--secondary) var(--pbar-fill), transparent var(--pbar-fill));
+      border-color: var(--secondary);
+    }
+    .pbar-track i.is-mix {
+      --pbar-prev: 75%;
+      background: linear-gradient(to right, var(--primary) var(--pbar-prev), var(--secondary) var(--pbar-prev));
+      border-color: var(--primary);
+    }
+    .pbar-track i.is-partial {
+      --pbar-fill: 90%;
+      background: linear-gradient(to right, var(--primary) var(--pbar-fill), transparent var(--pbar-fill));
+      border-color: var(--primary);
+    }
+    .pbar-track i.is-na {
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent 0 3px,
+        rgba(133, 134, 138, 0.28) 3px 5px
+      );
+      border: 1.5px dashed var(--grey-300);
+    }
+    .pbar-steps {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      font-size: 10px; font-weight: 600;
+      color: var(--primary);
+      text-align: center;
+      line-height: 1.25;
+    }
+    .pbar-steps .is-done { color: var(--primary); }
+    .pbar-steps .is-now { color: var(--secondary); font-weight: 700; }
+    .pbar-steps .is-mix { color: var(--secondary); font-weight: 700; }
+    .pbar-steps .is-partial { color: var(--primary); }
+    .pbar-steps .is-na {
+      color: var(--text-disabled);
+      font-weight: 500;
+      text-decoration: line-through;
+      text-decoration-color: var(--grey-300);
+    }
+    @media (max-width: 860px) { .pbar-steps { font-size: 9px; } }
+    .pbar-legend {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin: -8px 0 24px; padding-left: 50px;
+    }
+    @media (max-width: 860px) { .pbar-legend { padding-left: 0; } }
+    .pbar-key {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 999px;
+    }
+    .pbar-key.is-done { background: var(--primary-light); color: var(--primary); }
+    .pbar-key.is-now { background: var(--secondary-light); color: var(--secondary); }
+    .pbar-key.is-wait {
+      background: transparent;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+    }
+    .pbar-key.is-na {
+      background: transparent;
+      color: var(--text-disabled);
+      border: 1.5px dashed var(--grey-300);
+      text-decoration: line-through;
+    }
+    .feat-note {
+      font-size: 13.5px;
+      color: var(--secondary);
+      margin: 0 0 12px;
+      padding: 8px 12px;
+      background: var(--secondary-light);
+      border: 1px solid #FFCCBC;
+      border-radius: 8px;
+    }
+    .feat-note.is-comment {
+      color: var(--grey-800);
+      background: var(--magic-50);
+      border-color: var(--primary-light);
+    }
+    .feat-line b { color: var(--text-primary); font-weight: 600; }
+
+  </style>
+<style>
+.draft-banner{background:var(--warning-light);border-bottom:1px solid var(--warning);color:var(--grey-800);font-size:14px;padding:10px 24px;text-align:center}
+.draft-banner b{color:var(--secondary)}
+.todo{display:inline-block;background:var(--warning-light);color:#8a6100;border:1px dashed var(--warning);border-radius:6px;padding:1px 8px;font-size:12.5px;font-weight:600}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;margin:0 6px 8px 0}
+.st-done{background:var(--success-light);color:var(--success)}
+.st-part{background:var(--warning-light);color:#8a6100}
+.st-plan{background:var(--info-light);color:var(--info)}
+.st-risk{background:var(--secondary-light);color:var(--secondary)}
+.feat-line{font-size:14.5px;color:var(--text-secondary);margin:6px 0 0}
+.feat-line b{color:var(--text-primary)}
+.src{font-size:12.5px;color:var(--text-secondary);margin-top:10px}
+.divider-label{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--primary-dark);margin:28px 0 12px}
+.prose{font-size:15px;color:var(--grey-800)} .prose ul{padding-left:20px} .prose li{margin:0 0 10px}
+table.mt{width:100%;border-collapse:collapse;background:var(--bg-paper);border:1px solid var(--grey-300);border-radius:var(--radius);overflow:hidden;font-size:14px}
+table.mt th,table.mt td{padding:9px 12px;border-bottom:1px solid var(--grey-300);text-align:left}
+table.mt th{background:var(--magic-50);color:var(--primary);font-weight:600}
+table.mt td.n{text-align:right;font-variant-numeric:tabular-nums}
+table.mt tr.total td{font-weight:700;background:var(--primary-light)}
+.kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.kpi .paper{padding:16px;text-align:center} .kpi b{display:block;font-size:28px;color:var(--primary)} .kpi span{font-size:13px;color:var(--text-secondary)}
+@media (max-width:860px){.kpi{grid-template-columns:repeat(2,1fr)}}
+.footer{padding:32px 0;color:var(--text-secondary);font-size:13px;border-top:1px solid var(--grey-300)}
+.demo-btn{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:"Fira Sans",sans-serif;font-size:13px;font-weight:600;color:#FFFFFF;background:var(--primary);border:0;padding:8px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:background 0.15s}
+.demo-btn:hover{background:var(--primary-dark)}
+.feat-list{margin:4px 0 0 20px;font-size:14.5px;color:var(--text-secondary)}
+.feat-list li{padding:2px 0}
+.charts .burn{width:100%;height:auto;display:block;margin-top:8px}
+.burn .ax{font-size:10px;fill:#85868A}.burn .lbl{font-size:10.5px;font-weight:600}
+.mods{width:100%;height:auto;display:block;margin-top:8px}.mods .mlbl{font-size:12.5px;fill:#050819}.mods .seg{font-size:10.5px;fill:#fff;font-weight:600}.mods .ax{font-size:11px;fill:#85868A}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--text-secondary);margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg{display:inline-block;width:18px;height:8px;border-radius:2px}
+.lg-scope{height:2px;background:#FF5722}.lg-plan{height:0;border-top:2px dashed #B3B0D6;background:none}.lg-fact{height:3px;background:#343A7E}.lg-fc{height:0;border-top:2px dotted #343A7E;background:none}
+.ag-board{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+.ag-col{background:var(--bg-default);border:1px solid var(--grey-300);border-radius:var(--radius);padding:12px;min-height:200px;display:flex;flex-direction:column}
+.ag-col-ss5{background:var(--magic-50);border-color:var(--magic-100)}
+.ag-head{font-weight:700;color:var(--primary);font-size:15px;margin:2px 4px 10px;display:flex;align-items:center;gap:8px}
+.ag-count{font-size:12px;font-weight:600;color:var(--text-secondary);background:var(--bg-paper);border-radius:999px;padding:1px 8px}
+.ag-list{flex:1;display:flex;flex-direction:column;gap:8px;min-height:120px}
+.ag-card{background:var(--bg-paper);border:1px solid var(--grey-300);border-radius:var(--radius-sm);padding:10px 12px;box-shadow:var(--shadow-card);cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none}
+.ag-card:hover{box-shadow:var(--shadow-hover)}.ag-card.is-drag{opacity:.55;cursor:grabbing}
+.ag-name{font-weight:600;font-size:14px;color:var(--text-primary);display:flex;justify-content:space-between;gap:8px}
+.ag-tag{flex:none;font-size:11px;font-weight:600;color:var(--magic-800);background:var(--magic-100);border-radius:999px;padding:1px 8px;height:fit-content}
+.ag-desc{font-size:13px;color:var(--text-secondary);margin-top:4px;line-height:1.45}
+.demo-btn-sec{background:transparent;color:var(--primary);border:1px solid var(--primary-light)}.demo-btn-sec:hover{background:var(--primary-light)}
+@media (max-width:720px){.ag-board{grid-template-columns:1fr}}
+</style>
+<style>
+/* стили графа из sprint-planning.html */
+.spg{--primaryLight:#E7E7F0;--text2:#85868A;--tr:250ms cubic-bezier(0.4,0,0.2,1);font-size:14px;line-height:16px}
+.seg{display:inline-flex;border:1px solid var(--primary);border-radius:8px;overflow:hidden;margin-left:auto}
+.seg button{font-family:inherit;font-size:14px;line-height:16px;padding:6px 18px;border:none;background:#fff;color:var(--primary);cursor:pointer;transition:background var(--tr)}
+.seg button+button{border-left:1px solid var(--primary)}
+.seg button:hover{background:var(--primaryLight)}
+.seg button.on{background:var(--primary);color:#fff}
+.gGrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media(max-width:1100px){.gGrid{grid-template-columns:1fr}}
+#gWrap{position:relative;height:740px;border:1px solid #EBEBEB;border-radius:8px;overflow:hidden;background:#FBFBFD}
+#gsvg{display:block;cursor:grab;user-select:none;max-width:none}
+#gsvg .ge{stroke:#D9DADF;stroke-width:1;transition:opacity 150ms}
+#gsvg .grp{stroke:#C5C8DA;stroke-width:1.8}
+#gsvg .gpf{stroke:#D0D2E0;stroke-width:1.3}
+#gsvg .gdep{stroke:#8E92BC;stroke-width:1.3;stroke-dasharray:5 4}
+#gsvg .gn{cursor:pointer;transition:opacity 150ms}
+#gsvg .glt{font-size:10px;fill:#5F6068;paint-order:stroke;stroke:#FBFBFD;stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+#gsvg .glf{font-size:12.5px;font-weight:600;fill:#050819;paint-order:stroke;stroke:#FBFBFD;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+#gsvg .glp{font-size:13.5px;font-weight:600;fill:#050819;paint-order:stroke;stroke:#FBFBFD;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+#gsvg .glr{font-size:14px;font-weight:600;fill:#343A7E;paint-order:stroke;stroke:#FBFBFD;stroke-width:4px;pointer-events:none}
+#gsvg .gls{font-size:11px;fill:#85868A;paint-order:stroke;stroke:#FBFBFD;stroke-width:3px;pointer-events:none}
+#gsvg.lowz .glt{display:none}
+#gsvg.dim .gn:not(.on){opacity:.12}
+#gsvg.dim .ge:not(.on){opacity:.05}
+#gsvg.dim .ge.on{stroke:#5D6198}
+#gsvg.dim .gdep.on{stroke:#FF5722}
+#gsvg.dim .gn.on .glt{display:block;fill:#050819}
+#gsvg .gn.pulse circle:first-child{stroke:#FF5722;stroke-width:3}
+.gtool{position:absolute;right:10px;top:10px;display:flex;gap:6px}
+.gtool .btn{padding:4px 10px;font-size:12px;background:#fff}
+.ghint{position:absolute;left:12px;bottom:10px;font-size:11px;color:#85868A;pointer-events:none}
+#gList{border:1px solid #EBEBEB;border-radius:8px;max-height:740px;overflow-y:auto;padding:4px 0}
+#gList .gl-h{display:flex;justify-content:space-between;gap:8px;padding:10px 14px 8px;font-size:13px;border-bottom:1px solid #EBEBEB;position:sticky;top:-4px;background:#fff;z-index:1}
+#gList .gl-h span{color:var(--text2);font-size:12px}
+#gList .gl-p{padding:10px 14px 8px;cursor:pointer;border-left:3px solid transparent;background:#FAFBFE;margin-top:2px}
+#gList .gl-p:hover{background:rgba(0,0,0,.04)}
+#gList .gl-p.on{background:var(--primaryLight);border-left-color:var(--primary)}
+#gList .gl-p .gl-n{font-size:14px;font-weight:600}
+#gList .gl-r{padding:8px 14px 8px 22px;cursor:pointer;border-left:3px solid transparent}
+#gList .gl-r:hover{background:rgba(0,0,0,.03)}
+#gList .gl-r.on{background:var(--primaryLight);border-left-color:var(--primary)}
+#gList .gl-n{display:flex;justify-content:space-between;gap:8px;font-size:13px;line-height:16px}
+#gList .gl-n span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#gList .gl-b{height:6px;background:#EFF0F6;border-radius:3px;margin:5px 0 3px;overflow:hidden}
+#gList .gl-b i{display:block;height:100%;border-radius:3px}
+#gList .gl-s{font-size:11px;color:var(--text2)}
+#gLeg i{border-radius:50%!important}
+#gtip{max-width:380px;pointer-events:none}
+
+#grSeg{margin-left:0;margin-bottom:2px}
+#gMatrix{margin-top:16px}
+#gMatrix .gm-leg{font-size:12px;line-height:16px;color:#5F6068;margin:0 0 10px}
+#gMatrix .gm-wrap{overflow-x:auto;border:1px solid #EBEBEB;border-radius:8px}
+#gMatrix table.gm{border-collapse:collapse;width:100%;min-width:720px;font-size:12px}
+#gMatrix table.gm th,#gMatrix table.gm td{border:1px solid #EBEBEB;padding:6px 8px;text-align:center;vertical-align:middle}
+#gMatrix table.gm thead th{background:#FAFBFE;font-weight:600}
+#gMatrix table.gm tbody th{text-align:left;white-space:nowrap;background:#fff;font-weight:600}
+#gMatrix table.gm th.gm-k,#gMatrix table.gm td.gm-k{width:28px;padding:4px 2px;background:#F4F4F8;color:#85868A;font-size:11px;font-weight:600}
+#gMatrix table.gm td.gm-empty{background:#FBFBFD}
+#gMatrix table.gm td.gm-c b{display:block;font-size:14px}
+#gMatrix table.gm td.gm-c div{font-size:11px;color:#85868A}
+
+#gMatrix table.gm td.gm-none b{font-size:11px;font-weight:600;color:#85868A}
+#artsBox input{margin:0}
+
+#gList .gl-caret{display:inline-block;width:0;height:0;border-style:solid;border-width:4px 0 4px 6px;border-color:transparent transparent transparent #5F6068;margin-right:6px;vertical-align:middle}
+#gList .gl-r.open .gl-caret{border-width:6px 4px 0 4px;border-color:#5F6068 transparent transparent transparent;position:relative;top:-1px}
+#gList .gl-dod{display:none;padding:6px 0 2px;margin-top:4px;border-top:1px solid #EFF0F6}
+#gList .gl-r.open .gl-dod{display:block}
+#gList .gl-dod-h{font-size:11px;font-weight:600;color:#5F6068;margin:0 0 4px}
+#gList .gl-art{display:flex;align-items:flex-start;gap:8px;padding:5px 4px;margin:0 -4px;cursor:pointer;border-radius:4px;font-size:12px;line-height:16px}
+#gList .gl-art:hover{background:rgba(0,0,0,.04)}
+#gList .gl-art.on{background:var(--primaryLight)}
+#gList .gl-art-n{flex:1;min-width:0;white-space:normal}
+#gList .gl-art-c{flex:0 0 auto;color:#85868A;font-size:11px;white-space:nowrap}
+#gList .gl-chk{flex:0 0 14px;width:14px;height:14px;box-sizing:border-box;border:1.5px solid #8E92BC;border-radius:3px;background:#fff;position:relative;margin-top:1px}
+#gList .gl-chk.on{background:#599C16;border-color:#599C16}
+#gList .gl-chk.on:after{content:"";position:absolute;left:3px;top:0px;width:5px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+
+.spg .btn{font-family:inherit;font-size:14px;border-radius:8px;padding:8px 16px;cursor:pointer;border:1px solid var(--primary);background:#fff;color:var(--primary)}
+.spg .btn:hover{background:rgba(0,0,0,.04)}
+.spg .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin:8px 0;line-height:16px}
+.spg .legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:4px;vertical-align:-2px}
+.spg .legend span{display:inline}
+.spg .sub{color:var(--text2);font-size:12px;line-height:15px;margin:6px 0 4px}
+#gtip.tip{position:fixed;pointer-events:none;background:#424242;color:#fff;font-size:12px;line-height:16px;padding:6px 8px;border-radius:4px;max-width:380px;z-index:50;display:none}
+#gWrap{height:640px}#gList{max-height:640px}
+.spg .gGrid{grid-template-columns:minmax(0,1fr) 280px}
+@media(max-width:900px){.spg .gGrid{grid-template-columns:1fr}}
+.kpi.kpi4{grid-template-columns:repeat(4,1fr)}
+.kpi .paper small{display:block;font-size:12px;color:var(--success);font-weight:600;margin-top:2px}
+.rburn{width:100%;height:auto;display:block;margin-top:6px}
+/* матрица КЮ */
+.ky-wrap{overflow-x:auto;margin-top:10px}
+table.ky{border-collapse:separate;border-spacing:0;width:100%;min-width:860px;table-layout:fixed;font-size:12px;line-height:15px}
+table.ky th,table.ky td{vertical-align:top;text-align:left}
+table.ky th.ky-ph{font-size:13px;font-weight:600;color:var(--text-primary);padding:6px 8px 8px}
+table.ky th.ky-role{width:118px;font-size:13px;font-weight:600;padding:10px 10px 10px 0;white-space:nowrap;color:var(--text-primary)}
+table.ky th.ky-k,table.ky td.ky-k{width:16px;min-width:16px;padding:0;border-left:1.5px dashed #FF8A65}
+table.ky th.ky-k span{display:inline-block;background:#FF5722;color:#fff;font-size:10px;font-weight:600;border-radius:4px;padding:1px 4px;margin-left:-13px}
+table.ky td.ky-c{background:#fff;border:1px solid #E1E2E8;border-radius:8px;padding:7px 8px;box-shadow:0 1px 2px rgba(5,8,25,.04)}
+table.ky tr td.ky-c{border-top-width:1px}
+table.ky tbody tr+tr td.ky-c{}
+table.ky td.ky-q{background:#EEF5E6;border-color:#C9DFB2}
+table.ky td.ky-e{background:#FAFAFC;opacity:.75}
+table.ky td.ky-q.ky-e{background:#F3F8EE}
+table.ky{border-spacing:6px 6px}
+.ky-art{font-weight:600;color:#050819;margin-bottom:5px}
+.ky-chips{display:flex;flex-wrap:wrap;gap:4px}
+.ky-chip{display:inline-flex;align-items:center;gap:4px;border-radius:10px;padding:1px 7px;font-size:11px;line-height:16px;white-space:nowrap;cursor:default}
+.ky-chip b{font-weight:700}
+.ky-chip.ky-f{background:#E7E7F0;color:#343A7E}
+.ky-chip.ky-t{background:#FFEBE4;color:#C43E12}
+.ky-sum{margin-top:5px;font-size:11px;color:#85868A}
+.ky-none{font-size:11px;color:#ABABAB}
+.ky-tot td{font-size:11.5px;color:#424242;padding:4px 8px}
+.ky-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.ky-dot.ky-f{background:#343A7E}.ky-dot.ky-t{background:#FF5722}
+table.kym{min-width:720px;table-layout:fixed}table.kym thead tr:first-child th:first-child{width:230px}
+table.kym td{text-align:center}
+table.kym th:first-child{text-align:left;white-space:nowrap}
+table.kym .ky-chip{margin:1px}
+.ky-dash{color:#D9DADF}
+.ky-legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--text-secondary);margin-top:10px}
+.ky-legend span{display:inline-flex;align-items:center;gap:6px}
+
+.ky-chip.ky-ok{background:#599C16;color:#fff}
+.ky-chip.ky-one{white-space:normal;border-radius:8px;max-width:100%;line-height:14px;padding:2px 7px}
+.ky-chip.ky-no{background:#D9DADF;color:#424242}
+table.ky td.ky-full{border-color:#A5CC7E}
+.ky-dot.ky-okd{background:#599C16}
+.kyseg{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.kyseg button{font-family:inherit;font-size:12.5px;line-height:16px;padding:5px 11px;border:1px solid var(--primary-light);border-radius:14px;background:#fff;color:var(--primary);cursor:pointer}
+.kyseg button i{font-style:normal;color:#85868A;margin-left:2px}
+.kyseg button:hover{background:var(--primary-light)}
+.kyseg button.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.kyseg button.on i{color:#D2DBF1}
+.ky-total{font-size:13px;font-weight:600;color:var(--primary);margin:6px 0 0}
+.kpi.kpi5{grid-template-columns:repeat(5,1fr)}
+.kpi .paper small.nd{color:#757575}
+</style>
+</head><body>
+<div class="draft-banner"><b>Черновик.</b> Не публиковать. Собран 16.11.2026 по таблице спринта и протоколам; итог демо 20.11 не заполнен.</div>
+<header class="app-header"><div class="app-header-in">
+<div class="brand"><div class="brand-mark">BP</div>BusinessPad · AI Products</div>
+<div class="header-navs">
+<nav class="nav nav-page" aria-label="Разделы страницы">
+<a href="#plan">Цели</a><a href="#done">По модулям</a><a href="#metrics">Метрики</a><a href="#agents">Агенты SS5</a>
+</nav>
+<nav class="nav nav-docs" aria-label="Отчёты суперспринтов">
+<a href="https://ukolovsky.github.io/ai-agents-trace/supersprint.html#ss1">Отчёт SS1</a>
+<a href="https://ukolovsky.github.io/ai-agents-trace/ss2-report.html">Отчёт SS2</a>
+<a href="https://ukolovsky.github.io/ai-agents-trace/ss3-report.html">Отчёт SS3</a>
+<a href="#" class="is-current" aria-current="page">Отчёт SS4</a>
+</nav></div></div></header>
+
+<div class="hero"><div class="wrap">
+<div class="eyebrow"><span class="eyebrow-dot"></span> Суперспринт 4 · 12.10-20.11.2026</div>
+<h1>Отчёт суперспринта 4</h1>
+<p class="lede">Итерационная версия AI-контура на отдельном AI-стенде: файловый менеджер, файловый индексатор, поиск и импорт, плюс вики, настройщик и первая версия видеотрекера.</p>
+</div></div>
+
+<section id="plan"><div class="wrap">
+<div class="sec-head"><div class="sec-num">1</div><h2>Цели суперспринта</h2></div>
+<p class="sec-sub">Цели поставили на планировании суперспринта 12.10.</p>
+<div class="grid g-3">
+<article class="paper"><div class="paper-kicker">Цель 1 · номер один</div><h3>Интеграция AI-сервисов в BP3</h3><p>Построить конкретный последовательный план перехода сервисов на интеграцию в BP3: выпустить в релиз часть продукта и дальше инкрементно дорабатывать её до полноценной интеграции в BP3. План по срокам и объёму задач собрать в первую неделю.</p></article>
+<article class="paper"><div class="paper-kicker">Цель 2</div><h3>Файловое хранилище</h3><p>Довести файловое хранилище, которое делается для интеграции и сервисов. Ориентир завершения следующий спринт, главный вопрос в том, насколько быстро пройдёт ревью.</p></article>
+<article class="paper"><div class="paper-kicker">Цель 3 · вне AI</div><h3>Billing под мультитенант</h3><p>По итогам демо эскиза работающего Billing проработать ТЗ под новые условия и мультитенант, разделить на инкременты и составить план реализации. Ведёт Мирон.</p></article>
+</div>
+<article class="paper" style="margin-top:20px"><div class="paper-kicker">Дополнение · TDR 22.10</div><h3>Переосмыслили подход и решили реализовывать на собственном стенде</h3><p>В ходе TDR 22.10 мы переосмыслили подход к работе. AI-платформа и базовая платформа равноправны, AI-сервисы не встраиваются в инфраструктуру монолита и могут иметь свои Redis, Postgres и RabbitMQ. В этом суперспринте доводим и выпускаем итерационную версию файлового менеджера, файлового индексатора, поиска и импорта, риски и последующая переделка приняты. Реализовывать решили на собственном AI-стенде: это отдельная среда, зеркальная Dev и синхронно обновляемая, через неё ближайшие полгода идут AI-релизы для демо и обратной связи.</p></article>
+</div></section>
+
+<section id="done" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300);"><div class="wrap">
+<div class="sec-head"><div class="sec-num">2</div><h2>Что сделано по модулям</h2></div>
+<p class="sec-sub">Что умеет каждый модуль и куда развиваем функциональность дальше.</p>
+<p class="divider-label">Блок 1 · файлы, импорт, поиск</p><div class="grid g-2">
+<article class="paper"><div class="paper-kicker">ИИ Импорт</div><h3>Экземпляр бизнес-процесса из входящего документа</h3>
+<p class="feat-line"><b>Что умеет.</b> Пользователь загружает документ, система распознаёт его и по параметрам инициации из настроек бизнес-процессов заводит нужный экземпляр бизнес-процесса. Разные документы и разные значения параметров дают разные ЭБП: если параметров инициации хватает, процесс сразу встаёт на следующий этап, если нет, экземпляр стартует в начальном статусе и ждёт уточнения. При загрузке финансовой операции из документа система проверяет, есть ли контрагент и товары в справочниках, и предлагает последовательно завести недостающие, так что автозаполнение проходит полностью. Человек подтверждает результат, текст документа приходит из контура распознавания файлового индексатора.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Целевой TDR импорта.</li><li>Связь с целевыми ФИ и ФМ: файловым индексатором и файловым менеджером.</li><li>Генеративная функция для пресета Задачи.</li></ul>
+<button type="button" class="demo-btn">Продемонстрировать</button></article>
+<article class="paper"><div class="paper-kicker">ИИ Поиск</div><h3>Глобальный поиск по объектам BP3</h3>
+<p class="feat-line"><b>Что умеет.</b> В шапке стенда глобальный поиск по объектам продукта. При наборе текста всплывает быстрая подсказка по подстроке, полный запрос ранжируется BM25, вес сигналов настраивается. В выдаче видны фрагменты найденного текста, из результата сразу открывается карточка, вкладка «Все» возвращает к полной картине. Подключили поиск по файлам, комментариям и проектной Вики.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Целевой TDR поиска.</li><li>Связь с целевыми ФИ и ФМ: файловым индексатором и файловым менеджером.</li><li>Heatmap активности действий с найденными объектами.</li></ul>
+<button type="button" class="demo-btn">Продемонстрировать</button></article>
+<article class="paper"><div class="paper-kicker">Файлы</div><h3>Файловый менеджер и файловый индексатор</h3>
+<p class="feat-line"><b>Что умеет.</b> Файл попадает в систему через файловый менеджер, единую точку входа. Индексатор ставит его в одну очередь с приоритетом, распознаёт текст и речь и сообщает о готовности подпиской Centrifugo, экрану не нужно постоянно спрашивать статус. Между сервисами передаются ссылки на объектное хранилище, а не сами файлы. Распознанный текст забирают импорт и видеотрекер.</p></article>
+</div><p class="divider-label">Блок 2 · настройщик и стенд</p><div class="grid g-2">
+<article class="paper"><div class="paper-kicker">ИИ Настройщик</div><h3>Настройка процессов в диалоге</h3>
+<p class="feat-line"><b>Что умеет.</b> Настройщик работает на AI-стенде и подключён к чату платформы через Centrifugo: настройку процесса обсуждают там же, где идёт рабочий диалог.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Сабагенты, в том числе валидации схемы, для сложных настроек.</li><li>Целевой TDR с контрактом фронтенда.</li><li>Обновление процесса по регламентам компании из Вики.</li><li>Подбор готового пресета по отрасли из фабрики пресетов.</li></ul>
+<button type="button" class="demo-btn">Продемонстрировать</button></article>
+<article class="paper"><div class="paper-kicker">AI-стенд</div><h3>Отдельная среда для AI-релизов</h3>
+<p class="feat-line"><b>Что умеет.</b> Выделенная группа узлов в Dev-инфраструктуре со своим пространством имён и сетевой изоляцией, чтобы демо и обратная связь не смешивались с основной площадкой. Цель стенда в том, чтобы за полгода создать 30+ агентов, оценить эффективность их работы, отработать их взаимодействие и тестировать их в пилотных и R&amp;D проектах.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Автоматическое подтягивание платформенных обновлений и правила синхронизации работы сервисов.</li><li>Основная витрина AI-релизов на ближайшие полгода.</li><li>Перенос проверенных сценариев в основной контур платформы.</li><li>Регламент синхронизации с Dev и отдельный R&amp;D стенд.</li></ul></article>
+</div><p class="divider-label">Блок 3 · вики и встречи</p><div class="grid g-2">
+<article class="paper"><div class="paper-kicker">Вики</div><h3>Проектная вики</h3>
+<p class="feat-line"><b>Что умеет.</b> Регламенты и проекты в одном интерфейсе. В вики загружают файлы без дополнительной обработки и редактируют их. Статьи находятся полнотекстовым поиском. К документу целиком и к выделенному фрагменту оставляют разные комментарии.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Целевая версия по TDR.</li><li>Обновление фронта.</li><li>Связи с ЭБП.</li><li>Направление help-центра.</li><li>Внешние базы знаний.</li></ul>
+<button type="button" class="demo-btn">Продемонстрировать</button></article>
+<article class="paper"><div class="paper-kicker">Видеотрекер</div><h3>BP Meet: запись, транскрибация, саммари</h3>
+<p class="feat-line"><b>Что умеет.</b> Встречу записывают прямо из BusinessPad. Запись начинает ведущий, автором файлов считается тот, кто нажал кнопку. Дорожки транскрибируются сами, общая запись видна тем, у кого есть права на встречу, статус обработки виден в интерфейсе.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Обновление саммаризации и создаваемых задач: ручная правка саммари и полей задач, статусы изменений «новая», «изменённая» и «удалённая», сравнение версий саммари по связанным объектам.</li><li>Материалы встреч будут добавлены в Вики.</li><li>Внешние календари в дополнение к календарю продукта.</li></ul>
+<button type="button" class="demo-btn">Продемонстрировать</button></article>
+</div><p class="divider-label">Блок 4 · помощники</p><div class="grid g-2">
+<article class="paper"><div class="paper-kicker">Помощник по договору</div><h3>Сверка с эталоном и сравнение договоров</h3>
+<p class="feat-line"><b>Что умеет.</b> Проектируется и идёт макетами. Эталон компании это бизнес-процесс с экземплярами и экраном исполнения, как у документа. Договор сверяется с эталоном: распознанные пункты показаны карточками, клик по карточке ведёт к строке текста, сначала видны критичные пункты, условие добавляется кликом по фрагменту. Протокол разногласий ложится во вкладку документов договора. Два договора сравниваются одной таблицей: цитаты обоих договоров, статус «изменено», «добавлено», «удалено» или «без изменений» и предлагаемая редакция.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Сделаем фронт.</li><li>Выкатим первую версию агента.</li></ul></article>
+
+<article class="paper"><div class="paper-kicker">Помощник оценки контрагентов</div><h3>Статус контрагента по ИНН</h3>
+<p class="feat-line"><b>Что умеет.</b> Описан use case и ТЗ с HTML-прототипом: шлюз проверки, риск тегом и оверлеем, согласование в runtime. Сигнал риска в Magic Pad ведёт на карточку контрагента.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Сделаем бэкенд, макеты и фронт.</li><li>Выкатим первую версию агента.</li></ul></article>
+
+<article class="paper"><div class="paper-kicker">Помощник по вики</div><h3>Агент-помощник по проектной вики</h3>
+<p class="feat-line"><b>Что умеет.</b> ТЗ помощника принято. Разработку агента из-за ресурсов перенесли в суперспринт 5.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Сделаем бэкенд, макеты и фронт.</li><li>Выкатим первую версию агента.</li></ul></article>
+</div><p class="divider-label">Блок 5 · CPQ</p><div class="grid g-2">
+<article class="paper"><div class="paper-kicker">Конфигуратор</div><h3>Конфигуратор и пресет CPQ в BP3</h3>
+<p class="feat-line"><b>Что умеет.</b> Конфигуратор с обновлённым пайплайном расчёта. Согласован план разработки CPQ как пресета в BP3: первая версия без конфигуратора и каталога материалов, с агентами на этапах, Magic Pad, шаблоном КП и каталогами товаров и поставщика через файл.</p>
+<button type="button" class="demo-btn">Продемонстрировать</button></article>
+<article class="paper"><div class="paper-kicker">Генератор КП</div><h3>Коммерческое предложение по заявке</h3>
+<p class="feat-line"><b>Что умеет.</b> С помощью набора шаблонов клиент сам составляет и меняет форму генерации КП и улучшает её визуальный стиль. Карточка товара применяется ко всем позициям заявки: сколько товаров, столько частей презентации. Дизайн и фронт сделаны, остался бэкенд.</p>
+<button type="button" class="demo-btn">Продемонстрировать</button></article>
+</div><p class="divider-label">Блок 6 · Billing</p><div class="grid g-2">
+<article class="paper"><div class="paper-kicker">Billing</div><h3>Обновлённый онбординг и переезд на BP3</h3>
+<p class="feat-line"><b>Что умеет.</b> Сделали обновлённый онбординг. Разобрали бэклог переезда с BP2 на BP3: логирование, аккаунты, аутентификация, создание стенда и почта уже есть, сейчас сервис состоит из 7 микросервисов.</p>
+<p class="feat-line"><b>Развитие.</b></p>
+<ul class="feat-list"><li>Пересмотр логики работы пользователя: ролевая модель на бэкенде.</li><li>Одно приложение вместо двух, клиента и админки.</li><li>Переписать или скопировать функциональные блоки.</li><li>Клиент: вместо 7 микросервисов (2 бэкенда, 2 фронта, 2 Celery, Redis) сделать 2, фронт и бэкенд с оркестратором.</li><li>Обновить админку.</li><li>Порядок работы: получить задачу, согласовать TDR, декомпозировать, оценить сроки.</li></ul></article>
+</div>
+</div></section>
+
+<section id="metrics"><div class="wrap">
+<div class="sec-head"><div class="sec-num">3</div><h2>Метрики по задачам</h2></div>
+<p class="sec-sub">Все 80 задач суперспринта 4. Выполнено: задача принята или её плановая дата не позже 20.11. Не выполнено: задача перенесена в суперспринт 5, без срока или со сроком после 20.11.</p>
+<div class="kpi kpi5"><div class="paper"><b>79%</b><span>готовность фич по группам работ</span><small>14 модулей</small></div><div class="paper"><b>66 из 80</b><span>задач, 1041 из 1279 ч</span><small>82% по числу</small></div><div class="paper"><b>33 из 41</b><span>фич, 522 из 674 ч</span><small>80%</small></div><div class="paper"><b>33 из 39</b><span>технических артефактов, 519 из 605 ч</span><small>85%</small></div><div class="paper"><b>14</b><span>не выполнено, 238 ч</span><small class="nd">3 не завершено, 11 не начато</small></div></div>
+
+<article class="paper spg"><div class="paper-kicker">Граф релиза</div><h3>Проекты, фичи и задачи суперспринта 4</h3>
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0 4px"><div class="seg" id="kindSeg" role="tablist" style="margin-left:0"><button data-k="feat" class="on">Фичи по модулям</button><button data-k="arts">Артефакты по типам работ</button></div></div>
+<div class="sub">В центре релиз. В виде «Фичи» вокруг три проекта: AI стенд, Биллинг, CPQ, у проекта модули, у модуля задачи. В виде «Артефакты» вокруг цели суперспринта и CPQ, у цели фичи, у фичи задачи с ободком по типу работ. Наведите на узел, чтобы увидеть подробности, клик по узлу подсвечивает связанные. Колесо мыши: масштаб, перетаскивание фона: сдвиг, узлы можно двигать.</div>
+<div class="legend" id="gLeg"></div>
+<div class="gGrid"><div id="gWrap"><svg id="gsvg"></svg><div class="gtool"><button class="btn" id="gFitB" title="Вписать граф в окно">Вписать</button><button class="btn" id="gReB" title="Заново разложить узлы">Перестроить</button></div><div class="ghint">Подписи задач появляются при приближении колесом и при наведении на фичу</div></div><div id="gList"></div></div>
+<div id="gMatrix" style="display:none"></div><div class="tip" id="gtip"></div>
+</article>
+
+<div class="grid g-2 charts" style="margin-top:20px">
+<article class="paper"><div class="paper-kicker">Фичи</div><h3>Выполнение по датам</h3><svg viewBox="0 0 520 230" class="rburn" role="img" aria-label="Фичи">
+<rect x="30" y="22" width="444" height="168" fill="#F7F7FA"/>
+<line x1="30" x2="474" y1="190.0" y2="190.0" stroke="#EBEBEB"/>
+<text x="25" y="193.0" text-anchor="end" font-size="10" fill="#85868A">0</text>
+<text x="479" y="193.0" font-size="10" fill="#FF5722">0%</text>
+<line x1="30" x2="474" y1="148.0" y2="148.0" stroke="#EBEBEB"/>
+<text x="25" y="151.0" text-anchor="end" font-size="10" fill="#85868A">10</text>
+<text x="479" y="151.0" font-size="10" fill="#FF5722">25%</text>
+<line x1="30" x2="474" y1="106.0" y2="106.0" stroke="#EBEBEB"/>
+<text x="25" y="109.0" text-anchor="end" font-size="10" fill="#85868A">20</text>
+<text x="479" y="109.0" font-size="10" fill="#FF5722">50%</text>
+<line x1="30" x2="474" y1="64.0" y2="64.0" stroke="#EBEBEB"/>
+<text x="25" y="67.0" text-anchor="end" font-size="10" fill="#85868A">31</text>
+<text x="479" y="67.0" font-size="10" fill="#FF5722">75%</text>
+<line x1="30" x2="474" y1="22.0" y2="22.0" stroke="#EBEBEB"/>
+<text x="25" y="25.0" text-anchor="end" font-size="10" fill="#85868A">41</text>
+<text x="479" y="25.0" font-size="10" fill="#FF5722">100%</text>
+<text x="30.0" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 30.0 202)">12.10</text>
+<text x="75.9" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 75.9 202)">15.10</text>
+<text x="121.9" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 121.9 202)">20.10</text>
+<text x="167.8" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 167.8 202)">23.10</text>
+<text x="213.7" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 213.7 202)">28.10</text>
+<text x="259.7" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 259.7 202)">02.11</text>
+<text x="305.6" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 305.6 202)">05.11</text>
+<text x="351.5" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 351.5 202)">10.11</text>
+<text x="397.4" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 397.4 202)">13.11</text>
+<text x="443.4" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 443.4 202)">18.11</text>
+<text x="474.0" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 474.0 202)">20.11</text>
+<line x1="30" x2="474" y1="22.0" y2="22.0" stroke="#FF5722" stroke-width="2"/>
+<text x="470" y="16.0" text-anchor="end" font-size="11" fill="#FF5722">объём: 41 задач, 674 ч</text>
+<polygon points="30.0,190.0 30.0,190.0 45.3,190.0 60.6,190.0 75.9,190.0 91.2,190.0 106.6,190.0 121.9,190.0 137.2,190.0 152.5,190.0 167.8,190.0 183.1,181.8 198.4,181.8 213.7,181.8 229.0,181.8 244.3,169.5 259.7,169.5 275.0,169.5 290.3,169.5 305.6,153.1 320.9,136.7 336.2,116.2 351.5,116.2 366.8,116.2 382.1,116.2 397.4,108.0 412.8,99.9 428.1,99.9 443.4,99.9 458.7,99.9 474.0,54.8 474.0,190.0" fill="#599C16" opacity=".10"/>
+<polyline points="30.0,190.0 45.3,190.0 60.6,190.0 75.9,190.0 91.2,190.0 106.6,190.0 121.9,190.0 137.2,190.0 152.5,190.0 167.8,190.0 183.1,181.8 198.4,181.8 213.7,181.8 229.0,181.8 244.3,169.5 259.7,169.5 275.0,169.5 290.3,169.5 305.6,153.1 320.9,136.7 336.2,116.2 351.5,116.2 366.8,116.2 382.1,116.2 397.4,108.0 412.8,99.9 428.1,99.9 443.4,99.9 458.7,99.9 474.0,54.8" fill="none" stroke="#343A7E" stroke-width="2.5"/>
+<line x1="474.0" x2="474.0" y1="22.0" y2="54.8" stroke="#BDBDBD" stroke-width="5"/>
+<circle cx="474.0" cy="54.8" r="4.5" fill="#599C16" stroke="#fff" stroke-width="1.5"/>
+<text x="466.0" y="70.8" text-anchor="end" font-size="11" font-weight="600" fill="#3E7A0E">20.11: 33 из 41, 522 из 674 ч (80%)</text>
+<text x="466.0" y="42.4" text-anchor="end" font-size="10.5" fill="#757575">не выполнено: 8</text>
+<text x="36" y="36" font-size="11" font-weight="600" fill="#343A7E">Фичи</text>
+</svg></article>
+<article class="paper"><div class="paper-kicker">Технические артефакты</div><h3>Выполнение по датам</h3><svg viewBox="0 0 520 230" class="rburn" role="img" aria-label="Технические артефакты">
+<rect x="30" y="22" width="444" height="168" fill="#F7F7FA"/>
+<line x1="30" x2="474" y1="190.0" y2="190.0" stroke="#EBEBEB"/>
+<text x="25" y="193.0" text-anchor="end" font-size="10" fill="#85868A">0</text>
+<text x="479" y="193.0" font-size="10" fill="#FF5722">0%</text>
+<line x1="30" x2="474" y1="148.0" y2="148.0" stroke="#EBEBEB"/>
+<text x="25" y="151.0" text-anchor="end" font-size="10" fill="#85868A">10</text>
+<text x="479" y="151.0" font-size="10" fill="#FF5722">25%</text>
+<line x1="30" x2="474" y1="106.0" y2="106.0" stroke="#EBEBEB"/>
+<text x="25" y="109.0" text-anchor="end" font-size="10" fill="#85868A">20</text>
+<text x="479" y="109.0" font-size="10" fill="#FF5722">50%</text>
+<line x1="30" x2="474" y1="64.0" y2="64.0" stroke="#EBEBEB"/>
+<text x="25" y="67.0" text-anchor="end" font-size="10" fill="#85868A">29</text>
+<text x="479" y="67.0" font-size="10" fill="#FF5722">75%</text>
+<line x1="30" x2="474" y1="22.0" y2="22.0" stroke="#EBEBEB"/>
+<text x="25" y="25.0" text-anchor="end" font-size="10" fill="#85868A">39</text>
+<text x="479" y="25.0" font-size="10" fill="#FF5722">100%</text>
+<text x="30.0" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 30.0 202)">12.10</text>
+<text x="75.9" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 75.9 202)">15.10</text>
+<text x="121.9" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 121.9 202)">20.10</text>
+<text x="167.8" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 167.8 202)">23.10</text>
+<text x="213.7" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 213.7 202)">28.10</text>
+<text x="259.7" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 259.7 202)">02.11</text>
+<text x="305.6" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 305.6 202)">05.11</text>
+<text x="351.5" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 351.5 202)">10.11</text>
+<text x="397.4" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 397.4 202)">13.11</text>
+<text x="443.4" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 443.4 202)">18.11</text>
+<text x="474.0" y="202" font-size="9.5" fill="#85868A" text-anchor="end" transform="rotate(-40 474.0 202)">20.11</text>
+<line x1="30" x2="474" y1="22.0" y2="22.0" stroke="#FF5722" stroke-width="2"/>
+<text x="470" y="16.0" text-anchor="end" font-size="11" fill="#FF5722">объём: 39 задач, 605 ч</text>
+<polygon points="30.0,190.0 30.0,190.0 45.3,190.0 60.6,190.0 75.9,190.0 91.2,185.7 106.6,155.5 121.9,155.5 137.2,155.5 152.5,155.5 167.8,155.5 183.1,125.4 198.4,125.4 213.7,125.4 229.0,125.4 244.3,103.8 259.7,103.8 275.0,103.8 290.3,103.8 305.6,78.0 320.9,78.0 336.2,69.4 351.5,69.4 366.8,69.4 382.1,69.4 397.4,65.1 412.8,65.1 428.1,65.1 443.4,65.1 458.7,65.1 474.0,47.8 474.0,190.0" fill="#599C16" opacity=".10"/>
+<polyline points="30.0,190.0 45.3,190.0 60.6,190.0 75.9,190.0 91.2,185.7 106.6,155.5 121.9,155.5 137.2,155.5 152.5,155.5 167.8,155.5 183.1,125.4 198.4,125.4 213.7,125.4 229.0,125.4 244.3,103.8 259.7,103.8 275.0,103.8 290.3,103.8 305.6,78.0 320.9,78.0 336.2,69.4 351.5,69.4 366.8,69.4 382.1,69.4 397.4,65.1 412.8,65.1 428.1,65.1 443.4,65.1 458.7,65.1 474.0,47.8" fill="none" stroke="#343A7E" stroke-width="2.5"/>
+<line x1="474.0" x2="474.0" y1="22.0" y2="47.8" stroke="#BDBDBD" stroke-width="5"/>
+<circle cx="474.0" cy="47.8" r="4.5" fill="#599C16" stroke="#fff" stroke-width="1.5"/>
+<text x="466.0" y="63.8" text-anchor="end" font-size="11" font-weight="600" fill="#3E7A0E">20.11: 33 из 39, 519 из 605 ч (85%)</text>
+<text x="466.0" y="38.9" text-anchor="end" font-size="10.5" fill="#757575">не выполнено: 6</text>
+<text x="36" y="36" font-size="11" font-weight="600" fill="#343A7E">Технические артефакты</text>
+</svg></article>
+</div>
+<div class="legend"><span><i class="lg lg-scope"></i>Объём суперспринта, справа доля объёма</span><span><i class="lg lg-fact"></i>Выполнено: дата приёмки или плановая дата</span><span><i class="lg" style="background:#BDBDBD;height:8px"></i>Не выполнено</span></div>
+
+<article class="paper" style="margin-top:20px"><div class="paper-kicker">Модель «Как мы работаем»</div><h3>Фичи и технические артефакты по фазам и ролям</h3>
+<p>Строки и ячейки взяты из матрицы «Потоки ролей по фазам» Кирилла Юрьевича: роль, фаза Ф1 до Ф4 и её артефакт, контрольные точки К1 до К4. Выберите фичу, чтобы увидеть её задачи по ячейкам. Зелёный тег: готово, серый: не выполнено. Наведите на тег, чтобы увидеть задачи.</p>
+<div class="kyseg" id="kySeg"></div><p class="ky-total" id="kySum"></p>
+<div class="ky-wrap" id="kyBox"></div>
+<div class="ky-legend"><span><span class="ky-chip ky-ok">готово</span></span><span><span class="ky-chip ky-no">не выполнено</span></span><span><i class="lg" style="background:#EEF5E6;border:1px solid #C9DFB2;height:12px;width:14px"></i>поток качества</span><span><i class="lg" style="background:#FF5722;width:14px;height:12px"></i>контрольные точки: К1 Берём в работу, К2 Готово к сборке, К3 Готово к выпуску, К4 Запуск завершён</span><span>В кнопке фичи её готовность по группам работ</span></div>
+</article>
+<p class="src">Как считали: доска планирования AI, 4th Super Sprint, срез 16.11, все 80 задач. Выполнено 66: принятые и задачи с плановой датой до 20.11 включительно. Не выполнено 14: 10 перенесены в суперспринт 5, 3 без срока, фронт помощника по договору не совмещён с бэкендом; из них 3 не завершены (пауза), 11 не начаты. Технические артефакты это TDR, ТЗ, аналитика, макеты, планы тестирования, стенд и техдолг, остальное фичи. Фаза, роль и группа работ задачи определены по типу артефакта по модели «Как мы работаем», версия 1.20.</p>
+</div></section>
+
+<section id="agents" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300);"><div class="wrap">
+<div class="sec-head"><div class="sec-num">4</div><h2>Агенты в следующий суперспринт</h2></div>
+<p class="sec-sub">Исходная раскладка: в «Суперспринт 5» агенты, которые уже запланированы на 5th Super Sprint, остальные в «Бэклоге». Карточки можно перетаскивать между списками, раскладка сохраняется в этом браузере.</p>
+<div class="ag-board">
+<div class="ag-col" data-col="backlog"><div class="ag-head">Бэклог <span class="ag-count"></span></div><div class="ag-list"><div class="ag-card" draggable="true" data-id="b0"><div class="ag-name">Data flow</div><div class="ag-desc">Настраиваемый процесс импорта с добавляемыми логиками и проверками в режиме agentic workflow: приложения, БД, файлы.</div></div><div class="ag-card" draggable="true" data-id="b1"><div class="ag-name">Динамический статус<span class="ag-tag">AI-12</span></div><div class="ag-desc">Статус ЭБП из всего контура: последние обновления, блокеры, кого или чего ждёт задача, сводка по обсуждениям.</div></div><div class="ag-card" draggable="true" data-id="b2"><div class="ag-name">Переменное окружение<span class="ag-tag">AI-05</span></div><div class="ag-desc">В любой точке BP3 отвечает, какие переменные доступны сейчас, с типами и подписями.</div></div><div class="ag-card" draggable="true" data-id="b3"><div class="ag-name">Помощник по контрагентам<span class="ag-tag">AI-08</span></div><div class="ag-desc">Получает статус контрагента по ИНН и по бизнес-критериям присваивает уровень риска.</div></div><div class="ag-card" draggable="true" data-id="b4"><div class="ag-name">Цель и follow-up в Динамическом статусе<span class="ag-tag">AI-12</span></div><div class="ag-desc">Держит цель ЭБП, сам запрашивает недостающие входы у исполнителей и складывает решения в очередь.</div></div><div class="ag-card" draggable="true" data-id="b5"><div class="ag-name">ИИ Перенос конфигурации<span class="ag-tag">AI-18</span></div><div class="ag-desc">Собирает пакет изменений пресета, процессов и справочников со стенда и после подтверждения применяет на прод с откатом.</div></div><div class="ag-card" draggable="true" data-id="b6"><div class="ag-name">Отладчик процесса в Настройщике<span class="ag-tag">AI-02</span></div><div class="ag-desc">Прогоняет процесс на имитированных событиях и проверяет логику до публикации.</div></div><div class="ag-card" draggable="true" data-id="b7"><div class="ag-name">Проект из документа<span class="ag-tag">AI-09</span></div><div class="ag-desc">Из ТЗ, договора или КП делает черновик проекта с этапами, задачами и ответственными.</div></div><div class="ag-card" draggable="true" data-id="b8"><div class="ag-name">Каталог конфигурации и анализ влияния<span class="ag-tag">AI-02, AI-01</span></div><div class="ag-desc">Поиск по смыслу в метаданных тенанта, зависимости и пометка изменений, требующих подписи.</div></div><div class="ag-card" draggable="true" data-id="b9"><div class="ag-name">Агентный режим извлечения в ИИ Импорт<span class="ag-tag">AI-04</span></div><div class="ag-desc">Для сложных документов включает агентный режим, у каждого поля ссылка на место в документе.</div></div><div class="ag-card" draggable="true" data-id="b10"><div class="ag-name">Пользовательские навыки в Magic Pad и Помощнике<span class="ag-tag">AI-07, AI-13</span></div><div class="ag-desc">Пользователь описывает повторяемую работу словами, агент сохраняет навык и запускает его по расписанию.</div></div></div></div>
+<div class="ag-col ag-col-ss5" data-col="ss5"><div class="ag-head">Суперспринт 5 <span class="ag-count"></span></div><div class="ag-list"><div class="ag-card" draggable="true" data-id="s0"><div class="ag-name">Агент-помощник по вики</div><div class="ag-desc">Отвечает на вопросы по регламентам и проектам из вики; в суперспринте 5 TDR, разработка агента и фронт помощника.</div></div><div class="ag-card" draggable="true" data-id="s1"><div class="ag-name">Генерация КП<span class="ag-tag">CPQ</span></div><div class="ag-desc">Агент генерации КП по заявке, библиотека шаблонов, реквизиты продавца и выпуск КП из заказа.</div></div><div class="ag-card" draggable="true" data-id="s2"><div class="ag-name">Оркестрация Magic Pad<span class="ag-tag">AI-07</span></div><div class="ag-desc">Процесс выбора действий агента в чате Magic Pad.</div></div><div class="ag-card" draggable="true" data-id="s3"><div class="ag-name">ИИ Настройщик<span class="ag-tag">AI-02</span></div><div class="ag-desc">Сабагенты в чате платформы и подбор пресета по отрасли и классификации деятельности.</div></div><div class="ag-card" draggable="true" data-id="s4"><div class="ag-name">ИИ Поиск<span class="ag-tag">AI-10</span></div><div class="ag-desc">Поиск по комментариям, затем по документам и файлам.</div></div><div class="ag-card" draggable="true" data-id="s5"><div class="ag-name">Видеотрекер, контекст встреч<span class="ag-tag">AI-11</span></div><div class="ag-desc">Договорённости из саммари в задачи процесса, связь встречи с объектом, материалы во вкладку вики.</div></div><div class="ag-card" draggable="true" data-id="s6"><div class="ag-name">Вики-хаб и семантика<span class="ag-tag">AI-01</span></div><div class="ag-desc">Читает проект из CI и обновляет семантические связи после релиза.</div></div><div class="ag-card" draggable="true" data-id="s7"><div class="ag-name">Датамайнер<span class="ag-tag">AI-09</span></div><div class="ag-desc">Молча заполняет поля задачи из переписки и файлов и делает черновики задач из поручений.</div></div><div class="ag-card" draggable="true" data-id="s8"><div class="ag-name">Интервьюер<span class="ag-tag">AI-15</span></div><div class="ag-desc">Опрашивает клиента в его канале и отдаёт менеджеру заявку с заполненными полями.</div></div><div class="ag-card" draggable="true" data-id="s9"><div class="ag-name">Аналитика и дашборды по промпту<span class="ag-tag">AI-16</span></div><div class="ag-desc">Дашборд по вопросу словами за минуту, с пояснением расчёта и правами пользователя.</div></div><div class="ag-card" draggable="true" data-id="s10"><div class="ag-name">Настройщик рабочих мест<span class="ag-tag">AI-17</span></div><div class="ag-desc">Собирает рабочее место или ЭБП под человека или роль после подтверждения.</div></div></div></div>
+</div>
+<button type="button" class="demo-btn demo-btn-sec" id="agReset">Сбросить к исходной раскладке</button>
+</div></section>
+
+<footer class="footer"><div class="wrap"><p>BusinessPad · AI Products · отчёт суперспринта 4 · 12.10-20.11.2026 · черновик от 16.11.2026, не опубликован</p></div></footer>
+<script>
+(function(){
+var KEY='ss4-report-agents-v1';
+var board=document.querySelector('.ag-board'); if(!board) return;
+var lists={}; board.querySelectorAll('.ag-col').forEach(function(c){lists[c.dataset.col]=c.querySelector('.ag-list');});
+var cards={}; board.querySelectorAll('.ag-card').forEach(function(c){cards[c.dataset.id]=c;});
+var initial={}; Object.keys(lists).forEach(function(k){initial[k]=[].map.call(lists[k].children,function(c){return c.dataset.id;});});
+function count(){board.querySelectorAll('.ag-col').forEach(function(c){c.querySelector('.ag-count').textContent=c.querySelector('.ag-list').children.length;});}
+function save(){var s={};Object.keys(lists).forEach(function(k){s[k]=[].map.call(lists[k].children,function(c){return c.dataset.id;});});try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}count();}
+function apply(s){var seen={};Object.keys(lists).forEach(function(k){(s[k]||[]).forEach(function(id){if(cards[id]&&!seen[id]){lists[k].appendChild(cards[id]);seen[id]=1;}});});
+ Object.keys(initial).forEach(function(k){initial[k].forEach(function(id){if(!seen[id])lists[k].appendChild(cards[id]);});});count();}
+try{var st=JSON.parse(localStorage.getItem(KEY)||'null');if(st)apply(st);}catch(e){}
+count();
+var drag=null;
+function after(list,y){var els=[].filter.call(list.children,function(c){return c!==drag;});for(var i=0;i<els.length;i++){var r=els[i].getBoundingClientRect();if(y<r.top+r.height/2)return els[i];}return null;}
+function place(list,y){var a=after(list,y);if(a)list.insertBefore(drag,a);else list.appendChild(drag);}
+Object.keys(lists).forEach(function(k){var l=lists[k];
+ l.addEventListener('dragover',function(e){if(!drag)return;e.preventDefault();place(l,e.clientY);});
+ l.addEventListener('drop',function(e){e.preventDefault();});});
+Object.keys(cards).forEach(function(id){var c=cards[id];
+ c.addEventListener('dragstart',function(e){drag=c;c.classList.add('is-drag');try{e.dataTransfer.setData('text/plain',id);e.dataTransfer.effectAllowed='move';}catch(_){}});
+ c.addEventListener('dragend',function(){c.classList.remove('is-drag');drag=null;save();});
+ c.addEventListener('touchstart',function(e){drag=c;c.classList.add('is-drag');},{passive:true});
+ c.addEventListener('touchmove',function(e){if(!drag)return;e.preventDefault();var t=e.touches[0];var el=document.elementFromPoint(t.clientX,t.clientY);var col=el&&el.closest?el.closest('.ag-col'):null;if(col)place(col.querySelector('.ag-list'),t.clientY);},{passive:false});
+ c.addEventListener('touchend',function(){if(drag){drag.classList.remove('is-drag');drag=null;save();}});});
+document.getElementById('agReset').addEventListener('click',function(){try{localStorage.removeItem(KEY);}catch(e){}apply(initial);});
+})();
+</script>
+<script>
+/* Граф релиза: код блока «Граф» страницы sprint-planning.html (ukolovsky.github.io/ai-agents-trace); данные: 80 задач суперспринта 4 */
+(function(){
+const DATA={"people": [{"id": "АК", "name": "Александр К", "hoursWeek": 40, "buffer": "", "meetSrc": "manual", "meet": {"2026-10-12": 0.5, "2026-10-13": 0.5, "2026-10-14": 0, "2026-10-15": 0.5, "2026-10-16": 0, "2026-10-19": 1, "2026-10-20": 0.5, "2026-10-21": 0, "2026-10-22": 0.5, "2026-10-23": 1.5, "2026-10-26": 0.5, "2026-10-27": 0.5, "2026-10-28": 0, "2026-10-29": 0.5, "2026-10-30": 1, "2026-11-02": 1, "2026-11-03": 0.5, "2026-11-04": 0, "2026-11-05": 0.5, "2026-11-06": 1, "2026-11-09": 1, "2026-11-10": 0.5, "2026-11-11": 0, "2026-11-12": 0.5, "2026-11-13": 1, "2026-11-16": 1, "2026-11-17": 0.5, "2026-11-18": 0, "2026-11-19": 0.5, "2026-11-20": 1}, "meetNote": "календарь Алексея (совместные)", "role": "Лид", "abs": [], "revRes": 30, "meetWeek": [0.8, 0.5, 2, 2, 2]}, {"id": "СА", "name": "Сергей А", "hoursWeek": 40, "buffer": "", "meetSrc": "calendar", "meet": {"2026-10-12": 1.5, "2026-10-13": 2.5, "2026-10-14": 2, "2026-10-15": 1.5, "2026-10-16": 2, "2026-10-19": 1.5, "2026-10-20": 1.5, "2026-10-21": 2, "2026-10-22": 1.5, "2026-10-23": 1.5, "2026-10-26": 1.5, "2026-10-27": 1.5, "2026-10-28": 2, "2026-10-29": 1.5, "2026-10-30": 2, "2026-11-02": 1.5, "2026-11-03": 1.5, "2026-11-04": 2, "2026-11-05": 1.5, "2026-11-06": 2, "2026-11-09": 1.5, "2026-11-10": 1.5, "2026-11-11": 2, "2026-11-12": 1.5, "2026-11-13": 2, "2026-11-16": 1.5, "2026-11-17": 1.5, "2026-11-18": 2, "2026-11-19": 1.5, "2026-11-20": 2}, "meetNote": "календарь Алексея (совместные)", "role": "Разработчик", "abs": [], "revRes": 0, "meetWeek": [0, 0, 0, 0, 0]}, {"id": "ДК", "name": "Дмитрий К", "hoursWeek": 40, "buffer": "", "meetSrc": "calendar", "meet": {"2026-10-12": 1.5, "2026-10-13": 1.5, "2026-10-14": 2, "2026-10-15": 0.5, "2026-10-16": 1, "2026-10-19": 0.5, "2026-10-20": 0.5, "2026-10-21": 1, "2026-10-22": 1.5, "2026-10-23": 1, "2026-10-26": 0.5, "2026-10-27": 1, "2026-10-28": 1, "2026-10-29": 1.5, "2026-10-30": 1, "2026-11-02": 0.5, "2026-11-03": 0.5, "2026-11-04": 2, "2026-11-05": 0.5, "2026-11-06": 1, "2026-11-09": 0.5, "2026-11-10": 0.5, "2026-11-11": 2, "2026-11-12": 0.5, "2026-11-13": 1, "2026-11-16": 0.5, "2026-11-17": 0.5, "2026-11-18": 2, "2026-11-19": 0.5, "2026-11-20": 1}, "meetNote": "календарь Алексея (совместные)", "role": "Разработчик", "abs": [], "revRes": 0, "meetWeek": [0, 0, 0, 0, 0]}, {"id": "АД", "name": "Александр Д", "hoursWeek": 40, "buffer": "", "meetSrc": "calendar", "meet": {"2026-10-12": 0.5, "2026-10-13": 1.5, "2026-10-14": 2.5, "2026-10-15": 0.5, "2026-10-16": 1, "2026-10-19": 0.5, "2026-10-20": 0.5, "2026-10-21": 1.5, "2026-10-22": 1.5, "2026-10-23": 1, "2026-10-26": 0.5, "2026-10-27": 0.5, "2026-10-28": 1.5, "2026-10-29": 1.5, "2026-10-30": 1, "2026-11-02": 0.5, "2026-11-03": 0.5, "2026-11-04": 2.5, "2026-11-05": 0.5, "2026-11-06": 1, "2026-11-09": 0.5, "2026-11-10": 0.5, "2026-11-11": 2.5, "2026-11-12": 0.5, "2026-11-13": 1, "2026-11-16": 0.5, "2026-11-17": 0.5, "2026-11-18": 2.5, "2026-11-19": 0.5, "2026-11-20": 1}, "meetNote": "календарь Алексея (совместные)", "role": "Разработчик", "abs": [], "revRes": 0, "meetWeek": [0, 0, 0, 0, 0]}, {"id": "У", "name": "Уколов", "hoursWeek": 40, "buffer": "", "meetSrc": "calendar", "meet": {"2026-10-12": 4.5, "2026-10-13": 4.5, "2026-10-14": 5.5, "2026-10-15": 2.5, "2026-10-16": 3, "2026-10-19": 3, "2026-10-20": 4.5, "2026-10-21": 5, "2026-10-22": 3.5, "2026-10-23": 4, "2026-10-26": 3.5, "2026-10-27": 4.5, "2026-10-28": 4.5, "2026-10-29": 3.5, "2026-10-30": 4, "2026-11-02": 3.5, "2026-11-03": 2.5, "2026-11-04": 3.5, "2026-11-05": 2.5, "2026-11-06": 3, "2026-11-09": 4.5, "2026-11-10": 2.5, "2026-11-11": 3.5, "2026-11-12": 2.5, "2026-11-13": 3, "2026-11-16": 2.5, "2026-11-17": 2.5, "2026-11-18": 3.5, "2026-11-19": 2.5, "2026-11-20": 3}, "role": "Другое", "roleNote": "PM", "abs": [], "revRes": 30, "meetWeek": [0, 0, 0, 0, 0]}, {"id": "АШ", "name": "Алексей Ш", "hoursWeek": 40, "buffer": "", "meetSrc": "manual", "meet": {"2026-10-12": 1.5, "2026-10-13": 1.5, "2026-10-14": 2.5, "2026-10-15": 0.5, "2026-10-16": 1, "2026-10-19": 0.5, "2026-10-20": 0.5, "2026-10-21": 1.5, "2026-10-22": 1.5, "2026-10-23": 1, "2026-10-26": 0.5, "2026-10-27": 0.5, "2026-10-28": 1.5, "2026-10-29": 1.5, "2026-10-30": 1, "2026-11-02": 0.5, "2026-11-03": 0.5, "2026-11-04": 2.5, "2026-11-05": 0.5, "2026-11-06": 1, "2026-11-09": 0.5, "2026-11-10": 0.5, "2026-11-11": 2.5, "2026-11-12": 0.5, "2026-11-13": 1, "2026-11-16": 0.5, "2026-11-17": 0.5, "2026-11-18": 2.5, "2026-11-19": 0.5, "2026-11-20": 1}, "meetNote": "календарь Алексея (совместные)", "role": "Разработчик", "abs": [], "revRes": 0, "meetWeek": [0.7, 0.7, 1, 0.8, 1]}, {"id": "Б", "name": "Беатрис", "hoursWeek": 40, "buffer": "", "meetSrc": "calendar", "meet": {"2026-10-12": 3, "2026-10-13": 0, "2026-10-14": 1, "2026-10-15": 1, "2026-10-16": 1, "2026-10-19": 1, "2026-10-20": 0, "2026-10-21": 0, "2026-10-22": 0, "2026-10-23": 0, "2026-10-26": 3, "2026-10-27": 1, "2026-10-28": 1, "2026-10-29": 1, "2026-10-30": 1, "2026-11-02": 1, "2026-11-03": 1, "2026-11-04": 1, "2026-11-05": 1, "2026-11-06": 1, "2026-11-09": 3, "2026-11-10": 1, "2026-11-11": 1, "2026-11-12": 1, "2026-11-13": 1, "2026-11-16": 1, "2026-11-17": 1, "2026-11-18": 1, "2026-11-19": 1, "2026-11-20": 1}, "meetNote": "календарь Алексея (совместные)", "role": "Другое", "roleNote": "дизайн", "abs": [], "revRes": 0, "meetWeek": [0, 0, 0, 0, 0]}, {"id": "Л", "name": "Леонид", "hoursWeek": 40, "buffer": "", "meetSrc": "calendar", "meet": {"2026-10-12": 3, "2026-10-13": 2, "2026-10-14": 2, "2026-10-15": 1, "2026-10-16": 2, "2026-10-19": 1, "2026-10-20": 1, "2026-10-21": 2, "2026-10-22": 1, "2026-10-23": 1, "2026-10-26": 3, "2026-10-27": 0, "2026-10-28": 1, "2026-10-29": 0, "2026-10-30": 1, "2026-11-02": 0, "2026-11-03": 0, "2026-11-04": 1, "2026-11-05": 0, "2026-11-06": 1, "2026-11-09": 2, "2026-11-10": 0, "2026-11-11": 1, "2026-11-12": 0, "2026-11-13": 1, "2026-11-16": 0, "2026-11-17": 0, "2026-11-18": 1, "2026-11-19": 0, "2026-11-20": 1}, "meetNote": "календарь Алексея (совместные)", "role": "Другое", "roleNote": "дизайн", "abs": [], "revRes": 0, "meetWeek": [0, 0, 0, 0, 0]}, {"id": "Вс", "name": "Василий", "hoursWeek": 40, "buffer": "", "meetSrc": "manual", "meet": {}, "meetNote": "", "role": "Другое", "dept": "DevOps", "abs": [], "revRes": 0, "meetWeek": {"0": 2, "1": 2, "2": 2, "3": 2, "4": 2}, "roleNote": "девопс"}, {"id": "Ан", "name": "Анастасия", "hoursWeek": 40, "buffer": "", "meetSrc": "manual", "meet": {}, "meetNote": "", "role": "Другое", "dept": "Тестировщик", "abs": [], "revRes": 0, "meetWeek": {"0": 0.5, "1": 0.5, "2": 0.5, "3": 0.5, "4": 0.5}, "roleNote": "тест"}, {"id": "Км", "name": "Камиль", "hoursWeek": 40, "buffer": "", "meetSrc": "manual", "meet": {}, "meetNote": "", "role": "Frontend", "dept": "Frontend", "abs": [], "revRes": 0, "meetWeek": {"0": 1, "1": 0.5, "2": 0.5, "3": 0.5, "4": 0.5}}, {"id": "Эд", "name": "Эдуард", "hoursWeek": 40, "buffer": "", "meetSrc": "manual", "meet": {}, "meetNote": "", "role": "Frontend", "dept": "Frontend", "abs": [], "revRes": 0, "meetWeek": {"0": 1, "1": 0.5, "2": 0.5, "3": 0.5, "4": 0.5}}], "tasks": [{"id": "11.0", "dir": "Продукт", "title": "Импорт: Обновленный TDR сервиса на общей архитектуре + продуманная архт", "person": "АК", "prio": 1, "est": 33, "spent": 31.1, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "", "revH": 5, "due": "2026-10-16", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Импорт", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-10-19", "state": "готово", "real": "Принята"}, {"id": "11.2", "dir": "Продукт", "title": "Обработка входящего файла: Подготовка стенда S14: Бизнес процессы с правилами инициации, э", "person": "СА", "prio": 1, "est": 9, "spent": 9.7, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-10-16", "parent": "", "dep": "", "needRev": true, "revSet": true, "phase": "Ф2", "streamRole": "Качество", "module": "Импорт", "kind": "tech", "grp": "qa", "done": true, "why": "принята", "when": "2026-10-19", "state": "готово", "real": "Принята"}, {"id": "15.6-1", "dir": "ML", "title": "Вики: Общий скоп подготовительных задач · инкр. 1/2", "person": "АШ", "prio": 1, "est": 14, "spent": 17, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-16", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Продакт", "module": "Вики", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-10-19", "state": "готово", "real": "Принята"}, {"id": "15.6-2", "dir": "ML", "title": "Вики: W2 TDR", "person": "АШ", "prio": 5, "est": 25, "spent": 8, "rem": 17, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 4, "due": "2026-11-20", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Вики", "kind": "tech", "grp": "an", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Активна"}, {"id": "16.4", "dir": "ML", "title": "VideoТрекер: Агент и его архитектура", "person": "АШ", "prio": 1, "est": 14, "spent": 17, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-16", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "BP Meet", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-10-19", "state": "готово", "real": "Принята"}, {"id": "17.5", "dir": "Продукт", "title": "Агент-Помощник по Вики (БЗ)- ТЗ", "person": "СА", "prio": 1, "est": 9, "spent": 9.7, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-10-16", "parent": "", "dep": "", "needRev": true, "revSet": true, "phase": "Ф2", "streamRole": "Аналитик", "module": "Помощник по вики", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-10-19", "state": "готово", "real": "Принята"}, {"id": "20.1", "dir": "Продукт", "title": "Помощник оценки контрагентов/ отрасль/ окружение: User story / Use Case для копилота догов", "person": "СА", "prio": 1, "est": 9, "spent": 9.7, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-10-16", "parent": "", "dep": "", "needRev": true, "revSet": true, "phase": "Ф2", "streamRole": "Аналитик", "module": "Контрагенты", "kind": "tech", "grp": "an", "done": true, "why": "по плану к 16.10", "when": "2026-10-16", "state": "готово", "real": "На ревью"}, {"id": "21-1", "dir": "ML", "title": "Помощник работы с Договором: TDR Файл Индексер + ОСR · инкр. 1/2", "person": "ДК", "prio": 1, "est": 28, "spent": 31.8, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 4, "due": "2026-10-16", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Помощник по договору", "kind": "tech", "grp": "be", "done": true, "why": "принята", "when": "2026-10-19", "state": "готово", "real": "Принята"}, {"id": "21-2", "dir": "ML", "title": "TDR Файл Индексер + ОСR · инкр. 2/2", "person": "ДК", "prio": 3, "est": 7, "spent": 16.6, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 1, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Помощник по договору", "kind": "tech", "grp": "be", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "R118", "dir": "Продукт", "title": "Генерация КП: Дизайн КП https://gamma.app", "person": "Л", "prio": 1, "est": 26, "spent": 28.5, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 4, "due": "2026-10-16", "parent": "", "dep": "", "needRev": false, "phase": "Ф2", "streamRole": "Дизайн", "module": "Генератор КП", "kind": "tech", "grp": "ds", "done": true, "why": "принята", "when": "2026-10-19", "state": "готово", "real": "Принята"}, {"id": "11.1", "dir": "ML", "title": "Импорт: Устранение багов работы сервиса", "person": "АК", "prio": 2, "est": 31, "spent": 31.1, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "", "revH": 5, "due": "2026-10-23", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Импорт", "kind": "feat", "grp": "be", "done": true, "why": "принята", "when": "2026-10-26", "state": "готово", "real": "Принята"}, {"id": "14.6", "dir": "ML", "title": "Сервис -Хранилище: Filemanager: частично на ревью", "person": "АД", "prio": 2, "est": 15, "spent": 16.6, "rem": 0, "status": "Принята", "type": "Техдолг", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-23", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Файлы", "kind": "tech", "grp": "be", "done": true, "why": "принята", "when": "2026-10-26", "state": "готово", "real": "Принята"}, {"id": "14.7", "dir": "ML", "title": "Сервис -Хранилище: Monlith + BFF: в процессе", "person": "АД", "prio": 2, "est": 15, "spent": 16.6, "rem": 0, "status": "Принята", "type": "Техдолг", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-23", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Файлы", "kind": "tech", "grp": "be", "done": true, "why": "принята", "when": "2026-10-26", "state": "готово", "real": "Принята"}, {"id": "14.99.1", "dir": "Продукт", "title": "Пресеты в Биллинге BP3: Передать документацию в Яндекс Wiki", "person": "У", "prio": 2, "est": 8, "spent": 9.5, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "", "revH": 1, "due": "2026-10-23", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф4", "streamRole": "Аналитик", "module": "Billing", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-10-26", "state": "готово", "real": "Принята"}, {"id": "15.0-1", "dir": "ML", "title": "Вики: Удобное чтение Метрик прогона Пресетов (Отдельный UI для чтения результатов в Langfu · инкр. 1/2", "person": "ДК", "prio": 2, "est": 15, "spent": 16.9, "rem": 0, "status": "Принята", "type": "Техдолг", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-23", "parent": "", "dep": "", "needRev": true, "phase": "Ф4", "streamRole": "Разработка", "module": "Вики", "kind": "tech", "grp": "ops", "done": true, "why": "принята", "when": "2026-10-26", "state": "готово", "real": "Принята"}, {"id": "15.0-2", "dir": "ML", "title": "Вики: Удобное чтение Метрик прогона Пресетов (Отдельный UI для чтения результатов в Langfu · инкр. 2/2", "person": "ДК", "prio": 3, "est": 7, "spent": 26.6, "rem": 0, "status": "Принята", "type": "Техдолг", "blocker": "", "since": "", "reviewer": "АК", "revH": 1, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "phase": "Ф4", "streamRole": "Разработка", "module": "Вики", "kind": "tech", "grp": "ops", "done": true, "why": "по плану к 30.10", "when": "2026-10-30", "state": "готово", "real": "На ревью"}, {"id": "15.1-1", "dir": "ML", "title": "Вики: Wiki Hub обновить TDR с общей архитектурой · инкр. 1/2", "person": "ДК", "prio": 2, "est": 15, "spent": 16.9, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-23", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Вики", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-10-26", "state": "готово", "real": "Принята"}, {"id": "15.1-2", "dir": "ML", "title": "Вики: Wiki Hub обновить TDR с общей архитектурой · инкр. 2/2", "person": "ДК", "prio": 4, "est": 15, "spent": 10, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Вики", "kind": "tech", "grp": "an", "done": true, "why": "по плану к 30.10", "when": "2026-10-30", "state": "готово", "real": "На ревью"}, {"id": "16.3-1", "dir": "ML", "title": "VideoТрекер: Сервис Календарь - правки по ревью от Саши · инкр. 1/2", "person": "АШ", "prio": 2, "est": 15, "spent": 17, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-23", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "BP Meet", "kind": "feat", "grp": "be", "done": true, "why": "принята", "when": "2026-10-26", "state": "готово", "real": "Принята"}, {"id": "16.3-2", "dir": "ML", "title": "VideoТрекер: Сервис Календарь - правки по ревью от Саши · инкр. 2/2", "person": "АШ", "prio": 4, "est": 10, "spent": 6.7, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-11-06", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "BP Meet", "kind": "feat", "grp": "be", "done": true, "why": "принята", "when": "2026-11-09", "state": "готово", "real": "Принята"}, {"id": "R121-1", "dir": "ML", "title": "Материалы: Синхронизация данных, резервы с 1С клиента · инкр. 1/2", "person": "АШ", "prio": 2, "est": 15, "spent": 17, "rem": 0, "status": "Принята", "type": "Техдолг", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-23", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Конфигуратор", "kind": "tech", "grp": "be", "done": true, "why": "принята", "when": "2026-10-26", "state": "готово", "real": "Принята"}, {"id": "R121-2", "dir": "ML", "title": "Материалы: Синхронизация данных, резервы с 1С клиента · инкр. 2/2", "person": "АШ", "prio": 5, "est": 10, "spent": 0, "rem": 10, "status": "Запланировано", "type": "Техдолг", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-11-06", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Конфигуратор", "kind": "tech", "grp": "be", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "R123", "dir": "Продукт", "title": "Рефакторинг: Аналитика: Согласовать план разработки под Пресет, ожидаемые сроки", "person": "У", "prio": 2, "est": 8, "spent": 9.5, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "", "revH": 1, "due": "2026-10-23", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф2", "streamRole": "Продакт", "module": "Конфигуратор", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-10-26", "state": "готово", "real": "Принята"}, {"id": "13.1", "dir": "ML", "title": "Поиск по BP3: Доработка сервиса: BFF, ФМ-1 и ФИ-1", "person": "ДК", "prio": 4, "est": 36, "spent": 44.2, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 5, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Поиск", "kind": "feat", "grp": "be", "done": true, "why": "по плану к 30.10", "when": "2026-10-30", "state": "готово", "real": "Активна"}, {"id": "14.1-1", "dir": "ML", "title": "Настройщик процессов BP3: рефакторинг и подключение чатов с centryfugo · инкр. 1/2", "person": "АД", "prio": 3, "est": 15, "spent": 14.3, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Настройщик", "kind": "feat", "grp": "be", "done": true, "why": "принята", "when": "2026-11-09", "state": "готово", "real": "Принята"}, {"id": "14.1-2", "dir": "ML", "title": "Настройщик ai-chat-bp3 + agent-bp-creator: ai-bff: Пользователь-агент.", "person": "АД", "prio": 4, "est": 48, "spent": 21.2, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 7, "due": "2026-11-06", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Настройщик", "kind": "feat", "grp": "be", "done": true, "why": "по плану к 06.11", "when": "2026-11-06", "state": "готово", "real": "На ревью"}, {"id": "14.8-1", "dir": "ML", "title": "Хранилище: Правки инкр. 1/4", "person": "АД", "prio": 3, "est": 15, "spent": 9.7, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Файлы", "kind": "feat", "grp": "be", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "14.8-2", "dir": "ML", "title": "Хранилище: Правки  инкр. 2/4", "person": "АД", "prio": 3, "est": 15, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-11-06", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Файлы", "kind": "feat", "grp": "be", "done": true, "why": "принята", "when": "2026-11-09", "state": "готово", "real": "Принята"}, {"id": "14.8-3", "dir": "ML", "title": "Хранилище: Правки инкр. 3/4", "person": "АД", "prio": 5, "est": 5, "spent": 9.7, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 1, "due": "2026-11-13", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Файлы", "kind": "feat", "grp": "be", "done": true, "why": "принята", "when": "2026-11-13", "state": "готово", "real": "Принята"}, {"id": "14.8-4", "dir": "ML", "title": "Хранилище: Правки инкр. 4/4", "person": "АД", "prio": 6, "est": 5, "spent": 3.6, "rem": 1.4, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 1, "due": "2026-11-20", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Файлы", "kind": "feat", "grp": "be", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Активна"}, {"id": "15.93", "dir": "Продукт", "title": "Вики: Wiki2: Аналитика Проектов", "person": "СА", "prio": 4, "est": 25, "spent": 0, "rem": 25, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 4, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "revSet": true, "phase": "Ф1", "streamRole": "Аналитик", "module": "Вики", "kind": "tech", "grp": "an", "done": true, "why": "по плану к 30.10", "when": "2026-10-30", "state": "готово", "real": "Запланировано"}, {"id": "16.2", "dir": "ML", "title": "VideoТрекер: в AI стенд", "person": "АШ", "prio": 4, "est": 35, "spent": 37.5, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 5, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "phase": "Ф4", "streamRole": "Разработка", "module": "BP Meet", "kind": "feat", "grp": "ops", "done": true, "why": "по плану к 30.10", "when": "2026-10-30", "state": "готово", "real": "Пауза/Блокер"}, {"id": "R67", "dir": "ML", "title": "VideoТрекер: Целевой TDR", "person": "АШ", "prio": 3, "est": 15, "spent": 10.3, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "BP Meet", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "R71", "dir": "Продукт", "title": "VideoТрекер: Проверка Правок по Суммаризации", "person": "СА", "prio": 3, "est": 13, "spent": 48, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 2, "due": "2026-10-30", "parent": "", "dep": "", "needRev": true, "revSet": true, "phase": "Ф3", "streamRole": "Качество", "module": "BP Meet", "kind": "feat", "grp": "qa", "done": true, "why": "по плану к 30.10", "when": "2026-10-30", "state": "готово", "real": "Активна"}, {"id": "17.6", "dir": "Продукт", "title": "Агент-Помощник по Вики: Макеты Помощника Magic Pad", "person": "Б", "prio": 4, "est": 25, "spent": 0, "rem": 25, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 4, "due": "2026-10-30", "parent": "", "dep": "", "needRev": false, "phase": "Ф2", "streamRole": "Дизайн", "module": "Помощник по вики", "kind": "tech", "grp": "ds", "done": true, "why": "по плану к 30.10", "when": "2026-10-30", "state": "готово", "real": "Запланировано"}, {"id": "21.2", "dir": "Продукт", "title": "Помощник работы с Договором: Макеты помощника с Договором: загрузка любого файла и распред", "person": "Б", "prio": 3, "est": 60, "spent": 71.3, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 9, "due": "2026-10-30", "parent": "", "dep": "", "needRev": false, "phase": "Ф2", "streamRole": "Дизайн", "module": "Помощник по договору", "kind": "tech", "grp": "ds", "done": true, "why": "по плану к 30.10", "when": "2026-10-30", "state": "готово", "real": "Активна"}, {"id": "R129-1", "dir": "ML", "title": "AI стенд: правила синхронизации и тестирования · инкр. 1/2", "person": "АК", "prio": 3, "est": 15, "spent": 19.7, "rem": 0, "status": "Пауза/Блокер", "type": "План", "blocker": "Пауза", "since": "2026-11-12", "reviewer": "", "revH": 2, "due": "2026-10-30", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф4", "streamRole": "Разработка", "module": "AI-стенд", "kind": "tech", "grp": "ops", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не завершено", "real": "Пауза/Блокер"}, {"id": "R129-2", "dir": "ML", "title": "AI стенд: улучшение правил синхронизации и тестирования · инкр. 2/2", "person": "АК", "prio": 5, "est": 5, "spent": 0, "rem": 5, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "", "revH": 1, "due": "2026-11-06", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф4", "streamRole": "Разработка", "module": "AI-стенд", "kind": "tech", "grp": "ops", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "11.5", "dir": "ML", "title": "Импорт: Обновить Сервис  в AI стенде", "person": "АК", "prio": 4, "est": 35, "spent": 15.5, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "", "revH": 5, "due": "2026-11-06", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф4", "streamRole": "Разработка", "module": "Импорт", "kind": "feat", "grp": "ops", "done": true, "why": "принята", "when": "2026-11-09", "state": "готово", "real": "Принята"}, {"id": "13.2", "dir": "ML", "title": "Поиск по BP3: бек- расчеты аналитики, копривание на параллельный стенд", "person": "ДК", "prio": 6, "est": 5, "spent": 0, "rem": 5, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 1, "due": "2026-11-06", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Поиск", "kind": "feat", "grp": "be", "done": true, "why": "по плану к 06.11", "when": "2026-11-06", "state": "готово", "real": "Запланировано"}, {"id": "15.94", "dir": "Продукт", "title": "Вики: Wiki2: Аналитика Подключений к внешним БЗ", "person": "СА", "prio": 5, "est": 25, "spent": 0, "rem": 25, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 4, "due": "2026-11-06", "parent": "", "dep": "", "needRev": true, "revSet": true, "phase": "Ф1", "streamRole": "Аналитик", "module": "Вики", "kind": "tech", "grp": "an", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "16.1-1", "dir": "ML", "title": "Вики W2 Написание целевого варианта.", "person": "АШ", "prio": 6, "est": 15, "spent": 4.5, "rem": 10.5, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-11-06", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Вики", "kind": "feat", "grp": "be", "done": true, "why": "по плану к 06.11", "when": "2026-11-06", "state": "готово", "real": "Пауза/Блокер"}, {"id": "R78", "dir": "ML", "title": "Агент-Помощник по Вики: TDR", "person": "АК", "prio": 4, "est": 15, "spent": 15.5, "rem": 0, "status": "Пауза/Блокер", "type": "План", "blocker": "Пауза", "since": "2026-11-12", "reviewer": "", "revH": 2, "due": "2026-11-06", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Помощник по вики", "kind": "tech", "grp": "an", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не завершено", "real": "Пауза/Блокер"}, {"id": "21.1-1", "dir": "ML", "title": "Файл-индексер реализация · инкр. 1/2", "person": "ДК", "prio": 4, "est": 20, "spent": 10.5, "rem": 9.6, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 3, "due": "2026-11-06", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Файлы", "kind": "feat", "grp": "be", "done": true, "why": "по плану к 06.11", "when": "2026-11-06", "state": "готово", "real": "Активна"}, {"id": "21.1-2", "dir": "ML", "title": "Файл-индексер реализация · инкр. 2/2", "person": "ДК", "prio": 5, "est": 15, "spent": 0, "rem": 15, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "2026-11-13", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Файлы", "kind": "feat", "grp": "be", "done": true, "why": "по плану к 13.11", "when": "2026-11-13", "state": "готово", "real": "Запланировано"}, {"id": "17.8", "dir": "ML", "title": "Агент-Помощник по Вики: Разработать агента", "person": "АК", "prio": 7, "est": 31, "spent": 0, "rem": 31, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "", "revH": 5, "due": "2026-11-13", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Помощник по вики", "kind": "feat", "grp": "be", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "11.7", "dir": "ML", "title": "Импорт: Подготовить и Согласовать Целевой TDR", "person": "АК", "prio": 5, "est": 16, "spent": 0, "rem": 16, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "", "revH": 2, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "revSet": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Импорт", "kind": "tech", "grp": "an", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Запланировано"}, {"id": "13.4", "dir": "ML", "title": "Поиск по BP3: Обновленный TDR сервиса на общей архитектуре + продуманная архтиектура агент", "person": "ДК", "prio": 3, "est": 30, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 4, "due": "2026-11-20", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Поиск", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "R37", "dir": "ML", "title": "Настройщик процессов BP3: Обновленный TDR сервиса на общей архитектуре + продуманная архти", "person": "АД", "prio": 6, "est": 5, "spent": 15, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 1, "due": "2026-11-20", "parent": "", "dep": "", "needRev": true, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Настройщик", "kind": "tech", "grp": "an", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Активна"}, {"id": "11.3", "dir": "Продукт", "title": "Импорт: Тестирование на стенде S14", "person": "Ан", "prio": 1, "est": 10, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Качество", "module": "Импорт", "kind": "feat", "grp": "qa", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "11.4", "dir": "Продукт", "title": "Импорт: Устранение багов работы сервиса", "person": "Эд", "prio": 2, "est": 10, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "Импорт", "kind": "feat", "grp": "fe", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "11.8", "dir": "Продукт", "title": "Импорт: API, внесение правок в фронтенд", "person": "Эд", "prio": 2, "est": 25, "spent": 52.7, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 4, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "Импорт", "kind": "feat", "grp": "fe", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Активна"}, {"id": "Ан-1", "dir": "Продукт", "title": "Импорт: Тестирование на стенде Beta-Test", "person": "Ан", "prio": 3, "est": 10, "spent": 42.8, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 2, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Качество", "module": "Импорт", "kind": "feat", "grp": "qa", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Активна"}, {"id": "13.0", "dir": "Продукт", "title": "Поиск по BP3: Фронт: компоненты аналитики", "person": "Эд", "prio": 1, "est": 10, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "Поиск", "kind": "feat", "grp": "fe", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "13.3", "dir": "Продукт", "title": "Поиск по BP3: Фронт: BFF целевой", "person": "Эд", "prio": 4, "est": 5, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-11-20", "parent": "", "dep": "", "needRev": true, "needRevSet": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Поиск", "kind": "feat", "grp": "fe", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "На ревью"}, {"id": "13.5", "dir": "Продукт", "title": "Поиск по BP3: Тестирование на стенде Beta-Test", "person": "Ан", "prio": 3, "est": 10, "spent": 0, "rem": 10, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 2, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Качество", "module": "Поиск", "kind": "feat", "grp": "qa", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Запланировано"}, {"id": "13.6", "dir": "Продукт", "title": "Поиск по BP3: Документ рефактора поиска под BP3", "person": "Вс", "prio": 1, "est": 10, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф2", "streamRole": "Системный анализ", "module": "Поиск", "kind": "tech", "grp": "an", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "Эд-1", "dir": "Продукт", "title": "Настройщик процессов BP3: Фронтенд: визуализация формирования/изменений БП -API", "person": "Эд", "prio": 7, "est": 15, "spent": 0, "rem": 15, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "Настройщик", "kind": "feat", "grp": "fe", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Запланировано"}, {"id": "14.9", "dir": "Продукт", "title": "Хранилище: -Выполнить задачи разворачивания -Настройка уведомлений в FM", "person": "Вс", "prio": 8, "est": 5, "spent": 0, "rem": 5, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф4", "streamRole": "Разработка", "module": "Файлы", "kind": "feat", "grp": "ops", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Запланировано"}, {"id": "15.97", "dir": "Продукт", "title": "Поиск по BP3: api для AI стенда", "person": "Эд", "prio": 6, "est": 15, "spent": 3.3, "rem": 11.7, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "Поиск", "kind": "feat", "grp": "fe", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Активна"}, {"id": "16.5", "dir": "Продукт", "title": "VideoТрекер: Подключить API", "person": "Эд", "prio": 6, "est": 25, "spent": 0, "rem": 25, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 4, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "BP Meet", "kind": "feat", "grp": "fe", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "Ан-2", "dir": "Продукт", "title": "VideoТрекер: Тестирование на стенде Beta-Test", "person": "Ан", "prio": 4, "est": 10, "spent": 0, "rem": 10, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 2, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Качество", "module": "BP Meet", "kind": "feat", "grp": "qa", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Запланировано"}, {"id": "Ан-3", "dir": "Продукт", "title": "VideoТрекер: Подготовка плана тестирования", "person": "Ан", "prio": 1, "est": 10, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф2", "streamRole": "Качество", "module": "BP Meet", "kind": "tech", "grp": "qa", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "Км-1", "dir": "Продукт", "title": "Агент-Помощник по Вики: Frontend верстка Помощника", "person": "Км", "prio": 3, "est": 15, "spent": 0, "rem": 15, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "Помощник по вики", "kind": "feat", "grp": "fe", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "21.3", "dir": "Продукт", "title": "Помощник работы с Договором: Фронтенд: визуализация формирования/изменений БП", "person": "Км", "prio": 2, "est": 25, "spent": 0, "rem": 25, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 4, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "Помощник по договору", "kind": "feat", "grp": "fe", "done": false, "why": "фронт не совмещён с бэкендом", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "21.6", "dir": "Продукт", "title": "Помощник работы с Договором: Подготовка плана тестирования", "person": "Ан", "prio": 2, "est": 6, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф2", "streamRole": "Качество", "module": "Помощник по договору", "kind": "tech", "grp": "qa", "done": true, "why": "принята", "when": "2026-11-09", "state": "готово", "real": "Принята"}, {"id": "Вс-1", "dir": "Продукт", "title": "Генерация КП: Агент для генерации", "person": "Вс", "prio": 4, "est": 15, "spent": 14.2, "rem": 0.8, "status": "Пауза/Блокер", "type": "План", "blocker": "Пауза", "since": "2026-11-12", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "Генератор КП", "kind": "feat", "grp": "be", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не завершено", "real": "Пауза/Блокер"}, {"id": "Км-3", "dir": "Продукт", "title": "Генерация КП: Вертска фронта страницы и подключение API", "person": "Км", "prio": 1, "est": 35, "spent": 42.3, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 5, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Разработка", "module": "Генератор КП", "kind": "feat", "grp": "fe", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "На ревью"}, {"id": "Б1", "dir": "Продукт", "title": "AI стенд: Параллельный Beta Dev стенд развернуть + Selectel права нужны от Максима", "person": "Вс", "prio": 2, "est": 10, "spent": 0, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф4", "streamRole": "Разработка", "module": "AI-стенд", "kind": "tech", "grp": "ops", "done": true, "why": "принята", "when": "2026-11-05", "state": "готово", "real": "Принята"}, {"id": "Вс-2", "dir": "Продукт", "title": "AI стенд: Развернуть сервисы: -llm шлюзы -импорт", "person": "Вс", "prio": 3, "est": 15, "spent": 5.7, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 0, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф4", "streamRole": "Разработка", "module": "AI-стенд", "kind": "feat", "grp": "ops", "done": true, "why": "принята", "when": "2026-11-09", "state": "готово", "real": "Принята"}, {"id": "Вс-3", "dir": "Продукт", "title": "AI стенд: Настроить синхронизацию и тестирование", "person": "Вс", "prio": 8, "est": 5, "spent": 0, "rem": 5, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-11-20", "parent": "", "dep": "", "needRev": true, "needRevSet": true, "phase": "Ф4", "streamRole": "Разработка", "module": "AI-стенд", "kind": "tech", "grp": "ops", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Запланировано"}, {"id": "Вс-4", "dir": "Продукт", "title": "langfuse.business-pad.com) неверный ENCRYPTION_KEY", "person": "Вс", "prio": 6, "est": 5, "spent": 1.9, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф4", "streamRole": "Разработка", "module": "AI-стенд", "kind": "tech", "grp": "ops", "done": true, "why": "принята", "when": "2026-11-13", "state": "готово", "real": "Принята"}, {"id": "Ан-4", "dir": "Продукт", "title": "AI стенд: проверить работу стенда по базовому функционалу BP3 -чеклист работающего и не работающего функцианал", "person": "Ан", "prio": 2, "est": 10, "spent": 14.3, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 2, "due": "2026-11-20", "parent": "", "dep": "", "needRev": false, "phase": "Ф3", "streamRole": "Качество", "module": "AI-стенд", "kind": "tech", "grp": "qa", "done": true, "why": "принята", "when": "2026-11-09", "state": "готово", "real": "Принята"}, {"id": "T84", "dep": "", "dir": "Продукт", "title": "Контрагент: proof of concept", "person": "АК", "prio": 6, "est": 16, "spent": 0, "rem": 16, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "", "revH": 2, "due": "", "needRev": false, "revSet": true, "phase": "Ф1", "streamRole": "Разработка", "module": "Контрагенты", "kind": "tech", "grp": "be", "done": false, "why": "без срока", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "T86", "dep": "", "dir": "Продукт", "title": "Развернуть сервисы: -Видео трекер", "person": "Вс", "prio": 6, "est": 5, "spent": 10.5, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-11-16", "needRev": false, "phase": "Ф4", "streamRole": "Разработка", "module": "BP Meet", "kind": "feat", "grp": "ops", "done": true, "why": "по плану к 16.11", "when": "2026-11-16", "state": "готово", "real": "Активна"}, {"id": "T87", "dep": "", "dir": "Продукт", "title": "Оркестрация MagicPad Процесс выбора действий в чате", "person": "У", "prio": 9, "est": 16, "spent": 0, "rem": 16, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 2, "due": "", "needRev": false, "phase": "Ф1", "streamRole": "Аналитик", "module": "Magic Pad", "kind": "feat", "grp": "an", "done": false, "why": "без срока", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "T82", "dep": "", "dir": "Продукт", "title": "CPQ Генерация КП тестирование", "person": "Ан", "prio": 9, "est": 5, "spent": 0, "rem": 5, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "", "needRev": false, "phase": "Ф3", "streamRole": "Качество", "module": "Генератор КП", "kind": "feat", "grp": "qa", "done": false, "why": "перенесено в суперспринт 5", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "T78", "dep": "", "dir": "Продукт", "title": "Развернуть сервисы: -ФМ1, ФИ1 ", "person": "Вс", "prio": 5, "est": 5, "spent": 13.3, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 1, "due": "2026-11-13", "needRev": false, "phase": "Ф4", "streamRole": "Разработка", "module": "Файлы", "kind": "feat", "grp": "ops", "done": true, "why": "принята", "when": "2026-11-16", "state": "готово", "real": "Принята"}, {"id": "T79", "dep": "", "dir": "Продукт", "title": "Развернуть Настройщик BPMCP чат Bm25", "person": "Вс", "prio": 7, "est": 20, "spent": 0, "rem": 20, "status": "Запланировано", "type": "План", "blocker": "", "since": "", "reviewer": "У", "revH": 3, "due": "", "needRev": false, "phase": "Ф4", "streamRole": "Разработка", "module": "Настройщик", "kind": "feat", "grp": "ops", "done": false, "why": "без срока", "when": null, "state": "не начато", "real": "Запланировано"}, {"id": "T88", "dir": "ML", "title": "CPQ: исправление багов (в т.ч. ошибка при переводе метров в сантиметры)", "person": "АШ", "prio": 5, "est": 4, "spent": 8, "rem": 0, "status": "Принята", "type": "План", "blocker": "", "since": "", "reviewer": "АК", "revH": 1, "due": "2026-11-20", "parent": "", "dep": "", "needRev": true, "phase": "Ф3", "streamRole": "Разработка", "module": "Конфигуратор", "kind": "feat", "grp": "be", "done": true, "why": "по плану к 20.11", "when": "2026-11-20", "state": "готово", "real": "Активна"}], "R": {"11.0": {"accepted": "2026-10-19", "endA": "2026-10-19", "fact": {}, "fc": {}}, "11.2": {"accepted": "2026-10-19", "endA": "2026-10-19", "fact": {}, "fc": {}}, "15.6-1": {"accepted": "2026-10-19", "endA": "2026-10-19", "fact": {}, "fc": {}}, "15.6-2": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "16.4": {"accepted": "2026-10-19", "endA": "2026-10-19", "fact": {}, "fc": {}}, "17.5": {"accepted": "2026-10-19", "endA": "2026-10-19", "fact": {}, "fc": {}}, "20.1": {"accepted": "2026-10-16", "endA": "2026-10-16", "fact": {}, "fc": {}}, "21-1": {"accepted": "2026-10-19", "endA": "2026-10-19", "fact": {}, "fc": {}}, "21-2": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "R118": {"accepted": "2026-10-19", "endA": "2026-10-19", "fact": {}, "fc": {}}, "11.1": {"accepted": "2026-10-26", "endA": "2026-10-26", "fact": {}, "fc": {}}, "14.6": {"accepted": "2026-10-26", "endA": "2026-10-26", "fact": {}, "fc": {}}, "14.7": {"accepted": "2026-10-26", "endA": "2026-10-26", "fact": {}, "fc": {}}, "14.99.1": {"accepted": "2026-10-26", "endA": "2026-10-26", "fact": {}, "fc": {}}, "15.0-1": {"accepted": "2026-10-26", "endA": "2026-10-26", "fact": {}, "fc": {}}, "15.0-2": {"accepted": "2026-10-30", "endA": "2026-10-30", "fact": {}, "fc": {}}, "15.1-1": {"accepted": "2026-10-26", "endA": "2026-10-26", "fact": {}, "fc": {}}, "15.1-2": {"accepted": "2026-10-30", "endA": "2026-10-30", "fact": {}, "fc": {}}, "16.3-1": {"accepted": "2026-10-26", "endA": "2026-10-26", "fact": {}, "fc": {}}, "16.3-2": {"accepted": "2026-11-09", "endA": "2026-11-09", "fact": {}, "fc": {}}, "R121-1": {"accepted": "2026-10-26", "endA": "2026-10-26", "fact": {}, "fc": {}}, "R121-2": {"fact": {}, "fc": {}}, "R123": {"accepted": "2026-10-26", "endA": "2026-10-26", "fact": {}, "fc": {}}, "13.1": {"accepted": "2026-10-30", "endA": "2026-10-30", "fact": {}, "fc": {}}, "14.1-1": {"accepted": "2026-11-09", "endA": "2026-11-09", "fact": {}, "fc": {}}, "14.1-2": {"accepted": "2026-11-06", "endA": "2026-11-06", "fact": {}, "fc": {}}, "14.8-1": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "14.8-2": {"accepted": "2026-11-09", "endA": "2026-11-09", "fact": {}, "fc": {}}, "14.8-3": {"accepted": "2026-11-13", "endA": "2026-11-13", "fact": {}, "fc": {}}, "14.8-4": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "15.93": {"accepted": "2026-10-30", "endA": "2026-10-30", "fact": {}, "fc": {}}, "16.2": {"accepted": "2026-10-30", "endA": "2026-10-30", "fact": {}, "fc": {}}, "R67": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "R71": {"accepted": "2026-10-30", "endA": "2026-10-30", "fact": {}, "fc": {}}, "17.6": {"accepted": "2026-10-30", "endA": "2026-10-30", "fact": {}, "fc": {}}, "21.2": {"accepted": "2026-10-30", "endA": "2026-10-30", "fact": {}, "fc": {}}, "R129-1": {"fact": {}, "fc": {}}, "R129-2": {"fact": {}, "fc": {}}, "11.5": {"accepted": "2026-11-09", "endA": "2026-11-09", "fact": {}, "fc": {}}, "13.2": {"accepted": "2026-11-06", "endA": "2026-11-06", "fact": {}, "fc": {}}, "15.94": {"fact": {}, "fc": {}}, "16.1-1": {"accepted": "2026-11-06", "endA": "2026-11-06", "fact": {}, "fc": {}}, "R78": {"fact": {}, "fc": {}}, "21.1-1": {"accepted": "2026-11-06", "endA": "2026-11-06", "fact": {}, "fc": {}}, "21.1-2": {"accepted": "2026-11-13", "endA": "2026-11-13", "fact": {}, "fc": {}}, "17.8": {"fact": {}, "fc": {}}, "11.7": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "13.4": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "R37": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "11.3": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "11.4": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "11.8": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "Ан-1": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "13.0": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "13.3": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "13.5": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "13.6": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "Эд-1": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "14.9": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "15.97": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "16.5": {"fact": {}, "fc": {}}, "Ан-2": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "Ан-3": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "Км-1": {"fact": {}, "fc": {}}, "21.3": {"fact": {}, "fc": {}}, "21.6": {"accepted": "2026-11-09", "endA": "2026-11-09", "fact": {}, "fc": {}}, "Вс-1": {"fact": {}, "fc": {}}, "Км-3": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "Б1": {"accepted": "2026-11-05", "endA": "2026-11-05", "fact": {}, "fc": {}}, "Вс-2": {"accepted": "2026-11-09", "endA": "2026-11-09", "fact": {}, "fc": {}}, "Вс-3": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}, "Вс-4": {"accepted": "2026-11-13", "endA": "2026-11-13", "fact": {}, "fc": {}}, "Ан-4": {"accepted": "2026-11-09", "endA": "2026-11-09", "fact": {}, "fc": {}}, "T84": {"fact": {}, "fc": {}}, "T86": {"accepted": "2026-11-16", "endA": "2026-11-16", "fact": {}, "fc": {}}, "T87": {"fact": {}, "fc": {}}, "T82": {"fact": {}, "fc": {}}, "T78": {"accepted": "2026-11-16", "endA": "2026-11-16", "fact": {}, "fc": {}}, "T79": {"fact": {}, "fc": {}}, "T88": {"accepted": "2026-11-20", "endA": "2026-11-20", "fact": {}, "fc": {}}}, "W": {"an": 15, "ds": 15, "be": 30, "fe": 25, "qa": 15}, "GN": {"an": "Аналитика", "ds": "Дизайн", "be": "Backend", "fe": "Frontend", "qa": "Test", "ops": "DevOps"}, "MODS": ["Импорт", "Поиск", "Файлы", "Настройщик", "AI-стенд", "Вики", "BP Meet", "Помощник по договору", "Контрагенты", "Помощник по вики", "Magic Pad", "Конфигуратор", "Генератор КП", "Billing"], "MODFULL": {"Импорт": "ИИ Импорт", "Поиск": "ИИ Поиск", "Файлы": "Файлы: ФМ и ФИ", "Настройщик": "Настройщик процессов", "AI-стенд": "AI-стенд", "Вики": "Проектная вики", "BP Meet": "BP Meet", "Помощник по договору": "Помощник по договору", "Контрагенты": "Помощник оценки контрагентов", "Помощник по вики": "Помощник по вики", "Конфигуратор": "CPQ: Конфигуратор", "Генератор КП": "CPQ: Генератор КП", "Billing": "Billing", "Magic Pad": "Оркестрация Magic Pad"}, "KYU": {"Продакт": ["Карточка и бриф", "Scope, нецели, капсула", "Приёмка, go/no-go", "Статус запуска"], "Аналитик": ["Сценарии, глоссарий", "BRD v1, три амиго", "Версии BRD, факт-лист", "Финальный факт-лист"], "Системный анализ": ["Оценка реализуемости", "Техспека, тестируемость", "Ревью, зонтик фичи", "Инциденты, откат"], "Дизайн": ["Карта болей, скетчи", "Капсула, UI-спека", "Дизайн-ревью", "Скриншоты"], "Разработка": ["Spike", "Контракт API, прототип", "Инкременты с тестами", "Деплой, мониторинг"], "Качество": ["Модель проверки v0", "v1: стратегия, тесты", "v2: автотесты, протокол", "Прод-smoke"]}, "ROLES": ["Продакт", "Аналитик", "Системный анализ", "Дизайн", "Разработка", "Качество"], "PH": ["Ф1", "Ф2", "Ф3", "Ф4"], "PHN": {"Ф1": "Исследование", "Ф2": "Проектирование", "Ф3": "Сборка", "Ф4": "Выпуск"}, "KN": {"К1": "Берём в работу", "К2": "Готово к сборке", "К3": "Готово к выпуску", "К4": "Запуск завершён"}, "MODREADY": {"Импорт": 1.0, "Поиск": 1.0, "Файлы": 1.0, "Настройщик": 0.9079956188389922, "AI-стенд": 0.7575757575757577, "Вики": 0.9369747899159663, "BP Meet": 0.75, "Помощник по договору": 0.75, "Контрагенты": 0.3, "Помощник по вики": 0.20625, "Magic Pad": 0.0, "Конфигуратор": 0.7586206896551724, "Генератор КП": 0.55, "Billing": 0.3}};
+
+const NS='http://www.w3.org/2000/svg';
+const $=id=>document.getElementById(id);
+function el(tag,a,p,txt){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;if(p)p.appendChild(e);return e;}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ru=s=>s?s.slice(8)+'.'+s.slice(5,7)+'.'+s.slice(0,4):'нет';
+const h1=x=>(Math.round(x*10)/10).toLocaleString('ru-RU');
+function stCol(t){if(t.status==='Принята')return {f:'#599C16',s:'#3E7A0E',n:'Принята'};if(t.status==='На ревью')return {f:'#7B1FA2',s:'#7B1FA2',n:'На ревью'};
+ if(t.status==='Пауза/Блокер')return t.blocker==='Пауза'?{f:'#BDBDBD',s:'#757575',n:'Пауза'}:{f:'#FFD4D8',s:'#F32A16',n:'Блокер'};
+ if(t.status==='Активна')return {f:'#1E88E5',s:'#1565C0',n:'Активна'};return {f:'#D9DADF',s:'#85868A',n:'Запланировано',dash:1};}
+const curSt=t=>t.status==='Пауза/Блокер'?(t.blocker==='Пауза'?'Пауза':'Блокер'):t.status;
+function deps(t){return String((t&&t.dep)||'').split(/[,;\s]+/).filter(Boolean);}
+const D={people:DATA.people,tasks:DATA.tasks,sprint:{today:'2026-11-20'}};
+const person=id=>D.people.find(p=>p.id===id);const task=id=>D.tasks.find(t=>t.id===id);
+const revName=id=>{const p=person(id);return p?p.name:'не назначен';};
+const isAU=p=>/Уколов/.test(p.name||'');
+const cmpPeople=(a,b)=>String(a&&a.name||'').localeCompare(String(b&&b.name||''),'ru');
+const cmpTasks=(a,b)=>String(a.due||'').localeCompare(String(b.due||''))||String(a.id).localeCompare(String(b.id));
+const F={wave:'all',dir:'all',person:'all',task:'all'};
+const C={name:'4th Super Sprint',release:'2026-11-23',sprints:[]};
+const LS='ss4-report-graph';const EPS=1e-6;
+let VIEW='feat';
+const visTasks=()=>D.tasks;
+const visDays=()=>[];const planOf=()=>null;const drawGantt=()=>{};const openPop=()=>{};
+window.__state={P:{R:DATA.R}};
+/* ===== Граф: релиз, проекты, фичи, задачи ===== */
+/* ===== Поток релиза: фазы, роли, артефакты Досье ===== */
+const STREAM_PHASES=["Ф1", "Ф2", "Ф3", "Ф4", "Ф5"];
+const STREAM_ROLES=["Продакт", "Аналитик", "Системный анализ", "Дизайн", "Разработка", "Качество", "Маркетинг", "Копирайтер", "Техписатель"];
+const STREAM_K=['К1','К2','К3','К4'];
+const STREAM_TABLE={"Продакт": {"Ф1": ["Карточка инициативы, бриф: гипотеза, метрики, нецели"], "Ф2": ["Бриф v1: scope и нецели утверждены", "решение по капсуле"], "Ф3": ["Принятые инкременты, изменения scope, go/no-go"], "Ф4": ["Статус запуска на К4"], "Ф5": ["Отчёт и ретро, решение по фиче"]}, "Аналитик": {"Ф1": ["Проблема и ключевые сценарии, глоссарий"], "Ф2": ["BRD v1: истории, критерии в Gherkin или EARS, согласованные с тестированием", "черновик факт-листа"], "Ф3": ["Версии BRD с журналом", "релизный пакет и факт-лист"], "Ф4": ["Финальный факт-лист"], "Ф5": ["Новые сигналы и требования"]}, "Системный анализ": {"Ф1": ["Оценка реализуемости, флаг смены стека"], "Ф2": ["Техспека с требованиями к тестируемости, ADR, контракт API", "черновик пакета задач"], "Ф3": ["Актуальная техспека, правки AGENTS.md, зонтик фичи"], "Ф4": ["Записи об инцидентах"], "Ф5": ["Правки контекст-файлов и скиллов"]}, "Дизайн": {"Ф1": ["Карта болей на пути пользователя, скетчи"], "Ф2": ["Протокол капсулы с аналитиком и продактом", "UI-спека со всеми состояниями"], "Ф3": ["Подтверждение соответствия UI-спеке"], "Ф4": ["Скриншоты для статей и Реестра"], "Ф5": ["Сигналы по UX"]}, "Разработка": {"Ф1": ["Выводы spike: что возможно и порядок сложности"], "Ф2": ["Контракт API и моки", "прототип интерфейса на дизайн-системе"], "Ф3": ["Инкременты с тестами за feature flag", "заметки «что было интересного» в PR"], "Ф4": ["Отчёт о релизе: версия и дата"], "Ф5": ["Предложения в скиллы, темы статей"]}, "Качество": {"Ф1": ["Модель проверки v0: критерии решения проблемы, способ измерить, риски качества"], "Ф2": ["Модель проверки v1: тест-стратегия, черновики тестов, требования к автоматизации"], "Ф3": ["Модель проверки v2: автотесты, матрица «критерий → тест → результат», протокол"], "Ф4": ["Заключение о стабильности"], "Ф5": ["Итог: решена ли проблема"]}, "Маркетинг": {"Ф1": ["Сегмент, черновик позиционирования, launch tier"], "Ф2": ["Черновик launch brief"], "Ф3": ["Материалы и демо-скрипт"], "Ф4": ["Отчёт о запуске за первую неделю"], "Ф5": ["Выводы для следующих запусков"]}, "Копирайтер": {"Ф1": ["Банк историй: боли словами клиентов, кейсы, альтернативы"], "Ф2": ["Контент-план, статьи о боли и о выборе решения"], "Ф3": ["Черновики help-статей и FAQ, инженерные статьи"], "Ф4": ["Опубликованный пакет контента"], "Ф5": ["Обновлённые статьи, новые истории"]}, "Техписатель": {"Ф1": ["Флаг влияния на Реестр с обоснованием"], "Ф2": ["Черновик изменений реестровой документации"], "Ф3": ["Реестровый комплект, проверенный на стенде"], "Ф4": ["Комплект и уведомление — не позже 5 рабочих дней от релиза"], "Ф5": ["Журнал изменений записи"]}};
+function defaultStreamRole(t){const p=person(t&&t.person),name=(p&&p.name)||'',role=(p&&p.role)||'',title=String((t&&t.title)||'');
+ if((typeof isAU==='function'&&p&&isAU(p))||/уколов/i.test(name))return 'Продакт';
+ if(/беатрис|леонид/i.test(name))return 'Дизайн';
+ if(/анастасия/i.test(name))return 'Качество';
+ if(role==='Лид'){if(/TDR|техспек|архитектур/i.test(title))return 'Системный анализ';if(/ТЗ|User story|Use case|BRD|пользовательск\w*\s+истори/i.test(title))return 'Аналитик';return 'Разработка';}
+ return 'Разработка';}
+function streamPhase(t){return (t&&t.phase&&STREAM_PHASES.indexOf(t.phase)>=0)?t.phase:'Ф2';}
+function streamRole(t){return (t&&t.streamRole&&STREAM_ROLES.indexOf(t.streamRole)>=0)?t.streamRole:defaultStreamRole(t);}
+function streamCellArts(phase,role){const r=STREAM_TABLE[role];return (r&&r[phase])?r[phase].slice():[];}
+function streamNames(list){return (Array.isArray(list)?list:[]).map(x=>typeof x==='string'?x:(x&&x.name)).filter(Boolean);}
+function streamNeedNames(t){const n=streamNames(t&&t.artifactsNeeded);if(n.length)return n;return streamNames((t&&t.arts)||[]);}
+function streamDoneNames(t){const n=streamNames(t&&t.artifactsDone);if(n.length)return n;return streamNames((t&&t.arts)||[]);}
+function streamHasMarks(t){return streamNeedNames(t).length>0||streamDoneNames(t).length>0;}
+function streamNeedSet(t){const n=streamNeedNames(t);return n.length?n:streamDoneNames(t);}
+function streamArrPut(arr,name,on){const a=streamNames(arr);const i=a.indexOf(name);if(on&&i<0)a.push(name);if(!on&&i>=0)a.splice(i,1);return a;}
+function gArtsProg(ts){const all=ts||[],marked=all.filter(streamHasMarks);
+ if(!marked.length)return {exp:0,acc:0,p:null,none:true,marked:0,unmarked:all.length,expected:[],accepted:[]};
+ const need=new Set();marked.forEach(t=>streamNeedSet(t).forEach(n=>need.add(n)));
+ const acc=new Set();marked.forEach(t=>streamDoneNames(t).forEach(n=>{if(need.has(n))acc.add(n);}));
+ return {exp:need.size,acc:acc.size,p:need.size?acc.size/need.size:0,none:false,marked:marked.length,unmarked:all.length-marked.length,expected:[...need],accepted:[...acc]};}
+function gArtsTxt(x,kind){if(!x||x.none)return kind==='short'?'н/о':'не отмечено';
+ const pct=Math.round((x.p||0)*100);if(kind==='short')return String(pct);if(kind==='pct')return pct+'%';if(kind==='sub')return x.acc+' из '+x.exp+' арт.';return pct+'% · '+x.acc+' из '+x.exp;}
+function gMatrixRoles(ts){const used=new Set((ts||[]).map(t=>streamRole(t)));return STREAM_ROLES.filter(r=>used.has(r));}
+function streamArtsBox(t){const show=t.status==='Принята'||t.status==='На ревью';if(!show)return '';
+ const ph=streamPhase(t),role=streamRole(t),items=streamCellArts(ph,role);
+ if(!items.length)return '<div style="margin-top:8px;font-size:12px;color:#85868A">В этой ячейке нет артефактов Досье.</div>';
+ const need=new Set(streamNeedNames(t)),done=new Set(streamDoneNames(t));
+ return '<div style="margin-top:8px" id="artsBox"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Артефакты при сдаче</div>'+
+  '<div style="font-size:11px;color:#85868A;margin-bottom:6px">Список ячейки '+esc(ph)+', '+esc(role)+'. Отметьте, какие артефакты были нужны и какие из них подготовлены.</div>'+
+  '<div style="display:grid;grid-template-columns:auto auto 1fr;gap:4px 10px;align-items:start;font-size:12px;line-height:16px">'+
+  '<div style="font-size:11px;color:#85868A">нужен</div><div style="font-size:11px;color:#85868A">подготовлен</div><div></div>'+
+  items.map(n=>'<label style="display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer"><input type="checkbox" data-f="artNeed" data-art="'+esc(n)+'"'+(need.has(n)?' checked':'')+'></label>'+
+   '<label style="display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer"><input type="checkbox" data-f="artDone" data-art="'+esc(n)+'"'+(done.has(n)?' checked':'')+'></label>'+
+   '<span>'+esc(n)+'</span>').join('')+'</div></div>';}
+const GV_KEY=LS+':ui:ganttView';
+let GV=(()=>{try{return localStorage.getItem(GV_KEY)==='graph'?'graph':'gantt';}catch(e){return 'gantt';}})();
+const GR_KEY=LS+':ui:graphReady';
+let GR=(()=>{try{return localStorage.getItem(GR_KEY)==='arts'?'arts':'hours';}catch(e){return 'hours';}})();
+const GPOS={};let GS={k:1,tx:0,ty:0,sel:null,hov:null,sig:'',N:[],L:[],A:{},drag:null,pan:null,raf:0,W:0,H:0,openF:{},artHL:null,artKey:null};
+const G_PROJ={ai:{id:'ai',name:'AI стенд',col:'#5D6198',colD:'#343A7E'},bill:{id:'bill',name:'Биллинг',col:'#00897B',colD:'#00695C'},cpq:{id:'cpq',name:'CPQ',col:'#1565C0',colD:'#0D47A1'}};
+const G_PROJ_ORDER=['ai','bill','cpq'];
+/* Правила по порядку, первое совпадение побеждает. Поиск по всему названию, без учёта регистра. */
+const G_RULES=[
+  {re:/помощник по вики/,key:'wiki-agent',name:'Агент-Помощник по Вики',proj:'ai',how:'wiki-agent'},
+  {re:/(^|[^а-яa-z])вики([^а-яa-z]|$)/,key:'wiki',name:'Вики',proj:'ai',how:'wiki'},
+  {re:/настройщик|bpmcp|agent[\s-]*bp[\s-]*creator/,key:'tuner',name:'Настройщик',proj:'ai',how:'tuner'},
+  {re:/langfuse\.|encryption_key|(?:^|\s)langfuse(?:\.|\s|$)/,key:'tuner',name:'Настройщик',proj:'ai',how:'langfuse'},
+  {re:/контрагент/,key:'counterparty',name:'Помощник оценки контрагентов',proj:'ai',how:'counterparty'},
+  {re:/файл\s*индекс[а-яa-z]*[\s\S]*реализац|реализац[\s\S]*файл\s*индекс/,key:'indexer',name:'Файл-индексер',proj:'ai',how:'indexer'},
+  {re:/договор/,key:'contract',name:'Помощник работы с Договором',proj:'ai',how:'contract'},
+  {re:/развернуть сервисы/,key:'stand',name:'AI стенд',proj:'ai',how:'deploy'},
+  {re:/^ai стенд/,key:'stand',name:'AI стенд',proj:'ai',how:'stand'},
+  {re:/(^|[^а-яa-z0-9])(1с|1c)([^а-яa-z0-9]|$)/,key:'1c',name:'1С',proj:'cpq',how:'1c'},
+  {re:/конфигуратор/,key:'cfg',name:'Конфигуратор',proj:'cpq',how:'cfg'},
+  {re:/(^|[^а-яa-z])cpq([^а-яa-z]|$)[\s\S]*баг|баг[\s\S]*(^|[^а-яa-z])cpq([^а-яa-z]|$)/,key:'cpqbugs',name:'Баги CPQ',proj:'cpq',how:'cpqbugs'},
+  {re:/генерац[а-я]*\s+кп|(^|[^а-яa-z])cpq([^а-яa-z]|$)/,key:'kp',name:'Генерация КП',proj:'cpq',how:'kp'},
+  {re:/^рефакторинг/,key:'refactor',name:'Рефакторинг',proj:'cpq',how:'refactor'},
+  {re:/онбординг/,key:'onb',name:'Онбординг',proj:'bill',how:'onb'},
+  {re:/пресет\w*[\s\S]*биллинг|биллинг[\s\S]*пресет/,key:'presets',name:'Пресеты в Биллинге BP3',proj:'bill',how:'presets'}
+];
+const G_HOW={
+  'wiki-agent':'по названию помощника по вики','wiki':'по слову вики','tuner':'по слову настройщик',
+  'langfuse':'по задаче langfuse','counterparty':'по слову контрагент','indexer':'файл-индексер, реализация',
+  'contract':'по слову договор','deploy':'развернуть сервисы','stand':'по названию AI стенд',
+  '1c':'по слову 1С','cfg':'по слову конфигуратор','kp':'генерация КП / CPQ','cpqbugs':'баги CPQ','refactor':'по слову рефакторинг','onb':'онбординг',
+  'presets':'пресеты в биллинге','prefix':'по префиксу названия','parent':'по родительской задаче',
+  'inc':'по соседнему инкременту','name':'по совпадению названия','other':'без правила'
+};
+const gNorm=s=>String(s||'').toLowerCase().replace(/ё/g,'е').replace(/[«»"'`]/g,'').replace(/[\s\-–—_]+/g,' ').replace(/[.,;:!?()]+$/,'').trim();
+function gPrefix(t){const s=String(t.title||'').replace(/https?:\/\/\S+/g,'');const i=s.indexOf(':');if(i<=0)return null;const p=s.slice(0,i).replace(/\s+/g,' ').trim();return p&&p.length<=70?p:null;}
+function gShort(t){const s=String(t.title||'').trim(),p=gPrefix(t);let r=p?s.slice(s.indexOf(':')+1).replace(/^[\s\-–]+/,'').trim():s;r=r.replace(/\s*·\s*инкр\.\s*/,' · ');if(!r)r=s;return r.length>34?r.slice(0,33).trim()+'…':r;}
+const gCut=(s,n)=>s.length>n?s.slice(0,n-1).trim()+'…':s;
+function gClassify(title){const n=gNorm(title);for(let i=0;i<G_RULES.length;i++){const r=G_RULES[i];if(r.re.test(n))return {key:r.key,name:r.name,proj:r.proj,how:r.how};}return null;}
+function gGroups(){const by={},how={},proj={},name={},vote={};
+ function set(id,key,nm,pr,h){by[id]=key;how[id]=h;proj[id]=pr;if(!name[key])name[key]=nm;}
+ D.tasks.forEach(t=>{const c=gClassify(t.title);if(c){set(t.id,c.key,c.name,c.proj,c.how);return;}
+  const p=gPrefix(t);if(!p)return;
+  const raw=p.replace(/^\s*Сервис\s*[-–—:]?\s*/i,'').trim()||p;
+  const c2=gClassify(raw);if(c2){set(t.id,c2.key,c2.name,c2.proj,c2.how);return;}
+  const k='pfx:'+gNorm(raw);set(t.id,k,raw,'ai','prefix');(vote[k]=vote[k]||{})[raw]=(vote[k][raw]||0)+1;});
+ Object.entries(vote).forEach(([k,o])=>{name[k]=Object.entries(o).sort((a,b)=>b[1]-a[1]||a[0].length-b[0].length)[0][0];});
+ D.tasks.forEach(t=>{if(by[t.id])return;if(t.parent&&by[t.parent])set(t.id,by[t.parent],name[by[t.parent]],proj[t.parent],'parent');});
+ D.tasks.forEach(t=>{if(by[t.id])return;const m=String(t.id).match(/^(.*\d.*)-\d+$/);if(!m)return;
+  const sib=D.tasks.find(q=>q.id!==t.id&&by[q.id]&&how[q.id]!=='other'&&how[q.id]!=='inc'&&how[q.id]!=='parent'&&String(q.id).replace(/-\d+$/,'')===m[1]);
+  if(sib)set(t.id,by[sib.id],name[by[sib.id]],proj[sib.id],'inc');});
+ const keys=Object.keys(name).filter(k=>k!=='@other').map(k=>({k,n:gNorm(name[k])})).filter(x=>x.n.length>=4).sort((a,b)=>b.n.length-a.n.length);
+ D.tasks.forEach(t=>{if(by[t.id])return;const n=' '+gNorm(t.title)+' ';const hit=keys.find(x=>n.includes(' '+x.n+' '));if(!hit)return;
+  let prj='ai';for(const id of Object.keys(by)){if(by[id]===hit.k){prj=proj[id];break;}}set(t.id,hit.k,name[hit.k],prj,'name');});
+ D.tasks.forEach(t=>{if(!by[t.id])set(t.id,'@other','Прочее','ai','other');});
+ name['@other']='Прочее';return {by,how,name,proj};}
+function gProg(t){if(t.status==='Принята')return 1;const e=+t.est||0,s=+t.spent||0;if(t.status==='На ревью')return 0.9;return e>0?Math.min(s/e,0.9):0;}
+const gW=t=>Math.max(+t.est||0,1);
+function gInPeriod(t,P){if(F.wave==='all')return true;const vd=visDays();if(!vd.length)return true;const a=vd[0],b=vd[vd.length-1],x=P.R[t.id];
+ if(t.due&&t.due>=a&&t.due<=b)return true;if(x&&x.accepted&&x.accepted>=a&&x.accepted<=b)return true;
+ return !!x&&Object.keys(x.fact||{}).filter(d=>x.fact[d]>EPS).concat(Object.keys(x.fc||{}).filter(d=>x.fc[d]>EPS)).some(d=>d>=a&&d<=b);}
+const G_ST=[['Запланировано','#D9DADF','#85868A',1],['Активна','#1E88E5','#1565C0'],['Пауза','#BDBDBD','#757575'],['Блокер','#FFD4D8','#F32A16'],['На ревью','#7B1FA2','#7B1FA2'],['Принята','#599C16','#3E7A0E']];
+function gRootName(){if(F.wave==='all')return C.name;const s=C.sprints.find(s=>s.id===F.wave);if(s)return 'Спринт '+s.id;return 'Волна '+F.wave;}
+function gWeighted(ts){let w=0,s=0;ts.forEach(t=>{w+=gW(t);s+=gW(t)*gProg(t);});return {w,p:w?s/w:0};}
+function gBuild(P){const gr=gGroups(),ts=visTasks().filter(t=>gInPeriod(t,P)),ids=new Set(ts.map(t=>t.id));
+ const FE={};ts.forEach(t=>{const k=gr.by[t.id];(FE[k]=FE[k]||{key:k,name:gr.name[k]||k,proj:gr.proj[t.id]||'ai',tasks:[]}).tasks.push(t);});
+ const feats=Object.values(FE);feats.forEach(f=>{const x=gWeighted(f.tasks);f.w=x.w;f.p=x.p;f.tasks.sort(cmpTasks);});
+ const PO={};G_PROJ_ORDER.forEach(id=>{PO[id]={id,name:G_PROJ[id].name,feats:[],tasks:[]};});
+ feats.forEach(f=>{(PO[f.proj]||PO.ai).feats.push(f);(PO[f.proj]||PO.ai).tasks.push(...f.tasks);});
+ const projs=G_PROJ_ORDER.map(id=>PO[id]).filter(p=>p.tasks.length);
+ projs.forEach(p=>{const x=gWeighted(p.tasks);p.w=x.w;p.p=x.p;p.feats.sort((a,b)=>(a.key==='@other')-(b.key==='@other')||b.tasks.length-a.tasks.length||a.name.localeCompare(b.name,'ru'));});
+ const rel=gWeighted(ts);
+ if(GR==='arts'){feats.forEach(f=>{const x=gArtsProg(f.tasks);f.pHours=f.p;f.artsX=x;f.p=x.p;});
+  projs.forEach(p=>{const x=gArtsProg(p.tasks);p.pHours=p.p;p.artsX=x;p.p=x.p;});
+  const relA=gArtsProg(ts);rel.pHours=rel.p;rel.artsX=relA;rel.p=relA.p;}
+ const N=[],L=[],A={};const add=(a,b)=>{(A[a]=A[a]||new Set()).add(b);(A[b]=A[b]||new Set()).add(a);};
+ const root={id:'@R',kind:'root',r:30,ch:-900,p:rel.p,n:ts.length,bw:150,bh:110,artsX:rel.artsX};N.push(root);
+ projs.forEach(p=>{const n={id:'@P:'+p.id,kind:'proj',pr:p,r:24,ch:-520-p.feats.length*18};n.bw=Math.max(2*n.r+16,(p.name.length+8)*7.2);n.bh=2*n.r+40;N.push(n);
+  L.push({s:'@R',t:n.id,kind:'rp',len:175+n.r,k:0.28});add('@R',n.id);
+  p.feats.forEach(f=>{const fn={id:'@F:'+f.key,kind:'feat',f,r:Math.min(13+Math.sqrt(f.w)*0.8,28),ch:-260-f.tasks.length*22};fn.bw=Math.max(2*fn.r+10,(Math.min(f.name.length,30)+6)*6.9);fn.bh=2*fn.r+30;N.push(fn);
+   L.push({s:n.id,t:fn.id,kind:'pf',len:100+fn.r+Math.min(p.feats.length,14)*3,k:0.32});add(n.id,fn.id);
+   f.tasks.forEach(t=>{const m={id:t.id,kind:'task',t,f,r:4+Math.sqrt(+t.est||1)*1.05,ch:-45};N.push(m);
+    L.push({s:fn.id,t:t.id,kind:'ft',len:34+fn.r+m.r+Math.min(f.tasks.length,12)*1.5,k:0.6});add(fn.id,t.id);});});});
+ ts.forEach(t=>deps(t).forEach(d=>{if(ids.has(d)&&d!==t.id){L.push({s:d,t:t.id,kind:'dep',len:160,k:0.02});add(d,t.id);}}));
+ const M={};N.forEach(n=>M[n.id]=n);L.forEach(l=>{l.a=M[l.s];l.b=M[l.t];});
+ return {N,L,A,M,feats,projs,gr,root};}
+/* лёгкий force-layout (как d3-force: many-body, link, collide, слабое притяжение к центру) */
+function gRand(seed){let s=seed>>>0||1;return ()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+function gInit(B){const rnd=gRand(7);
+ B.N.forEach(n=>{const o=GPOS[n.id];if(o){n.x=o.x;n.y=o.y;}});
+ const place={ai:{a:0.12,R:290},bill:{a:Math.PI*0.82,R:270},cpq:{a:-Math.PI*0.68,R:270}};
+ B.projs.forEach(p=>{const n=B.M['@P:'+p.id],pl=place[p.id]||{a:0,R:200};
+  n.tx=Math.cos(pl.a)*pl.R;n.ty=Math.sin(pl.a)*pl.R;
+  if(n.x==null){n.x=n.tx;n.y=n.ty;}
+  n.fx=n.x;n.fy=n.y;
+  const nf=p.feats.length,spread=Math.min(Math.PI*1.4,0.55+nf*0.2);
+  p.feats.forEach((f,i)=>{const fn=B.M['@F:'+f.key],fa=pl.a+(nf<=1?0:(i/(nf-1)-0.5)*spread),R2=150+(i%2)*30;
+   if(fn.x==null){fn.x=n.x+Math.cos(fa)*R2;fn.y=n.y+Math.sin(fa)*R2;}
+   f.tasks.forEach((t,j)=>{const m=B.M[t.id];if(m.x!=null)return;const b=fa+(j/Math.max(f.tasks.length,1)-0.5)*Math.PI*1.2,r2=fn.r+40+rnd()*20;m.x=fn.x+Math.cos(b)*r2;m.y=fn.y+Math.sin(b)*r2;});});});
+ B.N.forEach(n=>{if(n.x==null){n.x=(rnd()-.5)*50;n.y=(rnd()-.5)*50;}n.vx=0;n.vy=0;});const r=B.M['@R'];r.x=0;r.y=0;r.fx=0;r.fy=0;}
+function gTick(B,alpha){const N=B.N,n=N.length;
+ for(let i=0;i<n;i++){const a=N[i];for(let j=i+1;j<n;j++){const b=N[j];let dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;if(d2<1){dx=0.5+i%3;dy=0.5+j%3;d2=dx*dx+dy*dy;}
+  const d=Math.sqrt(d2),dd=Math.max(d2,400);const fa=b.ch*alpha/dd,fb=a.ch*alpha/dd;a.vx+=dx*fa;a.vy+=dy*fa;b.vx-=dx*fb;b.vy-=dy*fb;
+  if(a.kind!=='task'&&b.kind!=='task'){const ox=(a.bw+b.bw)/2+10-Math.abs(dx),oy=(a.bh+b.bh)/2+8-Math.abs(dy);if(ox>0&&oy>0){if(ox*0.6<oy){const o=ox*0.5*0.5*(dx<0?-1:1);a.x-=o;b.x+=o;}else{const o=oy*0.5*0.5*(dy<0?-1:1);a.y-=o;b.y+=o;}}}
+  else{const mn=a.r+b.r+(a.kind==='task'&&b.kind==='task'?6:18);if(d<mn){const o=(mn-d)/d*0.5*0.8;a.x-=dx*o;a.y-=dy*o;b.x+=dx*o;b.y+=dy*o;}}}}
+ B.L.forEach(l=>{const a=l.a,b=l.b;let dx=b.x+b.vx-a.x-a.vx,dy=b.y+b.vy-a.y-a.vy,d=Math.sqrt(dx*dx+dy*dy)||1;const f=(d-l.len)/d*alpha*l.k;const ba=l.kind==='rp'?0.85:l.kind==='pf'?0.65:0.5;b.vx-=dx*f*ba;b.vy-=dy*f*ba;a.vx+=dx*f*(1-ba);a.vy+=dy*f*(1-ba);});
+ N.forEach(m=>{if(m.kind==='proj'&&m.tx!=null){m.vx+=(m.tx-m.x)*0.02*alpha;m.vy+=(m.ty-m.y)*0.02*alpha;return;}if(m.kind==='proj')return;m.vx-=m.x*0.025*alpha;m.vy-=m.y*0.025*alpha*1.25;});
+ N.forEach(m=>{if(m.fx!=null){m.x=m.fx;m.y=m.fy;m.vx=m.vy=0;return;}m.vx*=0.6;m.vy*=0.6;m.x+=m.vx;m.y+=m.vy;});}
+function gRun(B,ticks,a0){let a=a0==null?1:a0;const dec=1-Math.pow(0.001,1/ticks);for(let i=0;i<ticks;i++){gTick(B,a);a+=(0-a)*dec;}}
+function gSave(B){B.N.forEach(n=>{GPOS[n.id]={x:n.x,y:n.y};});}
+function gPeople(ids){return [...new Set(ids)].map(id=>person(id)||{id,name:id}).sort(cmpPeople);}
+function gTaskTip(t,P,B){const x=P.R[t.id]||{},c=curSt(t)||'Запланировано',p=person(t.person),pl=planOf(t);
+ const dep=deps(t).map(d=>{const q=task(d);return q?`${esc(q.title)} <span style="color:#B9BAC4">(${esc(d)}, ${esc(curSt(q))})</span>`:esc(d);});
+ const need=D.tasks.filter(q=>deps(q).includes(t.id)).map(q=>`${esc(q.title)} <span style="color:#B9BAC4">(${esc(q.id)})</span>`);
+ const feat=B.gr.name[B.gr.by[t.id]]||'Прочее',prj=(G_PROJ[B.gr.proj[t.id]]||G_PROJ.ai).name,how=G_HOW[B.gr.how[t.id]];
+ const fc=t.done?(t.real==='Принята'?'принята ':'по плану ')+ru(t.when):'не выполнено, '+t.why+', '+t.state;
+ return `<div style="font-weight:600;font-size:13px;line-height:17px;margin-bottom:4px">${esc(t.title)}</div>`+
+ `<div style="color:#B9BAC4;margin-bottom:6px">${esc(t.id)} · проект: ${esc(prj)} · фича: ${esc(feat)}${how?' ('+how+')':''}</div>`+
+ `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${stCol(t).f};border:1px solid #fff;margin-right:5px"></span><b>${esc(c)}</b>`+(c==='Блокер'||c==='Пауза'?(t.blocker&&t.blocker!=='Блокер'&&t.blocker!=='Пауза'?', причина: '+esc(t.blocker):'')+(t.since?', с '+ru(t.since):''):'')+
+ `<br>Ответственный: ${esc(p?p.name:(t.person||'не назначен'))}`+(t.needRev?`<br>Ревьюер: ${esc(revName(t.reviewer))}`:'<br>Без ревью')+
+ `<br>Часы: факт ${h1(+t.spent||0)} / оценка ${h1(+t.est||0)} / остаток ${h1(+t.rem||0)}`+
+ `<br>Готовность: ${Math.round(gProg(t)*100)}%`+(GR==='arts'?(function(){const x=gArtsProg([t]);return '<br>Артефакты: '+(x.none?'не отмечено':x.acc+' из '+x.exp+' (подготовлен / нужен)');})():'')+
+ `<br>Плановая дата: ${t.due?ru(t.due):pl&&pl.d?ru(pl.d)+' (план '+esc(pl.sp.id)+')':'не задана'}`+
+ `<br>Приёмка: ${fc}${x.revLate?', ревью просрочено':''}`+
+ (dep.length?`<div style="margin-top:6px"><b>Зависит от:</b><br>${dep.join('<br>')}</div>`:'')+(need.length?`<div style="margin-top:6px"><b>Нужна для:</b><br>${need.join('<br>')}</div>`:'');}
+function gFeatTip(f,P){const cnt={};f.tasks.forEach(t=>{const c=curSt(t)||'Запланировано';cnt[c]=(cnt[c]||0)+1;});
+ const open=f.tasks.filter(t=>t.status!=='Принята');let late=null,hor=false;open.forEach(t=>{const e=(P.R[t.id]||{}).endA;if(!e)hor=true;else if(!late||e>late)late=e;});
+ const bl=f.tasks.filter(t=>curSt(t)==='Блокер');let est=0,sp=0,rem=0;f.tasks.forEach(t=>{est+=+t.est||0;sp+=+t.spent||0;rem+=+t.rem||0;});
+ return `<div style="font-weight:600;font-size:13px;line-height:17px;margin-bottom:4px">${esc(f.name)}: ${GR==='arts'?gArtsTxt(f.artsX,'pct'):Math.round(f.p*100)+'% к релизу'}</div>`+
+ `Проект: ${esc((G_PROJ[f.proj]||G_PROJ.ai).name)}<br>`+
+ `Задач: ${f.tasks.length} · `+G_ST.filter(s=>cnt[s[0]]).map(s=>`${esc(s[0].toLowerCase())} ${cnt[s[0]]}`).join(', ')+
+ `<br>Часы: факт ${h1(sp)} / оценка ${h1(est)} / остаток ${h1(rem)}`+
+ `<br>Участники: ${gPeople(f.tasks.map(t=>t.person).filter(Boolean)).map(p=>esc(p.name)).join(', ')||'нет'}`+
+ `<br>Последняя приёмка: ${!open.length?'все задачи приняты':hor?'за горизонтом':ru(late)}`+(GR==='arts'?`<br>Артефакты: ${gArtsTxt(f.artsX)}`:'')+
+ (bl.length?`<div style="margin-top:6px;color:#FFB4B4"><b>Блокеры:</b><br>${bl.map(t=>esc(t.title)+(t.blocker&&t.blocker!=='Блокер'?': '+esc(t.blocker):'')).join('<br>')}</div>`:'');}
+function gProjTip(p){const acc=p.tasks.filter(t=>t.status==='Принята').length,cnt={};p.tasks.forEach(t=>{const c=curSt(t)||'Запланировано';cnt[c]=(cnt[c]||0)+1;});
+ let est=0,sp=0,rem=0;p.tasks.forEach(t=>{est+=+t.est||0;sp+=+t.spent||0;rem+=+t.rem||0;});
+ const bl=p.tasks.filter(t=>curSt(t)==='Блокер');
+ return `<div style="font-weight:600;font-size:13px;line-height:17px;margin-bottom:4px">${esc(p.name)}: ${GR==='arts'?gArtsTxt(p.artsX,'pct'):Math.round(p.p*100)+'% к релизу'}</div>`+
+ `Фич: ${p.feats.length} · задач: ${p.tasks.length} · принято: ${acc}<br>`+
+ G_ST.filter(s=>cnt[s[0]]).map(s=>`${esc(s[0].toLowerCase())} ${cnt[s[0]]}`).join(', ')+
+ `<br>Часы: факт ${h1(sp)} / оценка ${h1(est)} / остаток ${h1(rem)}`+
+ (GR==='arts'?`<br>Артефакты: ${gArtsTxt(p.artsX)}`:'')+
+ (bl.length?`<div style="margin-top:6px;color:#FFB4B4"><b>Блокеры:</b><br>${bl.map(t=>esc(t.title)+(t.blocker&&t.blocker!=='Блокер'?': '+esc(t.blocker):'')).join('<br>')}</div>`:'');}
+function gRootTip(B){const ts=B.projs.flatMap(p=>p.tasks),acc=ts.filter(t=>t.status==='Принята').length;
+ return `<div style="font-weight:600;font-size:13px;margin-bottom:4px">${esc(gRootName())}: ${GR==='arts'?gArtsTxt(B.root.artsX,'pct'):Math.round(B.root.p*100)+'% к релизу'}</div>Релиз ${ru(C.release)}<br>Проектов: ${B.projs.length} · фич: ${B.feats.length} · задач: ${ts.length} · принято: ${acc}<br>`+B.projs.map(p=>`${esc(p.name)} ${GR==='arts'?gArtsTxt(p.artsX,'pct'):Math.round(p.p*100)+'%'}`).join(', ')+(GR==='arts'?`<br>Артефакты: ${gArtsTxt(B.root.artsX)}`:'');}
+function gTipShow(h,ev){const g=$('gtip');g.innerHTML=h;g.style.display='block';const w=g.offsetWidth,hh=g.offsetHeight;let x=ev.clientX+14,y=ev.clientY+14;if(x+w>innerWidth-8)x=ev.clientX-w-14;if(y+hh>innerHeight-8)y=Math.max(8,innerHeight-hh-8);g.style.left=x+'px';g.style.top=y+'px';}
+function gTipHide(){const g=$('gtip');if(g)g.style.display='none';}
+function gFit(){const B=GS.B;if(!B||!B.N.length)return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;B.N.forEach(n=>{const lw=n.kind==='proj'?110:n.kind==='feat'?95:n.kind==='root'?80:60;x0=Math.min(x0,n.x-n.r-lw);x1=Math.max(x1,n.x+n.r+lw);y0=Math.min(y0,n.y-n.r-8);y1=Math.max(y1,n.y+n.r+(n.kind==='task'?18:36));});
+ const W=GS.W,H=GS.H,k=Math.min(W/(x1-x0),H/(y1-y0),1.6);GS.k=k;GS.tx=W/2-(x0+x1)/2*k;GS.ty=H/2-(y0+y1)/2*k;gView();}
+function gView(){const v=$('gvp');if(!v)return;v.setAttribute('transform',`translate(${GS.tx},${GS.ty}) scale(${GS.k})`);$('gsvg').classList.toggle('lowz',GS.k<1.15);}
+function gPos(){const B=GS.B;if(!B)return;B.N.forEach(n=>{const g=n.el;if(g)g.setAttribute('transform',`translate(${n.x},${n.y})`);});
+ B.L.forEach(l=>{if(!l.el)return;if(l.kind==='dep'){const dx=l.b.x-l.a.x,dy=l.b.y-l.a.y,d=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/d,uy=dy/d;l.el.setAttribute('x1',l.a.x+ux*(l.a.r+2));l.el.setAttribute('y1',l.a.y+uy*(l.a.r+2));l.el.setAttribute('x2',l.b.x-ux*(l.b.r+4));l.el.setAttribute('y2',l.b.y-uy*(l.b.r+4));}
+  else{l.el.setAttribute('x1',l.a.x);l.el.setAttribute('y1',l.a.y);l.el.setAttribute('x2',l.b.x);l.el.setAttribute('y2',l.b.y);}});}
+function gOn(id){const B=GS.B,on=new Set([id]),n=B&&B.M[id];if(!n)return on;
+ if(n.kind==='task'){(B.A[id]||[]).forEach(x=>on.add(x));}
+ else if(n.kind==='feat'){on.add('@R');on.add('@P:'+n.f.proj);n.f.tasks.forEach(t=>on.add(t.id));}
+ else if(n.kind==='proj'){on.add('@R');n.pr.feats.forEach(f=>{on.add('@F:'+f.key);f.tasks.forEach(t=>on.add(t.id));});}
+ else if(n.kind==='root'){B.N.forEach(x=>on.add(x.id));}
+ return on;}
+function gHL(){const B=GS.B,svg=$('gsvg');if(!B||!svg)return;
+ const arts=GS.artHL&&GS.artHL.length&&!GS.hov,c=GS.hov||(arts?null:GS.sel);
+ svg.classList.toggle('dim',!!(c||arts));B.N.forEach(n=>n.el&&n.el.classList.remove('on'));B.L.forEach(l=>l.el&&l.el.classList.remove('on'));
+ if(arts){const on=new Set(GS.artHL);if(GS.sel)on.add(GS.sel);B.N.forEach(n=>{if(on.has(n.id))n.el.classList.add('on');});B.L.forEach(l=>{if(on.has(l.s)&&on.has(l.t))l.el.classList.add('on');});}
+ else if(c){const on=gOn(c);B.N.forEach(n=>{if(on.has(n.id))n.el.classList.add('on');});B.L.forEach(l=>{if(on.has(l.s)&&on.has(l.t))l.el.classList.add('on');});}
+ document.querySelectorAll('#gList [data-gf]').forEach(r=>r.classList.toggle('on',r.dataset.gf===GS.sel));
+ document.querySelectorAll('#gList [data-gp]').forEach(r=>r.classList.toggle('on',r.dataset.gp===GS.sel));
+ document.querySelectorAll('#gList [data-ga]').forEach(r=>r.classList.toggle('on',!!GS.artKey&&GS.artKey===(r.dataset.gf||'')+'|'+r.dataset.ga));}
+function gNum(n,a,b,c){return n%10===1&&n%100!==11?a:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?b:c;}
+
+function gFeatDod(f){const ts=f.tasks||[],marked=ts.filter(streamHasMarks);
+ if(!marked.length)return {none:true,items:[]};
+ const roleUsed=new Set(ts.map(t=>streamRole(t))),order=[],seen=new Set();
+ STREAM_ROLES.forEach(r=>{if(!roleUsed.has(r))return;streamCellArts('Ф2',r).forEach(n=>{if(!seen.has(n)){seen.add(n);order.push(n);}});});
+ const need=new Set(),done=new Set(),cover={};
+ marked.forEach(t=>{streamNeedSet(t).forEach(n=>need.add(n));streamDoneNames(t).forEach(n=>done.add(n));
+  const names=new Set(streamNeedSet(t).concat(streamDoneNames(t)));
+  names.forEach(n=>{if(!cover[n])cover[n]=[];cover[n].push(t.id);});});
+ need.forEach(n=>{if(!seen.has(n)){seen.add(n);order.push(n);}});
+ return {none:false,items:order.filter(n=>need.has(n)).map(n=>({name:n,done:done.has(n),count:(cover[n]||[]).length,ids:cover[n]||[]}))};}
+function gDodHtml(f,fid,dod){return '<div class="gl-dod"><div class="gl-dod-h">DoD</div>'+dod.items.map(it=>{
+ const cnt=it.count+' '+gNum(it.count,'задача','задачи','задач');
+ return `<div class="gl-art" data-ga="${esc(it.name)}" data-gf="${esc(fid)}" data-gids="${esc(it.ids.join(','))}"><i class="gl-chk${it.done?' on':''}" aria-hidden="true"></i><span class="gl-art-n">${esc(it.name)}</span><span class="gl-art-c">${cnt}</span></div>`;
+}).join('')+'</div>';}
+function gBar(pc){return `<div class="gl-b"><i style="width:${pc}%;background:${pc>=100?'#599C16':pc>=60?'#7CB342':pc>=30?'#1E88E5':'#B1B6D4'}"></i></div>`;}
+function gList(B){const rows=B.projs.map(p=>{const pc=Math.round((p.p||0)*100),pcLbl=GR==='arts'?gArtsTxt(p.artsX,'pct'):pc+'%',col=G_PROJ[p.id].colD;
+  const pSub=GR==='arts'?`${p.feats.length} ${gNum(p.feats.length,'фича','фичи','фич')} · ${p.tasks.length} ${gNum(p.tasks.length,'задача','задачи','задач')} · ${gArtsTxt(p.artsX,'sub')}`:`${p.feats.length} ${gNum(p.feats.length,'фича','фичи','фич')} · ${p.tasks.length} ${gNum(p.tasks.length,'задача','задачи','задач')} · ${h1(p.w)} ч`;
+  const head=`<div class="gl-p" data-gp="${esc('@P:'+p.id)}"><div class="gl-n"><span style="color:${col}">${esc(p.name)}</span><b>${pcLbl}</b></div>${gBar(pc)}<div class="gl-s">${pSub}</div></div>`;
+  const fs=p.feats.slice().sort((a,b)=>(a.key==='@other')-(b.key==='@other')||b.p-a.p||a.name.localeCompare(b.name,'ru'));
+  return head+fs.map(f=>{const bl=f.tasks.some(t=>curSt(t)==='Блокер'),fpc=Math.round(f.p*100);
+   const fSub=GR==='arts'?`${f.tasks.length} ${gNum(f.tasks.length,'задача','задачи','задач')} · ${gArtsTxt(f.artsX,'sub')}`:`${f.tasks.length} ${gNum(f.tasks.length,'задача','задачи','задач')} · ${h1(f.w)} ч`;
+   const fLbl=GR==='arts'?gArtsTxt(f.artsX,'pct'):fpc+'%';
+   if(GR!=='arts')return `<div class="gl-r" data-gf="${esc('@F:'+f.key)}" title="${esc(f.name)}"><div class="gl-n"><span>${esc(f.name)}${bl?' <b style="color:#F32A16">⛔</b>':''}</span><b>${fLbl}</b></div>${gBar(fpc)}<div class="gl-s">${fSub}</div></div>`;
+   const fid='@F:'+f.key,dod=gFeatDod(f),has=!dod.none&&dod.items.length,open=has&&GS.openF&&GS.openF[fid];
+   const caret=has?`<i class="gl-caret" data-gtog="${esc(fid)}"></i>`:'';
+   return `<div class="gl-r${has?' has-dod':''}${open?' open':''}" data-gf="${esc(fid)}" title="${esc(f.name)}"><div class="gl-n"><span>${caret}${esc(f.name)}${bl?' <b style="color:#F32A16">⛔</b>':''}</span><b>${fLbl}</b></div>${gBar(fpc)}<div class="gl-s">${fSub}</div>${has?gDodHtml(f,fid,dod):''}</div>`;}).join('');}).join('');
+ const readyTitle=GR==='arts'?'Готовность по артефактам':'Готовность к релизу';
+ const readySub=GR==='arts'?`${esc(gRootName())}: ${gArtsTxt(B.root.artsX)}`:`${esc(gRootName())}: ${Math.round(B.root.p*100)}%`;
+ $('gList').innerHTML=`<div class="gl-h"><b>${readyTitle}</b><span>${readySub}</span></div>`+rows;
+ gDrawMatrix(B);}
+function gDrawMatrix(B){const box=$('gMatrix');if(!box)return;if(GR!=='arts'){box.style.display='none';box.innerHTML='';return;}
+ const ts=(B.projs||[]).flatMap(p=>p.tasks),roles=gMatrixRoles(ts);
+ let h='<div class="gm-leg">Готовность - доля подготовленных среди нужных артефактов. В расчёт фичи, проекта и релиза входят только задачи с отметками: объединение нужных и объединение подготовленных. Задачи без отметок показываются как «не отмечено» и не считаются как 0%. Строки ролей без задач скрыты и не входят в расчёт. Готовность ячейки считается так же, только по задачам этой ячейки.</div>';
+ h+='<div class="gm-wrap"><table class="gm"><thead><tr><th>Роль</th>';
+ STREAM_PHASES.forEach((ph,i)=>{h+='<th class="gm-ph">'+esc(ph)+'</th>';if(i<STREAM_K.length)h+='<th class="gm-k">'+esc(STREAM_K[i])+'</th>';});
+ h+='</tr></thead><tbody>';
+ roles.forEach(role=>{h+='<tr><th>'+esc(role)+'</th>';
+  STREAM_PHASES.forEach((ph,i)=>{const cellTs=ts.filter(t=>streamPhase(t)===ph&&streamRole(t)===role),items=streamCellArts(ph,role);
+   if(!cellTs.length)h+='<td class="gm-empty"></td>';
+   else{const x=gArtsProg(cellTs);
+    if(x.none)h+='<td class="gm-c gm-none"><b>не отмечено</b></td>';
+    else h+='<td class="gm-c" title="'+esc(x.acc+' из '+x.exp)+'"><b>'+gArtsTxt(x,'pct')+'</b><div>'+x.acc+' из '+x.exp+'</div></td>';}
+   if(i<STREAM_K.length)h+='<td class="gm-k"></td>';});
+  h+='</tr>';});
+ if(!roles.length)h+='<tr><td colspan="10">Нет задач в текущем срезе</td></tr>';
+ h+='</tbody></table></div>';box.style.display='';box.innerHTML=h;}
+function drawGraph(P){if(GV!=='graph')return;const box=$('gWrap');if(!box)return;const svg=$('gsvg');GS.W=box.clientWidth||1000;GS.H=box.clientHeight||720;svg.setAttribute('width',GS.W);svg.setAttribute('height',GS.H);
+ const B=gBuild(P);const sig=B.N.map(n=>n.id).join('|')+'#'+B.L.filter(l=>l.kind==='dep').map(l=>l.s+'>'+l.t).join('|');const fresh=sig!==GS.sig;
+ if(GS.B)gSave(GS.B);gInit(B);if(fresh){const known=B.N.filter(n=>GPOS[n.id]).length;gRun(B,known>B.N.length*0.8?140:450,known>B.N.length*0.8?0.3:1);}
+ GS.B=B;GS.sig=sig;if(GS.sel&&!B.M[GS.sel])GS.sel=null;
+ while(svg.firstChild)svg.removeChild(svg.firstChild);
+ const defs=el('defs',{},svg);const mk=el('marker',{id:'gArr',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},defs);el('path',{d:'M0,0 L10,5 L0,10 z',fill:'#8E92BC'},mk);
+ const bg=el('rect',{x:0,y:0,width:GS.W,height:GS.H,fill:'#FBFBFD',class:'gbg'},svg);const vp=el('g',{id:'gvp'},svg);
+ const gE=el('g',{},vp),gD=el('g',{},vp),gN=el('g',{},vp);
+ B.L.forEach(l=>{l.el=l.kind==='dep'?el('line',{class:'ge gdep','marker-end':'url(#gArr)'},gD):el('line',{class:'ge '+(l.kind==='rp'?'grp':l.kind==='pf'?'gpf':'gft')},gE);});
+ const ORD={task:0,feat:1,proj:2,root:3};B.N.slice().sort((a,b)=>ORD[a.kind]-ORD[b.kind]).forEach(n=>{const g=el('g',{class:'gn g'+n.kind,'data-id':n.id},gN);n.el=g;
+  if(n.kind==='root'){el('circle',{r:n.r,fill:'#343A7E'},g);el('circle',{r:n.r+5,fill:'none',stroke:'#E7E7F0','stroke-width':4},g);const C2=2*Math.PI*(n.r+5);el('circle',{r:n.r+5,fill:'none',stroke:'#599C16','stroke-width':4,'stroke-dasharray':`${C2*(n.p||0)} ${C2}`,transform:'rotate(-90)'},g);
+   el('text',{y:6,'text-anchor':'middle','font-size':17,'font-weight':600,fill:'#fff'},g,GR==='arts'?gArtsTxt(n.artsX,'pct'):Math.round(n.p*100)+'%');el('text',{y:n.r+24,'text-anchor':'middle',class:'glr'},g,gRootName());el('text',{y:n.r+39,'text-anchor':'middle',class:'gls'},g,'релиз '+ru(C.release));}
+  else if(n.kind==='proj'){const p=n.pr,C2=2*Math.PI*(n.r+5),col=G_PROJ[p.id].colD,bl=p.tasks.some(t=>curSt(t)==='Блокер');el('circle',{r:n.r,fill:col,stroke:bl?'#F32A16':'#fff','stroke-width':bl?2.5:2},g);el('circle',{r:n.r+5,fill:'none',stroke:'#E7E7F0','stroke-width':4},g);
+   el('circle',{r:n.r+5,fill:'none',stroke:'#599C16','stroke-width':4,'stroke-dasharray':`${C2*(p.p||0)} ${C2}`,transform:'rotate(-90)'},g);
+   el('text',{y:6,'text-anchor':'middle','font-size':14,'font-weight':600,fill:'#fff'},g,GR==='arts'?gArtsTxt(p.artsX,'pct'):Math.round(p.p*100)+'%');el('text',{y:n.r+22,'text-anchor':'middle',class:'glp'},g,p.name+' · '+(GR==='arts'?gArtsTxt(p.artsX,'pct'):Math.round(p.p*100)+'%'));}
+  else if(n.kind==='feat'){const f=n.f,C2=2*Math.PI*(n.r+4),bl=f.tasks.some(t=>curSt(t)==='Блокер'),col=(G_PROJ[f.proj]||G_PROJ.ai).col;el('circle',{r:n.r,fill:col,stroke:bl?'#F32A16':'#fff','stroke-width':bl?2.5:1.5},g);el('circle',{r:n.r+4,fill:'none',stroke:'#E7E7F0','stroke-width':3.5},g);
+   el('circle',{r:n.r+4,fill:'none',stroke:'#599C16','stroke-width':3.5,'stroke-dasharray':`${C2*(f.p||0)} ${C2}`,transform:'rotate(-90)'},g);
+   el('text',{y:4,'text-anchor':'middle','font-size':10.5,'font-weight':600,fill:'#fff'},g,GR==='arts'?gArtsTxt(f.artsX,'short'):String(Math.round(f.p*100)));el('text',{y:n.r+19,'text-anchor':'middle',class:'glf'},g,gCut(f.name,30)+' · '+(GR==='arts'?gArtsTxt(f.artsX,'pct'):Math.round(f.p*100)+'%'));}
+  else{const t=n.t,s=stCol(t),c=curSt(t);const ca={r:n.r,fill:s.f,stroke:c==='Блокер'?'#F32A16':s.s,'stroke-width':c==='Блокер'?2.5:(s.w||1)};if(s.dash)ca['stroke-dasharray']='3 2';el('circle',ca,g);
+   if(c==='Блокер')el('circle',{r:n.r+3.5,fill:'none',stroke:'#F32A16','stroke-width':1,opacity:.6},g);
+   el('text',{y:n.r+11,'text-anchor':'middle',class:'glt'},g,gShort(t));}});
+ gPos();gList(B);if(fresh||!GS.fitted){gFit();GS.fitted=true;}else gView();gHL();
+ $('gLeg').innerHTML=G_ST.map(s=>`<span><i style="background:${s[1]};border:${s[0]==='Блокер'?'2px solid #F32A16':'1px '+(s[3]?'dashed ':'solid ')+s[2]}"></i>${s[0]}</span>`).join('')+
+  `<span><i style="background:#343A7E;border:2px solid #599C16"></i>${window.__gProjTxt}</span>`+
+  `<span><i style="background:#5D6198;border:2px solid #599C16"></i>фича, кольцо: готовность</span>`+
+  `<span><svg width="34" height="10" style="vertical-align:-1px;margin-right:4px"><line x1="1" y1="5" x2="26" y2="5" stroke="#8E92BC" stroke-dasharray="4 3" stroke-width="1.5"/><path d="M25,1 L33,5 L25,9 z" fill="#8E92BC"/></svg>зависимость, стрелка к зависящей задаче</span>`+
+  (GR==='arts'
+  ?`<span style="flex-basis:100%">Готовность - доля подготовленных среди нужных артефактов. В расчёт фичи, проекта и релиза входят только задачи с отметками: объединение нужных и объединение подготовленных. Задачи без отметок показываются как «не отмечено» и не считаются как 0%. Строки ролей без задач скрыты и не входят в расчёт. Размер узла задачи = оценка в часах.</span>`
+  :`<span style="flex-basis:100%">${window.__gLegTxt}</span>`);}
+function gLoop(){cancelAnimationFrame(GS.raf);let a=0.35,i=0;const step=()=>{const B=GS.B;if(!B)return;gTick(B,a);gTick(B,a);a*=0.96;gPos();if((GS.drag||a>0.01)&&i++<600)GS.raf=requestAnimationFrame(step);else gSave(B);};GS.raf=requestAnimationFrame(step);}
+function gPt(ev){const r=$('gsvg').getBoundingClientRect();return {x:(ev.clientX-r.left-GS.tx)/GS.k,y:(ev.clientY-r.top-GS.ty)/GS.k};}
+function gSetView(v){GV=v;try{localStorage.setItem(GV_KEY,v);}catch(e){}gApplyView();}
+function gSetReady(v){GR=v==='arts'?'arts':'hours';try{localStorage.setItem(GR_KEY,GR);}catch(e){}
+ document.querySelectorAll('#grSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.gr||'hours')===GR));
+ const mx=$('gMatrix');if(mx&&GR!=='arts'){mx.style.display='none';}
+ GS.artHL=null;GS.artKey=null;gTipHide();const P=(window.__state||{}).P;if(P&&GV==='graph')drawGraph(P);}
+function gApplyView(){const g=GV==='graph';$('gvGantt').style.display=g?'none':'';$('gvGraph').style.display=g?'':'none';$('gvT').textContent=g?'2. Граф релиза: проекты, фичи и готовность':'2. Гант: задачи по дням, факт и план';
+ document.querySelectorAll('#gvSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===GV));
+ document.querySelectorAll('#grSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.gr||'hours')===GR));
+ gTipHide();const P=(window.__state||{}).P;if(!P)return;if(g){GS.fitted=false;drawGraph(P);}else drawGantt(P);}
+window.__graph={get GS(){return GS;},get GR(){return GR;},get tasks(){return D.tasks.length;},
+ arts(){const ts=visTasks();return {mode:GR,release:gArtsProg(ts),roles:gMatrixRoles(ts)};}, featDod:gFeatDod,
+ map(){const gr=gGroups();return D.tasks.map(t=>({id:t.id,title:t.title,feature:gr.name[gr.by[t.id]],project:(G_PROJ[gr.proj[t.id]]||G_PROJ.ai).name,how:gr.how[t.id],key:gr.by[t.id]}));},
+ rules:G_RULES.map(r=>({key:r.key,name:r.name,proj:r.proj,how:r.how,re:String(r.re)}))};
+(function gWire(){document.querySelectorAll('#gvSeg button').forEach(b=>b.addEventListener('click',()=>gSetView(b.dataset.v)));
+ document.querySelectorAll('#grSeg button').forEach(b=>b.addEventListener('click',()=>gSetReady(b.dataset.gr)));
+ const svg=$('gsvg');
+ svg.addEventListener('wheel',ev=>{ev.preventDefault();const r=svg.getBoundingClientRect(),mx=ev.clientX-r.left,my=ev.clientY-r.top,k0=GS.k,k=Math.max(0.2,Math.min(4,k0*Math.exp(-ev.deltaY*0.0015)));GS.tx=mx-(mx-GS.tx)*k/k0;GS.ty=my-(my-GS.ty)*k/k0;GS.k=k;gView();},{passive:false});
+ svg.addEventListener('mousedown',ev=>{if(ev.button!==0)return;const g=ev.target.closest('.gn');gTipHide();
+  if(g){const n=GS.B.M[g.dataset.id];if(!n)return;GS.drag={n,x0:ev.clientX,y0:ev.clientY,moved:false};ev.preventDefault();}
+  else{GS.pan={x0:ev.clientX,y0:ev.clientY,tx:GS.tx,ty:GS.ty,moved:false};svg.style.cursor='grabbing';ev.preventDefault();}});
+ window.addEventListener('mousemove',ev=>{if(GS.drag){const d=GS.drag;if(!d.moved&&Math.hypot(ev.clientX-d.x0,ev.clientY-d.y0)<4)return;if(!d.moved){d.moved=true;gLoop();}const p=gPt(ev);d.n.fx=p.x;d.n.fy=p.y;d.n.x=p.x;d.n.y=p.y;gPos();return;}
+  if(GS.pan){const p=GS.pan;GS.tx=p.tx+ev.clientX-p.x0;GS.ty=p.ty+ev.clientY-p.y0;if(Math.hypot(ev.clientX-p.x0,ev.clientY-p.y0)>3)p.moved=true;gView();}});
+ window.addEventListener('mouseup',ev=>{if(GS.drag){const d=GS.drag;GS.drag=null;if(d.n.id==='@R'){}else if(d.n.kind==='proj'){d.n.fx=d.n.x;d.n.fy=d.n.y;d.n.tx=d.n.x;d.n.ty=d.n.y;}else{delete d.n.fx;delete d.n.fy;}
+   if(!d.moved){if(d.n.kind==='task')openPop(d.n.id,ev);else if(d.n.kind==='feat'||d.n.kind==='proj'){GS.sel=GS.sel===d.n.id?null:d.n.id;gHL();}}else gSave(GS.B);return;}
+  if(GS.pan){const p=GS.pan;GS.pan=null;svg.style.cursor='';if(!p.moved&&(GS.sel||GS.artHL)){GS.sel=null;GS.artHL=null;GS.artKey=null;gHL();}}});
+ svg.addEventListener('mouseover',ev=>{if(GS.drag||GS.pan)return;const g=ev.target.closest('.gn');if(!g)return;GS.hov=g.dataset.id;gHL();});
+ svg.addEventListener('mousemove',ev=>{if(GS.drag||GS.pan){gTipHide();return;}const g=ev.target.closest('.gn');if(!g){if(GS.hov){GS.hov=null;gHL();}gTipHide();return;}
+  const n=GS.B.M[g.dataset.id],P=(window.__state||{}).P;if(!n||!P)return;gTipShow(n.kind==='task'?gTaskTip(n.t,P,GS.B):n.kind==='feat'?gFeatTip(n.f,P):n.kind==='proj'?gProjTip(n.pr):gRootTip(GS.B),ev);});
+ svg.addEventListener('mouseleave',()=>{GS.hov=null;gHL();gTipHide();});
+ $('gList').addEventListener('click',ev=>{
+  const art=ev.target.closest('[data-ga]');
+  if(art){ev.preventDefault();ev.stopPropagation();const ids=(art.dataset.gids||'').split(',').filter(Boolean),key=(art.dataset.gf||'')+'|'+art.dataset.ga;
+   if(GS.artKey===key){GS.artKey=null;GS.artHL=null;}else{GS.artKey=key;GS.artHL=ids;if(art.dataset.gf)GS.sel=art.dataset.gf;}gHL();return;}
+  const caret=ev.target.closest('[data-gtog]');
+  if(caret){ev.preventDefault();ev.stopPropagation();const id=caret.dataset.gtog;GS.openF=GS.openF||{};GS.openF[id]=!GS.openF[id];const box=caret.closest('.gl-r');if(box)box.classList.toggle('open',GS.openF[id]);return;}
+  const r=ev.target.closest('[data-gf],[data-gp]');if(!r)return;const id=r.dataset.gf||r.dataset.gp;
+  if(r.classList.contains('has-dod')){GS.openF=GS.openF||{};if(GS.sel!==id){GS.openF[id]=true;r.classList.add('open');}}
+  GS.sel=GS.sel===id?null:id;GS.artHL=null;GS.artKey=null;gHL();});
+ $('gList').addEventListener('mouseover',ev=>{const art=ev.target.closest('[data-ga]');
+  if(art&&GS.B){(art.dataset.gids||'').split(',').filter(Boolean).forEach(id=>{const n=GS.B.M[id];if(n&&n.el)n.el.classList.add('pulse');});return;}
+  const r=ev.target.closest('[data-gf],[data-gp]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf||r.dataset.gp];if(n)n.el.classList.add('pulse');});
+ $('gList').addEventListener('mouseout',ev=>{const art=ev.target.closest('[data-ga]');
+  if(art&&GS.B){(art.dataset.gids||'').split(',').filter(Boolean).forEach(id=>{const n=GS.B.M[id];if(n&&n.el)n.el.classList.remove('pulse');});return;}
+  const r=ev.target.closest('[data-gf],[data-gp]');if(!r||!GS.B)return;const n=GS.B.M[r.dataset.gf||r.dataset.gp];if(n)n.el.classList.remove('pulse');});
+ $('gFitB').addEventListener('click',gFit);
+ $('gReB').addEventListener('click',()=>{Object.keys(GPOS).forEach(k=>delete GPOS[k]);GS.sig='';const P=(window.__state||{}).P;if(P)drawGraph(P);});
+ let rt=0;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(GV==='graph'&&window.__state){GS.fitted=false;drawGraph(window.__state.P);}},200);});
+})();
+
+GV='graph';GR='hours';
+const GCOL={an:['#9575CD','#7E3FD0'],ds:['#F06292','#E91E63'],be:['#5D6198','#1A237E'],fe:['#64B5F6','#1E88E5'],qa:['#FFB74D','#FF9800'],ops:['#A1887F','#6D4C41']};
+const GOALS={g1:{id:'g1',name:'Интеграция AI-сервисов в BP3',col:'#5D6198',colD:'#343A7E'},g2:{id:'g2',name:'Файловое хранилище',col:'#7E6BC4',colD:'#4E3A9E'},g3:{id:'g3',name:'Billing под мультитенант',col:'#00897B',colD:'#00695C'},cpq:{id:'cpq',name:'CPQ',col:'#1565C0',colD:'#0D47A1'}};
+const goalOf=m=>m==='Файлы'?'g2':m==='Billing'?'g3':(m==='Конфигуратор'||m==='Генератор КП')?'cpq':'g1';
+const _sc=stCol;stCol=t=>VIEW==='arts'?{f:t.done?'#7CB342':'#D9DADF',s:GCOL[t.grp][1],w:2.8,n:t.done?'выполнено':'не выполнено'}:_sc(t);
+const _gl=gList;
+gList=function(B){if(VIEW!=='arts')return _gl(B);
+ const all=B.projs.flatMap(p=>p.tasks);
+ const projs=['an','ds','be','fe','qa','ops'].map(k=>{const ts=all.filter(t=>t.grp===k);const fm={};ts.forEach(t=>{(fm[t.module]=fm[t.module]||{key:t.module,name:t.module,tasks:[]}).tasks.push(t);});
+  const feats=Object.values(fm);feats.forEach(f=>{f.p=cntReady(f.tasks);f.w=hrs(f.tasks);});return {id:k,name:DATA.GN[k],tasks:ts,feats,p:cntReady(ts),w:hrs(ts)};}).filter(p=>p.tasks.length);
+ _gl({projs,root:B.root});
+ document.querySelectorAll('#gList [data-gp]').forEach(r=>{r.dataset.gtype=r.dataset.gp.slice(3);r.removeAttribute('data-gp');});
+ document.querySelectorAll('#gList [data-gf]').forEach(r=>{let p=r.previousElementSibling;while(p&&!p.dataset.gtype)p=p.previousElementSibling;r.dataset.gtype2=p?p.dataset.gtype:'';});};
+document.getElementById('gList').addEventListener('click',ev=>{if(VIEW!=='arts')return;const r=ev.target.closest('[data-gtype],[data-gf]');if(!r)return;ev.stopPropagation();ev.preventDefault();
+ const ty=r.dataset.gtype||r.dataset.gtype2,m=r.dataset.gtype?null:r.dataset.gf.slice(3);const key=(ty||'')+'|'+(m||'');
+ if(GS.artKey===key){GS.artKey=null;GS.artHL=null;}else{GS.artKey=key;GS.artHL=D.tasks.filter(t=>t.grp===ty&&(!m||t.module===m)).map(t=>t.id);}GS.sel=null;gHL();
+ document.querySelectorAll('#gList .gl-p,#gList .gl-r').forEach(x=>x.classList.toggle('on',GS.artKey&&((x.dataset.gtype||'')+'|'+(x.dataset.gtype?'':(x.dataset.gf||'').slice(3)))===((x.dataset.gtype?ty+'|':ty+'|'+(m||'')))&&x===r));},true);
+const PJ0=JSON.parse(JSON.stringify(G_PROJ));
+const hrs=ts=>ts.reduce((a,t)=>a+(+t.est||0),0);
+function modReady(ts){const W=DATA.W,gs={};ts.forEach(t=>{const g=t.grp==='ops'?'be':t.grp;const a=gs[g]=gs[g]||[0,0];a[0]+=+t.est||0;if(t.done)a[1]+=+t.est||0;});
+ const r={};for(const g in gs)r[g]=gs[g][0]?gs[g][1]/gs[g][0]:0;const A=['an','ds'].filter(g=>g in r),B=['be','fe','qa'].filter(g=>g in r);
+ const wa=gr=>gr.reduce((a,g)=>a+W[g]*r[g],0)/gr.reduce((a,g)=>a+W[g],0);
+ if(!B.length)return A.length?wa(A)*0.3:0;if(!A.length)return wa(B);return 0.3*wa(A)+0.7*wa(B);}
+const cntReady=ts=>ts.length?ts.filter(t=>t.done).length/ts.length:0;
+gProg=t=>t.done?1:0;
+gGroups=function(){const by={},how={},proj={},name={};D.tasks.forEach(t=>{const k=t.module;by[t.id]=k;name[k]=t.module;proj[t.id]=VIEW==='feat'?(t.module==='Billing'?'bill':(t.module==='Конфигуратор'||t.module==='Генератор КП')?'cpq':'ai'):goalOf(t.module);});return {by,how,name,proj};};
+const _gb=gBuild;
+gBuild=function(P){const B=_gb(P);
+ {B.feats.forEach(f=>{f.p=modReady(f.tasks);});const av=fs=>{const h=fs.reduce((a,f)=>a+hrs(f.tasks),0);return h?fs.reduce((a,f)=>a+f.p*hrs(f.tasks),0)/h:0;};B.projs.forEach(p=>{p.p=av(p.feats);});B.root.p=av(B.feats);}
+
+ window.__gB={root:B.root.p,projs:B.projs.map(p=>[p.name,p.p]),feats:B.feats.map(f=>[f.key,f.p])};return B;};
+const _gi=gInit;
+gInit=function(B){if(VIEW!=='feat'){const n=B.projs.length;B.projs.forEach((p,i)=>{const id='@P:'+p.id;if(!GPOS[id]){const a=-Math.PI/2+2*Math.PI*i/n;GPOS[id]={x:Math.cos(a)*300,y:Math.sin(a)*260};}});}_gi(B);};
+const LEG={feat:'Узел фичи: модуль. Готовность модуля собирается из групп работ с весами: Аналитика 15%, Дизайн 15%, Backend 30% (вместе с DevOps), Frontend 25%, Test 15%. Внутри группы готовность считается по часам выполненных задач. Аналитика и дизайн вместе дают не больше 30%. Если у модуля в суперспринте нет задач какой то группы, её вес делится между остальными группами того же блока; если нет аналитики и дизайна, весь вес у разработки; если нет разработки, модуль не выше 30%. Проект и релиз: среднее по модулям, взвешенное по часам. Зелёный узел задачи: выполнена, серый: не выполнена. Размер узла задачи: оценка в часах.',
+ arts:'Цель, фича, артефакты: вокруг релиза три цели суперспринта и отдельно CPQ, у цели её фичи (модули), у фичи её задачи. Заливка задачи: зелёная выполнена, серая не выполнена. Ободок задачи: тип работ. Готовность фичи и цели считается так же, как в виде «Фичи»: по группам работ с весами, цель как среднее по фичам, взвешенное по часам. Справа те же задачи сгруппированы по типу работ, готовность там по числу задач, клик по строке подсвечивает задачи. Размер узла задачи: оценка в часах.'};
+const RIMS=['an','ds','be','fe','qa','ops'].map(k=>'<span><i style="background:#fff;border:3px solid '+GCOL[k][1]+';border-radius:50%;box-sizing:border-box"></i>'+DATA.GN[k]+'</span>').join('');
+function ssView(v){VIEW=v;G_PROJ_ORDER.length=0;Object.keys(G_PROJ).forEach(k=>delete G_PROJ[k]);
+ if(v==='feat'){Object.assign(G_PROJ,JSON.parse(JSON.stringify(PJ0)));G_PROJ_ORDER.push('ai','bill','cpq');window.__gProjTxt='проект: AI стенд, Биллинг, CPQ';}
+ else{Object.assign(G_PROJ,JSON.parse(JSON.stringify(GOALS)));G_PROJ_ORDER.push('g1','g2','g3','cpq');['an','ds','be','fe','qa','ops'].forEach(k=>{G_PROJ[k]={id:k,name:DATA.GN[k],col:GCOL[k][0],colD:GCOL[k][1]};});window.__gProjTxt='цель суперспринта или CPQ';}
+ window.__gLegTxt=(v==='arts'?'<b style="color:#050819">Ободок задачи:</b> </span>'+RIMS+'<span style="flex-basis:100%">':'')+LEG[v];GS.artHL=null;GS.artKey=null;
+ document.querySelectorAll('#kindSeg button').forEach(b=>b.classList.toggle('on',b.dataset.k===v));
+ Object.keys(GPOS).forEach(k=>delete GPOS[k]);GS.sig='';GS.sel=null;GS.hov=null;GS.fitted=false;gTipHide();drawGraph(window.__state.P);}
+document.querySelectorAll('#kindSeg button').forEach(b=>b.addEventListener('click',()=>ssView(b.dataset.k)));
+ssView('feat');
+/* матрица КЮ с переключателем по фичам */
+const KY={sel:'all'};
+const nW=(n,a,b,c)=>n%10===1&&n%100!==11?a:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?b:c;
+const short=t=>{let s=String(t.title||'');const i=s.indexOf(':');if(i>0&&i<45)s=s.slice(i+1);s=s.replace(/https?:\/\/\S+/g,'').replace(/\s*·\s*инкр\.\s*/,' · ').replace(/^[\s\-]+/,'').trim();return s.length>42?s.slice(0,41).trim()+'…':s;};
+const tipOf=ts=>ts.map(t=>t.id+' '+t.title+' ('+Math.round(+t.est||0)+' ч, '+(t.done?'готово, '+t.why:t.state+', '+t.why)+')').join('\n');
+function kyTag(label,ts,ok){return '<span class="ky-chip '+(ok?'ky-ok':'ky-no')+(KY.sel==='all'?'':' ky-one')+'" title="'+esc(tipOf(ts))+'">'+esc(label)+(ts.length>1||KY.sel==='all'?'<b>'+ts.length+'</b>':'')+'</span>';}
+function kyDraw(){const all=DATA.tasks,ts=KY.sel==='all'?all:all.filter(t=>t.module===KY.sel);
+ let h='<table class="ky"><tr><th class="ky-role">Роль</th>';
+ DATA.PH.forEach((ph,i)=>{h+='<th class="ky-ph">'+ph+' '+DATA.PHN[ph]+'</th><th class="ky-k" title="'+esc(DATA.KN['К'+(i+1)])+'"><span>К'+(i+1)+'</span></th>';});h+='</tr>';
+ DATA.ROLES.forEach(ro=>{h+='<tr><th class="ky-role">'+ro+'</th>';DATA.PH.forEach((ph,i)=>{const c=ts.filter(t=>t.phase===ph&&t.streamRole===ro);const q=ro==='Качество'?' ky-q':'';
+  let cell='<div class="ky-art">'+esc(DATA.KYU[ro][i])+'</div>';
+  if(!c.length){cell+='<div class="ky-none">нет задач</div>';h+='<td class="ky-c ky-e'+q+'">'+cell+'</td><td class="ky-k"></td>';return;}
+  let tags='';
+  if(KY.sel==='all'){DATA.MODS.forEach(m=>{const mt=c.filter(t=>t.module===m);if(!mt.length)return;const d=mt.filter(t=>t.done),n=mt.filter(t=>!t.done);if(d.length)tags+=kyTag(m,d,true);if(n.length)tags+=kyTag(m,n,false);});}
+  else c.slice().sort((a,b)=>(b.done-a.done)||String(a.due||'9').localeCompare(String(b.due||'9'))).forEach(t=>{tags+=kyTag(short(t),[t],t.done);});
+  const d=c.filter(t=>t.done);const hh=Math.round(hrs(c)),hd=Math.round(hrs(d));
+  cell+='<div class="ky-chips">'+tags+'</div><div class="ky-sum">готово '+d.length+' из '+c.length+', '+hd+' из '+hh+' ч</div>';
+  h+='<td class="ky-c'+q+(d.length===c.length?' ky-full':'')+'">'+cell+'</td><td class="ky-k"></td>';});h+='</tr>';});
+ h+='<tr class="ky-tot"><th class="ky-role">Итого</th>';DATA.PH.forEach(ph=>{const c=ts.filter(t=>t.phase===ph),d=c.filter(t=>t.done);h+='<td>'+(c.length?'<span class="ky-dot ky-okd"></span>готово '+d.length+' из '+c.length+'<br>'+Math.round(hrs(d))+' из '+Math.round(hrs(c))+' ч':'нет задач')+'</td><td class="ky-k"></td>';});h+='</tr></table>';
+ document.getElementById('kyBox').innerHTML=h;
+ const d=ts.filter(t=>t.done);document.getElementById('kySum').innerHTML=(KY.sel==='all'?'Все фичи':esc(DATA.MODFULL[KY.sel]))+': готово '+d.length+' из '+ts.length+' '+nW(ts.length,'задачи','задач','задач')+', '+Math.round(hrs(d))+' из '+Math.round(hrs(ts))+' ч'+(KY.sel==='all'?'':', готовность фичи '+Math.round(DATA.MODREADY[KY.sel]*100)+'%');
+ document.querySelectorAll('#kySeg button').forEach(b=>b.classList.toggle('on',b.dataset.m===KY.sel));}
+(function(){const box=document.getElementById('kySeg');let h='<button data-m="all" class="on">Все фичи</button>';DATA.MODS.forEach(m=>{h+='<button data-m="'+esc(m)+'">'+esc(m)+' <i>'+Math.round(DATA.MODREADY[m]*100)+'%</i></button>';});box.innerHTML=h;
+ box.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;KY.sel=b.dataset.m;kyDraw();});kyDraw();})();
+window.__ky=KY;window.__kyDraw=kyDraw;
+})();
+</script>
+</body></html>
