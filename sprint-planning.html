@@ -234,9 +234,24 @@ const KEY=(sp,ss)=>LS+':'+(sp||IDX.cur)+':'+(ss||ssOf(sp||IDX.cur).cur);
 function mondayToday(){const n=new Date();let d=new Date(Date.UTC(n.getFullYear(),n.getMonth(),n.getDate()));while(d.getUTCDay()!==1)d=new Date(d.getTime()-864e5);return d.toISOString().slice(0,10);}
 function emptyData(start,name){return {sprint:{start,end:start,release:'',today:localToday(),dayHours:8,buffer:15},waves:[],people:[],tasks:[],hist:{},config:{superSprint:{name:name||'Суперспринт 1',start,end:start,release:'',sprintNo:1,sprints:[]}}};}
 function loadData(sp,ss){let x=null;try{x=JSON.parse(localStorage.getItem(KEY(sp,ss))||'null');}catch(e){}if(x)return x;if(ss==='ss1'&&SEED[sp])return JSON.parse(JSON.stringify(SEED[sp]));return emptyData(mondayToday());}
-function saveIdx(){localStorage.setItem(LS+':idx',JSON.stringify(IDX));}
+/* личный выбор команды/суперспринта: хранится в LS+':ui:sel', не синхронизируется; в общий idx cur пишется из уже сохранённой (общей) копии */
+function getSel(){try{const o=JSON.parse(localStorage.getItem(LS+':ui:sel')||'null');if(o&&typeof o==='object')return {team:o.team||null,ss:o.ss||{}};}catch(e){}return {team:null,ss:{}};}
+function putSel(o){try{localStorage.setItem(LS+':ui:sel',JSON.stringify(o));}catch(e){}}
+function ssRange(sp,x){let d=null;try{const r=localStorage.getItem(LS+':'+sp+':'+x.id);d=r?JSON.parse(r):(x.id==='ss1'&&SEED[sp]?SEED[sp]:null);}catch(e){}
+ if(!d)return {st:x.start||'',en:''};const c=(d.config&&d.config.superSprint)||{},sps=c.sprints||[];
+ const st=c.start||(sps[0]&&sps[0].start)||(d.sprint&&d.sprint.start)||x.start||'';const en=(sps.length?sps.map(q=>q.end).sort().pop():'')||c.end||(d.sprint&&d.sprint.end)||'';return {st,en};}
+function defSS(sp){const o=IDX.ss[sp];if(!o||!o.list.length)return o?o.cur:'ss1';const t=localToday();const R=o.list.map(x=>Object.assign({id:x.id},ssRange(sp,x)));
+ let m=R.find(r=>r.st&&r.en&&r.st<=t&&t<=r.en);if(!m)m=R.filter(r=>r.st&&r.st<=t).sort((a,b)=>b.st.localeCompare(a.st))[0];return m?m.id:o.cur;}
+function applySel(){const S=getSel();if(S.team&&IDX.spaces.includes(S.team))IDX.cur=S.team;else if(!IDX.spaces.includes(IDX.cur))IDX.cur=IDX.spaces[0];
+ Object.keys(IDX.ss).forEach(sp=>{const o=IDX.ss[sp],v=S.ss[sp];if(v&&o.list.some(x=>x.id===v))o.cur=v;else o.cur=defSS(sp);});}
+function setSel(sp,ss){const S=getSel();S.team=sp;if(ss){if(ss===defSS(sp))delete S.ss[sp];else S.ss[sp]=ss;}putSel(S);}
+function idxForStore(){let s=null;try{s=JSON.parse(localStorage.getItem(LS+':idx')||'null');}catch(e){}const o=JSON.parse(JSON.stringify(IDX));if(!s)return o;
+ if(s.cur&&o.spaces.includes(s.cur))o.cur=s.cur;Object.keys(o.ss).forEach(sp=>{const so=s.ss&&s.ss[sp];if(so&&so.cur&&o.ss[sp].list.some(x=>x.id===so.cur))o.ss[sp].cur=so.cur;});return o;}
+function saveIdx(){localStorage.setItem(LS+':idx',JSON.stringify(idxForStore()));}
+/* перед перезагрузкой отправить несохранённые изменения (новый суперспринт, команда), иначе первый pull их перезапишет */
+function reloadAfterSync(){const s=window.__sync;if(!s||!s.flush){location.reload();return;}let done=false;const go=()=>{if(done)return;done=true;location.reload();};s.flush().then(go,go);setTimeout(go,10000);}
 function saveNow(){const m=ssOf(IDX.cur).list.find(x=>x.id===ssOf(IDX.cur).cur);if(m){m.name=D.config.superSprint.name;m.start=D.config.superSprint.start;}localStorage.setItem(KEY(),JSON.stringify(D));saveIdx();}
-ssOf(IDX.cur);let D=loadData(IDX.cur,ssOf(IDX.cur).cur);let FROM_LS=true;
+ssOf(IDX.cur);applySel();ssOf(IDX.cur);let D=loadData(IDX.cur,ssOf(IDX.cur).cur);let FROM_LS=true;
 
 D.sprint.today=localToday();let C=D.config.superSprint;
 const STATUSES=['Запланировано','Активна','Пауза/Блокер','На ревью','Принята'];
@@ -1379,7 +1394,7 @@ function rotateRev(pidv,people){people=people||D.people;if(people.length<2)retur
 $('addTask').addEventListener('click',()=>{let i=D.tasks.length+1;while(task('T'+i))i++;const id='T'+i;const pid=F.person!=='all'?F.person:'';D.tasks.push({id,dep:'',dir:'Продукт',title:'',person:pid,prio:9,est:16,spent:0,rem:16,status:'Запланировано',type:'План',blocker:'',since:'',reviewer:pid?rotateRev(pid):'',revH:2,due:''});F.task='all';OPEN.delete(id);render();setTimeout(()=>{const x=document.querySelector(`#tbl tr[data-id="${id}"] input[data-f=title]`);if(x)x.focus();},50);});
 window.__dbg={get D(){return D;},get IDX(){return IDX;}};
 /* ===== команды и суперспринты ===== */
-function switchTo(sp,ss){saveNow();IDX.cur=sp;if(ss)ssOf(sp).cur=ss;else ssOf(sp);saveIdx();location.reload();}
+function switchTo(sp,ss){saveNow();IDX.cur=sp;if(ss)ssOf(sp).cur=ss;else ssOf(sp);saveIdx();setSel(sp,ss||null);reloadAfterSync();}
 function fillSpaceSel(){$('selSpace').innerHTML=IDX.spaces.map(s=>`<option${s===IDX.cur?' selected':''}>${esc(s)}</option>`).join('')+'<option value="__new">+ Новая команда…</option>';
  const o=ssOf(IDX.cur);$('selSS').innerHTML=o.list.map(x=>`<option value="${x.id}"${x.id===o.cur?' selected':''}>${esc(x.name)}${x.start?' · с '+ruS(x.start):''}</option>`).join('');
  const empty=!D.people.length&&!D.tasks.length;$('emptyBox').style.display=empty?'block':'none';$('ganttBox').style.display=empty?'none':'';document.title='Планирование · '+IDX.cur;}
@@ -1401,9 +1416,9 @@ $('sideB').addEventListener('click',e=>{const b=e.target;
  if(b.id==='createTeam'){const n=$('newTeam').value.trim();if(!n)return;if(IDX.spaces.includes(n)){alert('Такая команда уже есть');return;}IDX.spaces.push(n);switchTo(n);}
  if(b.dataset.a==='ren'){const i=+b.closest('[data-i]').dataset.i,o=IDX.spaces[i],n=b.closest('[data-i]').querySelector('[data-ren]').value.trim();if(!n||n===o)return;if(IDX.spaces.includes(n)){alert('Такая команда уже есть');return;}saveNow();
   ssOf(o).list.forEach(x=>{const v=localStorage.getItem(LS+':'+o+':'+x.id);if(v!=null){localStorage.setItem(LS+':'+n+':'+x.id,v);localStorage.removeItem(LS+':'+o+':'+x.id);}else if(x.id==='ss1'&&SEED[o])localStorage.setItem(LS+':'+n+':'+x.id,JSON.stringify(SEED[o]));});
-  IDX.ss[n]=IDX.ss[o];delete IDX.ss[o];IDX.spaces[i]=n;if(IDX.cur===o)IDX.cur=n;saveIdx();location.reload();}
+  IDX.ss[n]=IDX.ss[o];delete IDX.ss[o];IDX.spaces[i]=n;if(IDX.cur===o)IDX.cur=n;saveIdx();{const S=getSel();if(S.team===o)S.team=n;if(S.ss[o]){S.ss[n]=S.ss[o];delete S.ss[o];}putSel(S);}reloadAfterSync();}
  if(b.dataset.a==='delT'){const i=+b.closest('[data-i]').dataset.i,o=IDX.spaces[i];if(IDX.spaces.length<2){alert('Должна остаться хотя бы одна команда');return;}if(!confirm('Удалить команду «'+o+'» и все её данные?'))return;
-  ssOf(o).list.forEach(x=>localStorage.removeItem(LS+':'+o+':'+x.id));delete IDX.ss[o];IDX.spaces.splice(i,1);if(IDX.cur===o)IDX.cur=IDX.spaces[0];saveIdx();location.reload();}
+  ssOf(o).list.forEach(x=>localStorage.removeItem(LS+':'+o+':'+x.id));delete IDX.ss[o];IDX.spaces.splice(i,1);if(IDX.cur===o)IDX.cur=IDX.spaces[0];saveIdx();reloadAfterSync();}
  if(b.id==='nsCreate'){const st=$('nsStart').value,nm=$('nsName').value.trim()||'Суперспринт';const o=ssOf(IDX.cur);let k=o.list.length+1;while(o.list.some(x=>x.id==='ss'+k))k++;const id='ss'+k;
   const N=emptyData(st,nm);N.config.superSprint.sprintNo=C.sprintNo+3;N.sprint.buffer=D.sprint.buffer;N.sprint.dayHours=D.sprint.dayHours;N.sprint.revSla=D.sprint.revSla;
   N.people=D.people.map(p=>{const q=JSON.parse(JSON.stringify(p));if(q.meetSrc==='calendar'&&q.meet){const v=[1,2,3,4,5].map(w=>{const a=DAYS.filter(d=>pd(d).getUTCDay()===w).map(d=>q.meet[d]||0);return Math.round(a.reduce((x,y)=>x+y,0)/Math.max(1,a.length)*2)/2;});q.meetWeek=v;q.meetSrc='manual';}delete q.meet;return q;});
@@ -1426,7 +1441,7 @@ normalize();syncInputs();render();
   const note=m=>{const n=document.createElement('div');n.style.cssText='position:fixed;right:16px;bottom:16px;z-index:9999;background:#FFF8E1;border:1px solid #FCCA25;border-radius:8px;padding:10px 14px;font-size:13px;max-width:380px;box-shadow:0 4px 12px rgba(0,0,0,.12)';n.textContent=m;document.body.appendChild(n);setTimeout(()=>n.remove(),8000);};
   const get=since=>fetch(SYNC_URL+(SYNC_URL.includes('?')?'&':'?')+'since='+since+'&t='+Date.now()).then(r=>r.json()).catch(()=>new Promise((res,rej)=>{const cb='__sync'+Date.now(),s=document.createElement('script');window[cb]=d=>{delete window[cb];s.remove();res(d);};s.onerror=()=>{delete window[cb];s.remove();rej(new Error('jsonp'));};s.src=SYNC_URL+(SYNC_URL.includes('?')?'&':'?')+'since='+since+'&callback='+cb;document.head.appendChild(s);}));
   const post=b=>fetch(SYNC_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)}).then(r=>r.json());
-  function reloadView(){try{IDX=JSON.parse(localStorage.getItem(LS+':idx')||'null')||IDX;}catch(e){}ssOf(IDX.cur);D=loadData(IDX.cur,ssOf(IDX.cur).cur);D.sprint.today=localToday();C=D.config.superSprint;normalize();syncInputs();render();}
+  function reloadView(){try{IDX=JSON.parse(localStorage.getItem(LS+':idx')||'null')||IDX;}catch(e){}ssOf(IDX.cur);applySel();ssOf(IDX.cur);D=loadData(IDX.cur,ssOf(IDX.cur).cur);D.sprint.today=localToday();C=D.config.superSprint;normalize();syncInputs();render();}
   function applyRemote(keys,first){const L=loc();let ch=false,conf=[];Object.entries(keys).forEach(([k,o])=>{if(!own(k))return;base[k]=o.rev;if(L[k]===o.v){known[k]=o.v;return;}
     if(!first&&L[k]!==undefined&&L[k]!==known[k])conf.push(k);
     localStorage.setItem(P+k,o.v);known[k]=o.v;ch=true;});persist();
@@ -1443,7 +1458,8 @@ normalize();syncInputs();render();
       ok();}).catch(()=>{busy=false;bad();});}
   function sched(){clearTimeout(tmr);tmr=setTimeout(()=>push(false),1500);}
   const _sn=saveNow,_si=saveIdx;saveNow=function(){_sn.apply(this,arguments);sched();};saveIdx=function(){_si.apply(this,arguments);sched();};
-  window.__sync={pull,push,state:()=>({rev,off})};
+  function flush(){clearTimeout(tmr);return new Promise(res=>{let n=0;const w=()=>{if(busy&&n++<40){setTimeout(w,200);return;}push(false).then(res,res);};w();});}
+  window.__sync={pull,push,flush,state:()=>({rev,off})};
   stat('Синхронизация…');pull(true).then(()=>push(false));setInterval(()=>{if(document.hidden)return;pull(false).then(()=>push(false));},20000);
  })();
 })();
