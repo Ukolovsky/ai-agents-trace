@@ -906,6 +906,30 @@ table.ky td.ky-full{border-color:#A5CC7E}
 .kpi.kpi5{grid-template-columns:repeat(5,1fr)}
 .kpi .paper small.nd{color:#757575}
 </style>
+<style>
+/* теги обоснования на карточках агентов */
+.ag-tags-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 12px}
+.ag-tags-bar .ag-bar-l{font-size:12.5px;font-weight:600;color:var(--text-secondary);margin-right:2px}
+.ag-why{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;align-items:center}
+.ag-pt{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;line-height:16px;font-weight:500;color:#7A2E0E;background:#FFF6F1;border:1px solid #FFB59B;border-radius:4px;padding:1px 6px 1px 5px;cursor:pointer;user-select:none;white-space:nowrap}
+.ag-pt:before{content:"";width:6px;height:6px;border-radius:1px;background:var(--secondary);transform:rotate(45deg);flex:none}
+.ag-pt .ag-pt-n{outline:none}
+.ag-pt .ag-pt-ed,.ag-pt .ag-pt-x{display:none;border:0;background:none;padding:0 1px;font:inherit;font-size:11px;line-height:14px;color:#B8532D;cursor:pointer}
+.ag-pt:hover .ag-pt-ed,.ag-pt:hover .ag-pt-x{display:inline}
+.ag-pt .ag-pt-x:hover,.ag-pt .ag-pt-ed:hover{color:var(--secondary)}
+.ag-pt.is-edit .ag-pt-n{user-select:text;-webkit-user-select:text;min-width:20px}
+.ag-pt.is-edit{background:#fff;border-color:var(--secondary);cursor:text}
+.ag-pt.is-edit .ag-pt-ed,.ag-pt.is-edit .ag-pt-x{display:none}
+.ag-pt.is-on{background:var(--secondary);border-color:var(--secondary);color:#fff}
+.ag-pt.is-on:before{background:#fff}
+.ag-pt .ag-pt-c{font-size:10.5px;opacity:.75}
+.ag-add{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:18px;font-size:13px;line-height:16px;font-weight:600;color:var(--text-secondary);background:none;border:1px dashed var(--grey-300);border-radius:4px;cursor:pointer;padding:0 5px;font-family:inherit}
+.ag-add:hover{color:var(--secondary);border-color:#FFB59B}
+.ag-add-in{font:inherit;font-size:11.5px;line-height:16px;border:1px solid var(--secondary);border-radius:4px;padding:0 5px;width:170px;outline:none}
+.ag-board.is-filter .ag-card:not(.is-hit){opacity:.35}
+.ag-board.is-filter .ag-card.is-hit{border-color:#FFB59B}
+.ag-btns{display:flex;flex-wrap:wrap;gap:8px}
+</style>
 </head><body>
 <div class="draft-banner"><b>Черновик.</b> Не публиковать. Собран 16.11.2026 по таблице спринта и протоколам; итог демо 20.11 не заполнен.</div>
 <header class="app-header"><div class="app-header-in">
@@ -1110,11 +1134,13 @@ table.ky td.ky-full{border-color:#A5CC7E}
 <section id="agents" style="background: var(--bg-paper); border-top: 1px solid var(--grey-300);"><div class="wrap">
 <div class="sec-head"><div class="sec-num">4</div><h2>Агенты в следующий суперспринт</h2></div>
 <p class="sec-sub">Исходная раскладка: в «Суперспринт 5» агенты, которые уже запланированы на 5th Super Sprint, остальные в «Бэклоге». Карточки можно перетаскивать между списками, раскладка сохраняется в этом браузере.</p>
+<p class="ag-hint" style="font-size:12.5px;color:var(--text-secondary);margin:-4px 0 8px">Оранжевые теги объясняют, зачем агент нужен: на какой пресет или улучшение он работает. Двойной клик или карандаш переименовывает тег сразу на всех карточках, крестик убирает тег с карточки, плюс добавляет. Клик по тегу в строке «Обоснование» подсвечивает карточки с ним.</p>
+<div class="ag-tags-bar" id="agTagsBar"></div>
 <div class="ag-board">
 <div class="ag-col" data-col="backlog"><div class="ag-head">Бэклог <span class="ag-count"></span></div><div class="ag-list"><div class="ag-card" draggable="true" data-id="b0"><div class="ag-name">Data flow</div><div class="ag-desc">Настраиваемый процесс импорта с добавляемыми логиками и проверками в режиме agentic workflow: приложения, БД, файлы.</div></div><div class="ag-card" draggable="true" data-id="b1"><div class="ag-name">Динамический статус<span class="ag-tag">AI-12</span></div><div class="ag-desc">Статус ЭБП из всего контура: последние обновления, блокеры, кого или чего ждёт задача, сводка по обсуждениям.</div></div><div class="ag-card" draggable="true" data-id="b2"><div class="ag-name">Переменное окружение<span class="ag-tag">AI-05</span></div><div class="ag-desc">В любой точке BP3 отвечает, какие переменные доступны сейчас, с типами и подписями.</div></div><div class="ag-card" draggable="true" data-id="b3"><div class="ag-name">Помощник по контрагентам<span class="ag-tag">AI-08</span></div><div class="ag-desc">Получает статус контрагента по ИНН и по бизнес-критериям присваивает уровень риска.</div></div><div class="ag-card" draggable="true" data-id="b4"><div class="ag-name">Цель и follow-up в Динамическом статусе<span class="ag-tag">AI-12</span></div><div class="ag-desc">Держит цель ЭБП, сам запрашивает недостающие входы у исполнителей и складывает решения в очередь.</div></div><div class="ag-card" draggable="true" data-id="b5"><div class="ag-name">ИИ Перенос конфигурации<span class="ag-tag">AI-18</span></div><div class="ag-desc">Собирает пакет изменений пресета, процессов и справочников со стенда и после подтверждения применяет на прод с откатом.</div></div><div class="ag-card" draggable="true" data-id="b6"><div class="ag-name">Отладчик процесса в Настройщике<span class="ag-tag">AI-02</span></div><div class="ag-desc">Прогоняет процесс на имитированных событиях и проверяет логику до публикации.</div></div><div class="ag-card" draggable="true" data-id="b7"><div class="ag-name">Проект из документа<span class="ag-tag">AI-09</span></div><div class="ag-desc">Из ТЗ, договора или КП делает черновик проекта с этапами, задачами и ответственными.</div></div><div class="ag-card" draggable="true" data-id="b8"><div class="ag-name">Каталог конфигурации и анализ влияния<span class="ag-tag">AI-02, AI-01</span></div><div class="ag-desc">Поиск по смыслу в метаданных тенанта, зависимости и пометка изменений, требующих подписи.</div></div><div class="ag-card" draggable="true" data-id="b9"><div class="ag-name">Агентный режим извлечения в ИИ Импорт<span class="ag-tag">AI-04</span></div><div class="ag-desc">Для сложных документов включает агентный режим, у каждого поля ссылка на место в документе.</div></div><div class="ag-card" draggable="true" data-id="b10"><div class="ag-name">Пользовательские навыки в Magic Pad и Помощнике<span class="ag-tag">AI-07, AI-13</span></div><div class="ag-desc">Пользователь описывает повторяемую работу словами, агент сохраняет навык и запускает его по расписанию.</div></div></div></div>
 <div class="ag-col ag-col-ss5" data-col="ss5"><div class="ag-head">Суперспринт 5 <span class="ag-count"></span></div><div class="ag-list"><div class="ag-card" draggable="true" data-id="s0"><div class="ag-name">Агент-помощник по вики</div><div class="ag-desc">Отвечает на вопросы по регламентам и проектам из вики; в суперспринте 5 TDR, разработка агента и фронт помощника.</div></div><div class="ag-card" draggable="true" data-id="s1"><div class="ag-name">Генерация КП<span class="ag-tag">CPQ</span></div><div class="ag-desc">Агент генерации КП по заявке, библиотека шаблонов, реквизиты продавца и выпуск КП из заказа.</div></div><div class="ag-card" draggable="true" data-id="s2"><div class="ag-name">Оркестрация Magic Pad<span class="ag-tag">AI-07</span></div><div class="ag-desc">Процесс выбора действий агента в чате Magic Pad.</div></div><div class="ag-card" draggable="true" data-id="s3"><div class="ag-name">ИИ Настройщик<span class="ag-tag">AI-02</span></div><div class="ag-desc">Сабагенты в чате платформы и подбор пресета по отрасли и классификации деятельности.</div></div><div class="ag-card" draggable="true" data-id="s4"><div class="ag-name">ИИ Поиск<span class="ag-tag">AI-10</span></div><div class="ag-desc">Поиск по комментариям, затем по документам и файлам.</div></div><div class="ag-card" draggable="true" data-id="s5"><div class="ag-name">Видеотрекер, контекст встреч<span class="ag-tag">AI-11</span></div><div class="ag-desc">Договорённости из саммари в задачи процесса, связь встречи с объектом, материалы во вкладку вики.</div></div><div class="ag-card" draggable="true" data-id="s6"><div class="ag-name">Вики-хаб и семантика<span class="ag-tag">AI-01</span></div><div class="ag-desc">Читает проект из CI и обновляет семантические связи после релиза.</div></div><div class="ag-card" draggable="true" data-id="s7"><div class="ag-name">Датамайнер<span class="ag-tag">AI-09</span></div><div class="ag-desc">Молча заполняет поля задачи из переписки и файлов и делает черновики задач из поручений.</div></div><div class="ag-card" draggable="true" data-id="s8"><div class="ag-name">Интервьюер<span class="ag-tag">AI-15</span></div><div class="ag-desc">Опрашивает клиента в его канале и отдаёт менеджеру заявку с заполненными полями.</div></div><div class="ag-card" draggable="true" data-id="s9"><div class="ag-name">Аналитика и дашборды по промпту<span class="ag-tag">AI-16</span></div><div class="ag-desc">Дашборд по вопросу словами за минуту, с пояснением расчёта и правами пользователя.</div></div><div class="ag-card" draggable="true" data-id="s10"><div class="ag-name">Настройщик рабочих мест<span class="ag-tag">AI-17</span></div><div class="ag-desc">Собирает рабочее место или ЭБП под человека или роль после подтверждения.</div></div></div></div>
 </div>
-<button type="button" class="demo-btn demo-btn-sec" id="agReset">Сбросить к исходной раскладке</button>
+<div class="ag-btns"><button type="button" class="demo-btn demo-btn-sec" id="agReset">Сбросить к исходной раскладке</button><button type="button" class="demo-btn demo-btn-sec" id="agTagReset">Сбросить теги</button></div>
 </div></section>
 
 <footer class="footer"><div class="wrap"><p>BusinessPad · AI Products · отчёт суперспринта 4 · 12.10-20.11.2026 · черновик от 16.11.2026, не опубликован</p></div></footer>
@@ -1580,6 +1606,56 @@ function kyDraw(){const all=DATA.tasks,ts=KY.sel==='all'?all:all.filter(t=>t.mod
 (function(){const box=document.getElementById('kySeg');let h='<button data-m="all" class="on">Все фичи</button>';DATA.MODS.forEach(m=>{h+='<button data-m="'+esc(m)+'">'+esc(m)+' <i>'+Math.round(DATA.MODREADY[m]*100)+'%</i></button>';});box.innerHTML=h;
  box.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;KY.sel=b.dataset.m;kyDraw();});kyDraw();})();
 window.__ky=KY;window.__kyDraw=kyDraw;
+})();
+</script>
+<script>
+/* теги обоснования: общий словарь, правки сохраняются в этом браузере */
+(function(){
+var KEY='ss4-report-agent-tags-v1';
+var DEF={dict:{"task": "Пресет Задачи", "mkt": "Пресет Маркетинг", "imp2": "Улучшение ИИ Импорта вер2", "opt": "Пресет Оптовой торговли", "cpq": "Пресет CPQ", "wiki": "Проектная Вики", "dog": "Договорная работа", "ship": "Поставка пресетов на прод"},cards:{"b0": ["imp2"], "b1": ["task"], "b2": [], "b3": ["dog"], "b4": ["task"], "b5": ["ship"], "b6": ["ship"], "b7": ["imp2", "task", "mkt"], "b8": ["ship"], "b9": ["imp2"], "b10": [], "s0": ["wiki"], "s1": ["cpq"], "s2": ["task"], "s3": ["opt"], "s4": ["task"], "s5": ["task", "wiki"], "s6": ["wiki"], "s7": ["task"], "s8": ["cpq"], "s9": [], "s10": ["task"]}};
+var board=document.querySelector('.ag-board'),bar=document.getElementById('agTagsBar');if(!board||!bar)return;
+var S;function load(){try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.dict&&s.cards)return s;}catch(e){}return JSON.parse(JSON.stringify(DEF));}
+S=load();var FIL=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function used(id){var n=0;for(var k in S.cards)if(S.cards[k].indexOf(id)>=0)n++;return n;}
+function chip(id,cardId){var nm=S.dict[id];if(nm==null)return '';
+ return '<span class="ag-pt'+(FIL===id?' is-on':'')+'" data-tag="'+id+'"'+(cardId?' data-card="'+cardId+'"':'')+' title="Двойной клик: переименовать на всех карточках"><span class="ag-pt-n">'+esc(nm)+'</span>'+
+  (cardId?'':'<span class="ag-pt-c">'+used(id)+'</span>')+'<button type="button" class="ag-pt-ed" title="Переименовать" aria-label="Переименовать">✎</button>'+
+  (cardId?'<button type="button" class="ag-pt-x" title="Убрать с карточки" aria-label="Убрать">×</button>':'')+'</span>';}
+function render(){
+ board.querySelectorAll('.ag-card').forEach(function(c){var id=c.dataset.id,box=c.querySelector('.ag-why');
+  if(!box){box=document.createElement('div');box.className='ag-why';c.appendChild(box);}
+  var ts=(S.cards[id]||[]).filter(function(t){return S.dict[t]!=null;});
+  box.innerHTML=ts.map(function(t){return chip(t,id);}).join('')+'<button type="button" class="ag-add" data-card="'+id+'" title="Добавить тег">+</button>';
+  c.classList.toggle('is-hit',!!FIL&&ts.indexOf(FIL)>=0);});
+ var ids=Object.keys(S.dict).filter(function(t){return used(t)>0;});
+ bar.innerHTML='<span class="ag-bar-l">Обоснование:</span>'+ids.map(function(t){return chip(t,null);}).join('');
+ board.classList.toggle('is-filter',!!FIL);}
+function rename(el){var id=el.dataset.tag,n=el.querySelector('.ag-pt-n');var card=el.closest('.ag-card');if(card)card.setAttribute('draggable','false');
+ el.classList.add('is-edit');n.setAttribute('contenteditable','true');n.focus();var r=document.createRange();r.selectNodeContents(n);var sl=getSelection();sl.removeAllRanges();sl.addRange(r);
+ var done=false;function fin(ok){if(done)return;done=true;var v=n.textContent.replace(/\s+/g,' ').trim();if(ok&&v){S.dict[id]=v;save();}if(card)card.setAttribute('draggable','true');render();}
+ n.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){fin(false);}});
+ n.addEventListener('blur',function(){fin(true);});}
+function addTag(btn){var cid=btn.dataset.card,card=btn.closest('.ag-card');card.setAttribute('draggable','false');
+ var dl=document.getElementById('agTagList');if(!dl){dl=document.createElement('datalist');dl.id='agTagList';document.body.appendChild(dl);}
+ dl.innerHTML=Object.keys(S.dict).map(function(t){return '<option value="'+esc(S.dict[t])+'">';}).join('');
+ var inp=document.createElement('input');inp.className='ag-add-in';inp.setAttribute('list','agTagList');inp.placeholder='тег: выберите или новый';btn.replaceWith(inp);inp.focus();
+ var done=false;function fin(ok){if(done)return;done=true;var v=inp.value.replace(/\s+/g,' ').trim();card.setAttribute('draggable','true');
+  if(ok&&v){var id=null;for(var t in S.dict)if(S.dict[t].toLowerCase()===v.toLowerCase())id=t;if(!id){id='u'+Date.now().toString(36);S.dict[id]=v;}
+   var a=S.cards[cid]=S.cards[cid]||[];if(a.indexOf(id)<0&&a.length<5)a.push(id);save();}render();}
+ inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape')fin(false);});inp.addEventListener('blur',function(){fin(true);});}
+function onClick(e){var x=e.target.closest('.ag-pt-x'),ed=e.target.closest('.ag-pt-ed'),add=e.target.closest('.ag-add'),pt=e.target.closest('.ag-pt');
+ if(x){e.stopPropagation();var p=x.closest('.ag-pt'),a=S.cards[p.dataset.card]||[],i=a.indexOf(p.dataset.tag);if(i>=0)a.splice(i,1);save();render();return;}
+ if(ed){e.stopPropagation();rename(ed.closest('.ag-pt'));return;}
+ if(add){e.stopPropagation();addTag(add);return;}
+ if(pt&&!pt.dataset.card&&!pt.classList.contains('is-edit')){clearTimeout(window.__agT);var id=pt.dataset.tag;window.__agT=setTimeout(function(){FIL=FIL===id?null:id;render();},220);}}
+function onDbl(e){var pt=e.target.closest('.ag-pt');if(pt&&!pt.classList.contains('is-edit')){clearTimeout(window.__agT);e.preventDefault();rename(pt);}}
+[board,bar].forEach(function(r){r.addEventListener('click',onClick);r.addEventListener('dblclick',onDbl);
+ r.addEventListener('mousedown',function(e){if(e.target.closest('.ag-pt.is-edit,.ag-add-in'))e.stopPropagation();});});
+document.getElementById('agTagReset').addEventListener('click',function(){try{localStorage.removeItem(KEY);}catch(e){}S=JSON.parse(JSON.stringify(DEF));FIL=null;render();});
+window.__agTags={get state(){return S;},render:render};
+render();
 })();
 </script>
 </body></html>
