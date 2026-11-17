@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta name="robots" content="noindex"/>
-<title>AI Products · Отчёт суперспринта 4 · черновик · BusinessPad</title>
+<title>AI Products · Отчёт суперспринта 4 · BusinessPad</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj4KICA8cGF0aCBmaWxsPSIjMjQyOTJFIiBkPSJNNSA0aDcuNHYxMy4yYzAgMi4xNSAxLjA1IDMuNDUgMy42IDMuNDVzMy42LTEuMyAzLjYtMy40NVY0SDI3djEzLjZDMjcgMjQuNyAyMi40IDI5IDE2IDI5UzUgMjQuNyA1IDE3LjZWNHoiLz4KPC9zdmc+Cg=="/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -717,8 +717,6 @@
 
   </style>
 <style>
-.draft-banner{background:var(--warning-light);border-bottom:1px solid var(--warning);color:var(--grey-800);font-size:14px;padding:10px 24px;text-align:center}
-.draft-banner b{color:var(--secondary)}
 .todo{display:inline-block;background:var(--warning-light);color:#8a6100;border:1px dashed var(--warning);border-radius:6px;padding:1px 8px;font-size:12.5px;font-weight:600}
 .st{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;margin:0 6px 8px 0}
 .st-done{background:var(--success-light);color:var(--success)}
@@ -727,6 +725,58 @@
 .st-risk{background:var(--secondary-light);color:var(--secondary)}
 .feat-line{font-size:14.5px;color:var(--text-secondary);margin:6px 0 0}
 .feat-line b{color:var(--text-primary)}
+/* роадмап готовности на карточке модуля */
+.paper:has(.rmap) > .paper-kicker { margin-bottom: 1px; }
+.rmap { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 2px; }
+.rmap-track { display: flex; gap: 3px; flex: 1; min-width: 0; }
+.rmap-seg { display: flex; flex-direction: column; gap: 1px; min-width: 0; cursor: default; }
+.rmap-seg:not(.is-empty) { min-width: 30px; }
+.rmap-bar {
+  display: block; height: 5px; border-radius: 99px;
+  background: #D9DADF; overflow: hidden;
+}
+.rmap-bar i { display: block; height: 100%; border-radius: 99px; }
+.rmap-lbl {
+  font-size: 8px; line-height: 9px; font-weight: 500;
+  color: #85868A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  letter-spacing: 0; text-transform: none; text-align: center;
+}
+.rmap-seg.is-empty .rmap-bar {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px #D9DADF;
+}
+.rmap-seg.is-empty .rmap-lbl { color: #C5C5C9; }
+.rmap-seg.is-done .rmap-lbl { color: #5F6068; }
+.rmap-ok {
+  display: inline; font-size: 8px; line-height: 9px;
+  color: #599C16; font-weight: 700; margin-left: 1px;
+}
+.rmap-pct {
+  flex: none; font-size: 12.5px; font-weight: 700; color: var(--primary);
+  font-variant-numeric: tabular-nums; letter-spacing: 0.01em;
+  line-height: 14px; min-width: 2.4em; text-align: right;
+}
+
+.rmap-seg, .rmap-pct { cursor: pointer; }
+.st-wait{background:#EEEEEE;color:#757575}
+#rmapTip{
+  position:fixed;z-index:200;display:none;
+  background:var(--bg-paper);color:var(--text-primary);
+  border:1px solid var(--grey-300);border-radius:12px;
+  box-shadow:0 8px 24px rgba(52,58,126,.12),0 1px 2px rgba(5,8,25,.04);
+  padding:10px 12px 8px;max-width:min(400px,calc(100vw - 16px));
+  max-height:min(360px,calc(100vh - 16px));overflow:auto;
+  font-size:13px;line-height:16px;
+}
+#rmapTip .rt-h{font-weight:600;font-size:13.5px;color:var(--primary);margin:0 0 8px;line-height:18px}
+#rmapTip .rt-ph{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--primary-dark);margin:10px 0 4px}
+#rmapTip .rt-ph:first-of-type{margin-top:0}
+#rmapTip .rt-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #F0F0F2}
+#rmapTip .rt-row:last-child{border-bottom:0}
+#rmapTip .rt-name{flex:1;min-width:0;font-size:13px;line-height:17px;color:var(--text-primary)}
+#rmapTip .rt-st{flex:none;margin:1px 0 0}
+#rmapTip .rt-empty{color:var(--text-secondary);font-size:12.5px;padding:2px 0 4px}
+#rmapTip .st{margin:0}
 .src{font-size:12.5px;color:var(--text-secondary);margin-top:10px}
 .divider-label{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--primary-dark);margin:28px 0 12px}
 .prose{font-size:15px;color:var(--grey-800)} .prose ul{padding-left:20px} .prose li{margin:0 0 10px}
@@ -931,7 +981,6 @@ table.ky td.ky-full{border-color:#A5CC7E}
 .ag-btns{display:flex;flex-wrap:wrap;gap:8px}
 </style>
 </head><body>
-<div class="draft-banner"><b>Черновик.</b> Не публиковать. Собран 16.11.2026 по таблице спринта и протоколам; итог демо 20.11 не заполнен.</div>
 <header class="app-header"><div class="app-header-in">
 <div class="brand"><div class="brand-mark">BP</div>BusinessPad · AI Products</div>
 <div class="header-navs">
@@ -966,63 +1015,89 @@ table.ky td.ky-full{border-color:#A5CC7E}
 <div class="sec-head"><div class="sec-num">2</div><h2>Что сделано по модулям</h2></div>
 <p class="sec-sub">Что умеет каждый модуль и куда развиваем функциональность дальше.</p>
 <p class="divider-label">Блок 1 · файлы, импорт, поиск</p><div class="grid g-2">
-<article class="paper"><div class="paper-kicker">ИИ Импорт</div><h3>Экземпляр бизнес-процесса из входящего документа</h3>
+<article class="paper"><div class="paper-kicker">ИИ Импорт</div>
+<div class="rmap" data-mod="Импорт" aria-label="Готовность 100%"><div class="rmap-track"><div class="rmap-seg is-done" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#7E3FD0"></i></span><span class="rmap-lbl">Аналитика<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg is-done" style="flex:14.091" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1A237E"></i></span><span class="rmap-lbl">Бэк<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-done" style="flex:15.909" data-grp="ops" tabindex="0" role="button" aria-label="Ops: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#6D4C41"></i></span><span class="rmap-lbl">Ops<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-done" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1E88E5"></i></span><span class="rmap-lbl">Фронт<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-done" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 3 из 3 задач"><span class="rmap-bar"><i style="width:100.00%;background:#FF9800"></i></span><span class="rmap-lbl">Тест<span class="rmap-ok" aria-hidden="true">✓</span></span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 100%">100%</span></div>
+<h3>Экземпляр бизнес-процесса из входящего документа</h3>
 <p class="feat-line"><b>Что умеет.</b> Пользователь загружает документ, система распознаёт его и по параметрам инициации из настроек бизнес-процессов заводит нужный экземпляр бизнес-процесса. Разные документы и разные значения параметров дают разные ЭБП: если параметров инициации хватает, процесс сразу встаёт на следующий этап, если нет, экземпляр стартует в начальном статусе и ждёт уточнения. При загрузке финансовой операции из документа система проверяет, есть ли контрагент и товары в справочниках, и предлагает последовательно завести недостающие, так что автозаполнение проходит полностью. Человек подтверждает результат, текст документа приходит из контура распознавания файлового индексатора.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Целевой TDR импорта.</li><li>Связь с целевыми ФИ и ФМ: файловым индексатором и файловым менеджером.</li><li>Генеративная функция для пресета Задачи.</li></ul>
 <button type="button" class="demo-btn">Продемонстрировать</button></article>
-<article class="paper"><div class="paper-kicker">ИИ Поиск</div><h3>Глобальный поиск по объектам BP3</h3>
+<article class="paper"><div class="paper-kicker">ИИ Поиск</div>
+<div class="rmap" data-mod="Поиск" aria-label="Готовность 100%"><div class="rmap-track"><div class="rmap-seg is-done" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#7E3FD0"></i></span><span class="rmap-lbl">Аналитика<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg is-done" style="flex:30" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1A237E"></i></span><span class="rmap-lbl">Бэк<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-done" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 3 из 3 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1E88E5"></i></span><span class="rmap-lbl">Фронт<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-done" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#FF9800"></i></span><span class="rmap-lbl">Тест<span class="rmap-ok" aria-hidden="true">✓</span></span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 100%">100%</span></div>
+<h3>Глобальный поиск по объектам BP3</h3>
 <p class="feat-line"><b>Что умеет.</b> В шапке стенда глобальный поиск по объектам продукта. При наборе текста всплывает быстрая подсказка по подстроке, полный запрос ранжируется BM25, вес сигналов настраивается. В выдаче видны фрагменты найденного текста, из результата сразу открывается карточка, вкладка «Все» возвращает к полной картине. Подключили поиск по файлам, комментариям и проектной Вики.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Целевой TDR поиска.</li><li>Связь с целевыми ФИ и ФМ: файловым индексатором и файловым менеджером.</li><li>Heatmap активности действий с найденными объектами.</li></ul>
 <button type="button" class="demo-btn">Продемонстрировать</button></article>
-<article class="paper"><div class="paper-kicker">Файлы</div><h3>Файловый менеджер и файловый индексатор</h3>
+<article class="paper"><div class="paper-kicker">Файлы</div>
+<div class="rmap" data-mod="Файлы" aria-label="Готовность 100%"><div class="rmap-track"><div class="rmap-seg is-empty" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Аналитика</span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg is-done" style="flex:27.391" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 8 из 8 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1A237E"></i></span><span class="rmap-lbl">Бэк<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-done" style="flex:2.609" data-grp="ops" tabindex="0" role="button" aria-label="Ops: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#6D4C41"></i></span><span class="rmap-lbl">Ops<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Фронт</span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Тест</span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 100%">100%</span></div>
+<h3>Файловый менеджер и файловый индексатор</h3>
 <p class="feat-line"><b>Что умеет.</b> Файл попадает в систему через файловый менеджер, единую точку входа. Индексатор ставит его в одну очередь с приоритетом, распознаёт текст и речь и сообщает о готовности подпиской Centrifugo, экрану не нужно постоянно спрашивать статус. Между сервисами передаются ссылки на объектное хранилище, а не сами файлы. Распознанный текст забирают импорт и видеотрекер.</p></article>
 </div><p class="divider-label">Блок 2 · настройщик и стенд</p><div class="grid g-2">
-<article class="paper"><div class="paper-kicker">ИИ Настройщик</div><h3>Настройка процессов в диалоге</h3>
+<article class="paper"><div class="paper-kicker">ИИ Настройщик</div>
+<div class="rmap" data-mod="Настройщик" aria-label="Готовность 91%"><div class="rmap-track"><div class="rmap-seg is-done" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#7E3FD0"></i></span><span class="rmap-lbl">Аналитика<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg is-done" style="flex:22.771" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1A237E"></i></span><span class="rmap-lbl">Бэк<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg" style="flex:7.229" data-grp="ops" tabindex="0" role="button" aria-label="Ops: 0 из 1 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Ops</span></div><div class="rmap-seg is-done" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1E88E5"></i></span><span class="rmap-lbl">Фронт<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Тест</span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 91%">91%</span></div>
+<h3>Настройка процессов в диалоге</h3>
 <p class="feat-line"><b>Что умеет.</b> Настройщик работает на AI-стенде и подключён к чату платформы через Centrifugo: настройку процесса обсуждают там же, где идёт рабочий диалог.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Сабагенты, в том числе валидации схемы, для сложных настроек.</li><li>Целевой TDR с контрактом фронтенда.</li><li>Обновление процесса по регламентам компании из Вики.</li><li>Подбор готового пресета по отрасли из фабрики пресетов.</li></ul>
 <button type="button" class="demo-btn">Продемонстрировать</button></article>
-<article class="paper"><div class="paper-kicker">AI-стенд</div><h3>Отдельная среда для AI-релизов</h3>
+<article class="paper"><div class="paper-kicker">AI-стенд</div>
+<div class="rmap" data-mod="AI-стенд" aria-label="Готовность 76%"><div class="rmap-track"><div class="rmap-seg is-empty" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Аналитика</span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg is-part" style="flex:30" data-grp="ops" tabindex="0" role="button" aria-label="Ops: 4 из 6 задач"><span class="rmap-bar"><i style="width:63.64%;background:#6D4C41"></i></span><span class="rmap-lbl">Ops</span></div><div class="rmap-seg is-empty" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Фронт</span></div><div class="rmap-seg is-done" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#FF9800"></i></span><span class="rmap-lbl">Тест<span class="rmap-ok" aria-hidden="true">✓</span></span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 76%">76%</span></div>
+<h3>Отдельная среда для AI-релизов</h3>
 <p class="feat-line"><b>Что умеет.</b> Выделенная группа узлов в Dev-инфраструктуре со своим пространством имён и сетевой изоляцией, чтобы демо и обратная связь не смешивались с основной площадкой. Цель стенда в том, чтобы за полгода создать 30+ агентов, оценить эффективность их работы, отработать их взаимодействие и тестировать их в пилотных и R&amp;D проектах.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Автоматическое подтягивание платформенных обновлений и правила синхронизации работы сервисов.</li><li>Основная витрина AI-релизов на ближайшие полгода.</li><li>Перенос проверенных сценариев в основной контур платформы.</li><li>Регламент синхронизации с Dev и отдельный R&amp;D стенд.</li></ul></article>
 </div><p class="divider-label">Блок 3 · вики и встречи</p><div class="grid g-2">
-<article class="paper"><div class="paper-kicker">Вики</div><h3>Проектная вики</h3>
+<article class="paper"><div class="paper-kicker">Вики</div>
+<div class="rmap" data-mod="Вики" aria-label="Готовность 94%"><div class="rmap-track"><div class="rmap-seg is-part" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 5 из 6 задач"><span class="rmap-bar"><i style="width:78.99%;background:#7E3FD0"></i></span><span class="rmap-lbl">Аналитика</span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg is-done" style="flex:12.162" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1A237E"></i></span><span class="rmap-lbl">Бэк<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-done" style="flex:17.838" data-grp="ops" tabindex="0" role="button" aria-label="Ops: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#6D4C41"></i></span><span class="rmap-lbl">Ops<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Фронт</span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Тест</span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 94%">94%</span></div>
+<h3>Проектная вики</h3>
 <p class="feat-line"><b>Что умеет.</b> Регламенты и проекты в одном интерфейсе. В вики загружают файлы без дополнительной обработки и редактируют их. Статьи находятся полнотекстовым поиском. К документу целиком и к выделенному фрагменту оставляют разные комментарии.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Целевая версия по TDR.</li><li>Обновление фронта.</li><li>Связи с ЭБП.</li><li>Направление help-центра.</li><li>Внешние базы знаний.</li></ul>
 <button type="button" class="demo-btn">Продемонстрировать</button></article>
-<article class="paper"><div class="paper-kicker">Видеотрекер</div><h3>BP Meet: запись, транскрибация, саммари</h3>
+<article class="paper"><div class="paper-kicker">Видеотрекер</div>
+<div class="rmap" data-mod="BP Meet" aria-label="Готовность 75%"><div class="rmap-track"><div class="rmap-seg is-done" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#7E3FD0"></i></span><span class="rmap-lbl">Аналитика<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg is-done" style="flex:11.538" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1A237E"></i></span><span class="rmap-lbl">Бэк<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-done" style="flex:18.462" data-grp="ops" tabindex="0" role="button" aria-label="Ops: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#6D4C41"></i></span><span class="rmap-lbl">Ops<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 0 из 1 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Фронт</span></div><div class="rmap-seg is-done" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 3 из 3 задач"><span class="rmap-bar"><i style="width:100.00%;background:#FF9800"></i></span><span class="rmap-lbl">Тест<span class="rmap-ok" aria-hidden="true">✓</span></span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 75%">75%</span></div>
+<h3>BP Meet: запись, транскрибация, саммари</h3>
 <p class="feat-line"><b>Что умеет.</b> Встречу записывают прямо из BusinessPad. Запись начинает ведущий, автором файлов считается тот, кто нажал кнопку. Дорожки транскрибируются сами, общая запись видна тем, у кого есть права на встречу, статус обработки виден в интерфейсе.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Обновление саммаризации и создаваемых задач: ручная правка саммари и полей задач, статусы изменений «новая», «изменённая» и «удалённая», сравнение версий саммари по связанным объектам.</li><li>Материалы встреч будут добавлены в Вики.</li><li>Внешние календари в дополнение к календарю продукта.</li></ul>
 <button type="button" class="demo-btn">Продемонстрировать</button></article>
 </div><p class="divider-label">Блок 4 · помощники</p><div class="grid g-2">
-<article class="paper"><div class="paper-kicker">Помощник по договору</div><h3>Сверка с эталоном и сравнение договоров</h3>
+<article class="paper"><div class="paper-kicker">Помощник по договору</div>
+<div class="rmap" data-mod="Помощник по договору" aria-label="Готовность 75%"><div class="rmap-track"><div class="rmap-seg is-empty" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Аналитика</span></div><div class="rmap-seg is-done" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#E91E63"></i></span><span class="rmap-lbl">Дизайн<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-done" style="flex:30" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 2 из 2 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1A237E"></i></span><span class="rmap-lbl">Бэк<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 0 из 1 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Фронт</span></div><div class="rmap-seg is-done" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#FF9800"></i></span><span class="rmap-lbl">Тест<span class="rmap-ok" aria-hidden="true">✓</span></span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 75%">75%</span></div>
+<h3>Сверка с эталоном и сравнение договоров</h3>
 <p class="feat-line"><b>Что умеет.</b> Проектируется и идёт макетами. Эталон компании это бизнес-процесс с экземплярами и экраном исполнения, как у документа. Договор сверяется с эталоном: распознанные пункты показаны карточками, клик по карточке ведёт к строке текста, сначала видны критичные пункты, условие добавляется кликом по фрагменту. Протокол разногласий ложится во вкладку документов договора. Два договора сравниваются одной таблицей: цитаты обоих договоров, статус «изменено», «добавлено», «удалено» или «без изменений» и предлагаемая редакция.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Сделаем фронт.</li><li>Выкатим первую версию агента.</li></ul></article>
 
-<article class="paper"><div class="paper-kicker">Помощник оценки контрагентов</div><h3>Статус контрагента по ИНН</h3>
+<article class="paper"><div class="paper-kicker">Помощник оценки контрагентов</div>
+<div class="rmap" data-mod="Контрагенты" aria-label="Готовность 30%"><div class="rmap-track"><div class="rmap-seg is-done" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#7E3FD0"></i></span><span class="rmap-lbl">Аналитика<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg" style="flex:30" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 0 из 1 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Бэк</span></div><div class="rmap-seg is-empty" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Фронт</span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Тест</span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 30%">30%</span></div>
+<h3>Статус контрагента по ИНН</h3>
 <p class="feat-line"><b>Что умеет.</b> Описан use case и ТЗ с HTML-прототипом: шлюз проверки, риск тегом и оверлеем, согласование в runtime. Сигнал риска в Magic Pad ведёт на карточку контрагента.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Сделаем бэкенд, макеты и фронт.</li><li>Выкатим первую версию агента.</li></ul></article>
 
-<article class="paper"><div class="paper-kicker">Помощник по вики</div><h3>Агент-помощник по проектной вики</h3>
+<article class="paper"><div class="paper-kicker">Помощник по вики</div>
+<div class="rmap" data-mod="Помощник по вики" aria-label="Готовность 21%"><div class="rmap-track"><div class="rmap-seg is-part" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 1 из 2 задач"><span class="rmap-bar"><i style="width:37.50%;background:#7E3FD0"></i></span><span class="rmap-lbl">Аналитика</span></div><div class="rmap-seg is-done" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#E91E63"></i></span><span class="rmap-lbl">Дизайн<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg" style="flex:30" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 0 из 1 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Бэк</span></div><div class="rmap-seg" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 0 из 1 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Фронт</span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Тест</span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 21%">21%</span></div>
+<h3>Агент-помощник по проектной вики</h3>
 <p class="feat-line"><b>Что умеет.</b> ТЗ помощника принято. Разработку агента из-за ресурсов перенесли в суперспринт 5.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Сделаем бэкенд, макеты и фронт.</li><li>Выкатим первую версию агента.</li></ul></article>
 </div><p class="divider-label">Блок 5 · CPQ</p><div class="grid g-2">
-<article class="paper"><div class="paper-kicker">Конфигуратор</div><h3>Конфигуратор и пресет CPQ в BP3</h3>
+<article class="paper"><div class="paper-kicker">Конфигуратор</div>
+<div class="rmap" data-mod="Конфигуратор" aria-label="Готовность 76%"><div class="rmap-track"><div class="rmap-seg is-done" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#7E3FD0"></i></span><span class="rmap-lbl">Аналитика<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg is-part" style="flex:30" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 2 из 3 задач"><span class="rmap-bar"><i style="width:65.52%;background:#1A237E"></i></span><span class="rmap-lbl">Бэк</span></div><div class="rmap-seg is-empty" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Фронт</span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Тест</span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 76%">76%</span></div>
+<h3>Конфигуратор и пресет CPQ в BP3</h3>
 <p class="feat-line"><b>Что умеет.</b> Конфигуратор с обновлённым пайплайном расчёта. Согласован план разработки CPQ как пресета в BP3: первая версия без конфигуратора и каталога материалов, с агентами на этапах, Magic Pad, шаблоном КП и каталогами товаров и поставщика через файл.</p>
 <button type="button" class="demo-btn">Продемонстрировать</button></article>
-<article class="paper"><div class="paper-kicker">Генератор КП</div><h3>Коммерческое предложение по заявке</h3>
+<article class="paper"><div class="paper-kicker">Генератор КП</div>
+<div class="rmap" data-mod="Генератор КП" aria-label="Готовность 55%"><div class="rmap-track"><div class="rmap-seg is-empty" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Аналитика</span></div><div class="rmap-seg is-done" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#E91E63"></i></span><span class="rmap-lbl">Дизайн<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg" style="flex:30" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 0 из 1 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Бэк</span></div><div class="rmap-seg is-done" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#1E88E5"></i></span><span class="rmap-lbl">Фронт<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 0 из 1 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Тест</span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 55%">55%</span></div>
+<h3>Коммерческое предложение по заявке</h3>
 <p class="feat-line"><b>Что умеет.</b> С помощью набора шаблонов клиент сам составляет и меняет форму генерации КП и улучшает её визуальный стиль. Карточка товара применяется ко всем позициям заявки: сколько товаров, столько частей презентации. Дизайн и фронт сделаны, остался бэкенд.</p>
 <button type="button" class="demo-btn">Продемонстрировать</button></article>
 </div><p class="divider-label">Блок 6 · Billing</p><div class="grid g-2">
-<article class="paper"><div class="paper-kicker">Billing</div><h3>Обновлённый онбординг и переезд на BP3</h3>
+<article class="paper"><div class="paper-kicker">Billing</div>
+<div class="rmap" data-mod="Billing" aria-label="Готовность 30%"><div class="rmap-track"><div class="rmap-seg is-done" style="flex:15" data-grp="an" tabindex="0" role="button" aria-label="Аналитика: 1 из 1 задач"><span class="rmap-bar"><i style="width:100.00%;background:#7E3FD0"></i></span><span class="rmap-lbl">Аналитика<span class="rmap-ok" aria-hidden="true">✓</span></span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="ds" tabindex="0" role="button" aria-label="Дизайн: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Дизайн</span></div><div class="rmap-seg is-empty" style="flex:30" data-grp="be" tabindex="0" role="button" aria-label="Бэк: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Бэк</span></div><div class="rmap-seg is-empty" style="flex:25" data-grp="fe" tabindex="0" role="button" aria-label="Фронт: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Фронт</span></div><div class="rmap-seg is-empty" style="flex:15" data-grp="qa" tabindex="0" role="button" aria-label="Тест: 0 из 0 задач"><span class="rmap-bar"></span><span class="rmap-lbl">Тест</span></div></div><span class="rmap-pct" tabindex="0" role="button" aria-label="Все задачи модуля, готовность 30%">30%</span></div>
+<h3>Обновлённый онбординг и переезд на BP3</h3>
 <p class="feat-line"><b>Что умеет.</b> Сделали обновлённый онбординг. Разобрали бэклог переезда с BP2 на BP3: логирование, аккаунты, аутентификация, создание стенда и почта уже есть, сейчас сервис состоит из 7 микросервисов.</p>
 <p class="feat-line"><b>Развитие.</b></p>
 <ul class="feat-list"><li>Пересмотр логики работы пользователя: ролевая модель на бэкенде.</li><li>Одно приложение вместо двух, клиента и админки.</li><li>Переписать или скопировать функциональные блоки.</li><li>Клиент: вместо 7 микросервисов (2 бэкенда, 2 фронта, 2 Celery, Redis) сделать 2, фронт и бэкенд с оркестратором.</li><li>Обновить админку.</li><li>Порядок работы: получить задачу, согласовать TDR, декомпозировать, оценить сроки.</li></ul></article>
@@ -1143,7 +1218,7 @@ table.ky td.ky-full{border-color:#A5CC7E}
 <div class="ag-btns"><button type="button" class="demo-btn demo-btn-sec" id="agReset">Сбросить к исходной раскладке</button><button type="button" class="demo-btn demo-btn-sec" id="agTagReset">Сбросить теги</button></div>
 </div></section>
 
-<footer class="footer"><div class="wrap"><p>BusinessPad · AI Products · отчёт суперспринта 4 · 12.10-20.11.2026 · черновик от 16.11.2026, не опубликован</p></div></footer>
+<footer class="footer"><div class="wrap"><p>BusinessPad · AI Products · отчёт суперспринта 4 · 12.10-20.11.2026</p></div></footer>
 <script>
 (function(){
 var KEY='ss4-report-agents-v1';
@@ -1656,6 +1731,150 @@ function onDbl(e){var pt=e.target.closest('.ag-pt');if(pt&&!pt.classList.contain
 document.getElementById('agTagReset').addEventListener('click',function(){try{localStorage.removeItem(KEY);}catch(e){}S=JSON.parse(JSON.stringify(DEF));FIL=null;render();});
 window.__agTags={get state(){return S;},render:render};
 render();
+})();
+</script>
+
+<script>
+(function(){
+var LABEL={an:'Аналитика',ds:'Дизайн',be:'Бэк',ops:'Ops',fe:'Фронт',qa:'Тест'};
+var ORDER=['an','ds','be','ops','fe','qa'];
+var RMAP_TASKS={"Импорт":[{"title":"Импорт: Обновленный TDR сервиса на общей архитектуре + продуманная архт","status":"Принята","blocker":"","grp":"an"},{"title":"Обработка входящего файла: Подготовка стенда S14: Бизнес процессы с правилами инициации, э","status":"Принята","blocker":"","grp":"qa"},{"title":"Импорт: Устранение багов работы сервиса","status":"Принята","blocker":"","grp":"be"},{"title":"Импорт: Обновить Сервис  в AI стенде","status":"Принята","blocker":"","grp":"ops"},{"title":"Импорт: Подготовить и Согласовать Целевой TDR","status":"Принята","blocker":"","grp":"an"},{"title":"Импорт: Тестирование на стенде S14","status":"Принята","blocker":"","grp":"qa"},{"title":"Импорт: Устранение багов работы сервиса","status":"Принята","blocker":"","grp":"fe"},{"title":"Импорт: API, внесение правок в фронтенд","status":"Принята","blocker":"","grp":"fe"},{"title":"Импорт: Тестирование на стенде Beta-Test","status":"Принята","blocker":"","grp":"qa"}],"Поиск":[{"title":"Поиск по BP3: Доработка сервиса: BFF, ФМ-1 и ФИ-1","status":"Принята","blocker":"","grp":"be"},{"title":"Поиск по BP3: бек- расчеты аналитики, копривание на параллельный стенд","status":"Принята","blocker":"","grp":"be"},{"title":"Поиск по BP3: Обновленный TDR сервиса на общей архитектуре + продуманная архтиектура агент","status":"Принята","blocker":"","grp":"an"},{"title":"Поиск по BP3: Фронт: компоненты аналитики","status":"Принята","blocker":"","grp":"fe"},{"title":"Поиск по BP3: Фронт: BFF целевой","status":"Принята","blocker":"","grp":"fe"},{"title":"Поиск по BP3: Тестирование на стенде Beta-Test","status":"Принята","blocker":"","grp":"qa"},{"title":"Поиск по BP3: Документ рефактора поиска под BP3","status":"Принята","blocker":"","grp":"an"},{"title":"Поиск по BP3: api для AI стенда","status":"Принята","blocker":"","grp":"fe"}],"Файлы":[{"title":"Сервис -Хранилище: Filemanager: частично на ревью","status":"Принята","blocker":"","grp":"be"},{"title":"Сервис -Хранилище: Monlith + BFF: в процессе","status":"Принята","blocker":"","grp":"be"},{"title":"Хранилище: Правки инкр. 1/4","status":"Принята","blocker":"","grp":"be"},{"title":"Хранилище: Правки  инкр. 2/4","status":"Принята","blocker":"","grp":"be"},{"title":"Хранилище: Правки инкр. 3/4","status":"Принята","blocker":"","grp":"be"},{"title":"Хранилище: Правки инкр. 4/4","status":"Принята","blocker":"","grp":"be"},{"title":"Файл-индексер реализация · инкр. 1/2","status":"Принята","blocker":"","grp":"be"},{"title":"Файл-индексер реализация · инкр. 2/2","status":"Принята","blocker":"","grp":"be"},{"title":"Хранилище: -Выполнить задачи разворачивания -Настройка уведомлений в FM","status":"Принята","blocker":"","grp":"ops"},{"title":"Развернуть сервисы: -ФМ1, ФИ1 ","status":"Принята","blocker":"","grp":"ops"}],"Настройщик":[{"title":"Настройщик процессов BP3: рефакторинг и подключение чатов с centryfugo · инкр. 1/2","status":"Принята","blocker":"","grp":"be"},{"title":"Настройщик ai-chat-bp3 + agent-bp-creator: ai-bff: Пользователь-агент.","status":"Принята","blocker":"","grp":"be"},{"title":"Настройщик процессов BP3: Обновленный TDR сервиса на общей архитектуре + продуманная архти","status":"Принята","blocker":"","grp":"an"},{"title":"Настройщик процессов BP3: Фронтенд: визуализация формирования/изменений БП -API","status":"Принята","blocker":"","grp":"fe"},{"title":"Развернуть Настройщик BPMCP чат Bm25","status":"Запланировано","blocker":"","grp":"ops"}],"AI-стенд":[{"title":"AI стенд: правила синхронизации и тестирования · инкр. 1/2","status":"Пауза/Блокер","blocker":"Пауза","grp":"ops"},{"title":"AI стенд: улучшение правил синхронизации и тестирования · инкр. 2/2","status":"Запланировано","blocker":"","grp":"ops"},{"title":"AI стенд: Параллельный Beta Dev стенд развернуть + Selectel права нужны от Максима","status":"Принята","blocker":"","grp":"ops"},{"title":"AI стенд: Развернуть сервисы: -llm шлюзы -импорт","status":"Принята","blocker":"","grp":"ops"},{"title":"AI стенд: Настроить синхронизацию и тестирование","status":"Принята","blocker":"","grp":"ops"},{"title":"langfuse.business-pad.com) неверный ENCRYPTION_KEY","status":"Принята","blocker":"","grp":"ops"},{"title":"AI стенд: проверить работу стенда по базовому функционалу BP3 -чеклист работающего и не работающего функцианал","status":"Принята","blocker":"","grp":"qa"}],"Вики":[{"title":"Вики: Общий скоп подготовительных задач · инкр. 1/2","status":"Принята","blocker":"","grp":"an"},{"title":"Вики: W2 TDR","status":"Принята","blocker":"","grp":"an"},{"title":"Вики: Удобное чтение Метрик прогона Пресетов (Отдельный UI для чтения результатов в Langfu · инкр. 1/2","status":"Принята","blocker":"","grp":"ops"},{"title":"Вики: Удобное чтение Метрик прогона Пресетов (Отдельный UI для чтения результатов в Langfu · инкр. 2/2","status":"Принята","blocker":"","grp":"ops"},{"title":"Вики: Wiki Hub обновить TDR с общей архитектурой · инкр. 1/2","status":"Принята","blocker":"","grp":"an"},{"title":"Вики: Wiki Hub обновить TDR с общей архитектурой · инкр. 2/2","status":"Принята","blocker":"","grp":"an"},{"title":"Вики: Wiki2: Аналитика Проектов","status":"Принята","blocker":"","grp":"an"},{"title":"Вики: Wiki2: Аналитика Подключений к внешним БЗ","status":"Запланировано","blocker":"","grp":"an"},{"title":"Вики W2 Написание целевого варианта.","status":"Принята","blocker":"","grp":"be"}],"BP Meet":[{"title":"VideoТрекер: Агент и его архитектура","status":"Принята","blocker":"","grp":"an"},{"title":"VideoТрекер: Сервис Календарь - правки по ревью от Саши · инкр. 1/2","status":"Принята","blocker":"","grp":"be"},{"title":"VideoТрекер: Сервис Календарь - правки по ревью от Саши · инкр. 2/2","status":"Принята","blocker":"","grp":"be"},{"title":"VideoТрекер: в AI стенд","status":"Принята","blocker":"","grp":"ops"},{"title":"VideoТрекер: Целевой TDR","status":"Принята","blocker":"","grp":"an"},{"title":"VideoТрекер: Проверка Правок по Суммаризации","status":"Принята","blocker":"","grp":"qa"},{"title":"VideoТрекер: Подключить API","status":"Запланировано","blocker":"","grp":"fe"},{"title":"VideoТрекер: Тестирование на стенде Beta-Test","status":"Принята","blocker":"","grp":"qa"},{"title":"VideoТрекер: Подготовка плана тестирования","status":"Принята","blocker":"","grp":"qa"},{"title":"Развернуть сервисы: -Видео трекер","status":"Принята","blocker":"","grp":"ops"}],"Помощник по договору":[{"title":"Помощник работы с Договором: TDR Файл Индексер + ОСR · инкр. 1/2","status":"Принята","blocker":"","grp":"be"},{"title":"TDR Файл Индексер + ОСR · инкр. 2/2","status":"Принята","blocker":"","grp":"be"},{"title":"Помощник работы с Договором: Макеты помощника с Договором: загрузка любого файла и распред","status":"Принята","blocker":"","grp":"ds"},{"title":"Помощник работы с Договором: Фронтенд: визуализация формирования/изменений БП","status":"Запланировано","blocker":"","grp":"fe"},{"title":"Помощник работы с Договором: Подготовка плана тестирования","status":"Принята","blocker":"","grp":"qa"}],"Контрагенты":[{"title":"Помощник оценки контрагентов/ отрасль/ окружение: User story / Use Case для копилота догов","status":"Принята","blocker":"","grp":"an"},{"title":"Контрагент: proof of concept","status":"Запланировано","blocker":"","grp":"be"}],"Помощник по вики":[{"title":"Агент-Помощник по Вики (БЗ)- ТЗ","status":"Принята","blocker":"","grp":"an"},{"title":"Агент-Помощник по Вики: Макеты Помощника Magic Pad","status":"Принята","blocker":"","grp":"ds"},{"title":"Агент-Помощник по Вики: TDR","status":"Пауза/Блокер","blocker":"Пауза","grp":"an"},{"title":"Агент-Помощник по Вики: Разработать агента","status":"Запланировано","blocker":"","grp":"be"},{"title":"Агент-Помощник по Вики: Frontend верстка Помощника","status":"Запланировано","blocker":"","grp":"fe"}],"Конфигуратор":[{"title":"Материалы: Синхронизация данных, резервы с 1С клиента · инкр. 1/2","status":"Принята","blocker":"","grp":"be"},{"title":"Материалы: Синхронизация данных, резервы с 1С клиента · инкр. 2/2","status":"Запланировано","blocker":"","grp":"be"},{"title":"Рефакторинг: Аналитика: Согласовать план разработки под Пресет, ожидаемые сроки","status":"Принята","blocker":"","grp":"an"},{"title":"CPQ: исправление багов (в т.ч. ошибка при переводе метров в сантиметры)","status":"Принята","blocker":"","grp":"be"}],"Генератор КП":[{"title":"Генерация КП: Дизайн КП https://gamma.app","status":"Принята","blocker":"","grp":"ds"},{"title":"Генерация КП: Агент для генерации","status":"Пауза/Блокер","blocker":"Пауза","grp":"be"},{"title":"Генерация КП: Вертска фронта страницы и подключение API","status":"Принята","blocker":"","grp":"fe"},{"title":"CPQ Генерация КП тестирование","status":"Запланировано","blocker":"","grp":"qa"}],"Billing":[{"title":"Пресеты в Биллинге BP3: Передать документацию в Яндекс Wiki","status":"Принята","blocker":"","grp":"an"}]};
+var tip=document.createElement('div');
+tip.id='rmapTip';
+tip.setAttribute('role','tooltip');
+document.body.appendChild(tip);
+var hideT=null,current=null,openKey=null;
+
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function chip(t){
+  var s=t.status||'';
+  if(s==='Принята')return {label:'Принята',cls:'st st-done'};
+  if(s==='Запланировано')return {label:'Запланировано',cls:'st st-wait'};
+  if(s==='Пауза/Блокер'){
+    if(t.blocker==='Пауза')return {label:'Пауза',cls:'st st-part'};
+    return {label:(t.blocker&&t.blocker!=='Пауза/Блокер'?t.blocker:'Блокер'),cls:'st st-risk'};
+  }
+  if(s==='Активна')return {label:'Активна',cls:'st st-part'};
+  if(s==='На ревью')return {label:'На ревью',cls:'st st-plan'};
+  if(s==='Частичное выполнение')return {label:'Частичное выполнение',cls:'st st-part'};
+  return {label:s||'—',cls:'st st-wait'};
+}
+function tasksOf(mod,grp){
+  var all=RMAP_TASKS[mod]||[];
+  return grp?all.filter(function(t){return t.grp===grp;}):all;
+}
+function row(t){
+  var c=chip(t);
+  return '<div class="rt-row"><span class="rt-name">'+esc(t.title)+'</span><span class="'+c.cls+' rt-st">'+esc(c.label)+'</span></div>';
+}
+function renderPhase(mod,grp){
+  var ts=tasksOf(mod,grp),name=LABEL[grp]||grp;
+  if(!ts.length)return '<div class="rt-h">'+esc(name)+'</div><div class="rt-empty">В этом суперспринте задач этой фазы нет.</div>';
+  return '<div class="rt-h">'+esc(name)+'</div>'+ts.map(row).join('');
+}
+function renderAll(mod){
+  var ts=tasksOf(mod);
+  var h='<div class="rt-h">Все задачи</div>';
+  if(!ts.length)return h+'<div class="rt-empty">Нет задач.</div>';
+  ORDER.forEach(function(g){
+    var gts=ts.filter(function(t){return t.grp===g;});
+    if(!gts.length)return;
+    h+='<div class="rt-ph">'+esc(LABEL[g]||g)+'</div>'+gts.map(row).join('');
+  });
+  return h;
+}
+function place(anchor){
+  tip.style.display='block';
+  tip.style.left='0px';tip.style.top='0px';
+  var r=anchor.getBoundingClientRect(),tw=tip.offsetWidth,th=tip.offsetHeight,pad=8;
+  var top=r.bottom+6;
+  if(top+th>innerHeight-pad){
+    top=r.top-th-6;
+    if(top<pad)top=Math.max(pad,innerHeight-th-pad);
+  }
+  var left=r.left;
+  if(left+tw>innerWidth-pad)left=innerWidth-tw-pad;
+  if(left<pad)left=pad;
+  tip.style.left=left+'px';
+  tip.style.top=top+'px';
+}
+function show(anchor,html,key){
+  clearTimeout(hideT);
+  tip.innerHTML=html;
+  current=anchor;
+  openKey=key;
+  place(anchor);
+}
+function hide(){
+  clearTimeout(hideT);
+  tip.style.display='none';
+  tip.innerHTML='';
+  current=null;
+  openKey=null;
+}
+function scheduleHide(){
+  clearTimeout(hideT);
+  hideT=setTimeout(hide,180);
+}
+function hit(el){
+  if(!el||!el.closest)return null;
+  var seg=el.closest('.rmap-seg');
+  if(seg){
+    var rmap=seg.closest('.rmap');
+    if(!rmap)return null;
+    return {anchor:seg,key:'seg:'+rmap.dataset.mod+':'+seg.dataset.grp,html:renderPhase(rmap.dataset.mod,seg.dataset.grp)};
+  }
+  var pct=el.closest('.rmap-pct');
+  if(pct){
+    var rmap=pct.closest('.rmap');
+    if(!rmap)return null;
+    return {anchor:pct,key:'all:'+rmap.dataset.mod,html:renderAll(rmap.dataset.mod)};
+  }
+  return null;
+}
+
+document.addEventListener('pointerover',function(e){
+  if(e.pointerType==='touch')return;
+  var h=hit(e.target);
+  if(h)show(h.anchor,h.html,h.key);
+});
+document.addEventListener('pointerout',function(e){
+  if(e.pointerType==='touch')return;
+  var to=e.relatedTarget;
+  if(tip.contains(to)||(current&&current.contains(to)))return;
+  if(hit(to))return;
+  scheduleHide();
+});
+tip.addEventListener('pointerenter',function(){clearTimeout(hideT);});
+tip.addEventListener('pointerleave',function(e){
+  if(e.pointerType==='touch')return;
+  scheduleHide();
+});
+document.addEventListener('click',function(e){
+  if(tip.contains(e.target))return;
+  var h=hit(e.target);
+  if(h){
+    if(openKey===h.key){hide();return;}
+    show(h.anchor,h.html,h.key);
+    return;
+  }
+  hide();
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){hide();return;}
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  var h=hit(e.target);
+  if(!h)return;
+  e.preventDefault();
+  if(openKey===h.key)hide();
+  else show(h.anchor,h.html,h.key);
+});
+window.addEventListener('scroll',function(){if(current)place(current);},true);
+window.addEventListener('resize',function(){if(current)place(current);});
 })();
 </script>
 </body></html>
