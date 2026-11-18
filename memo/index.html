@@ -193,6 +193,7 @@ function saveEd(){for(const k in edits){const b=M.tasks[k],e=edits[k];if(e.t===b
   ls('memo-edits:'+M.id,Object.keys(edits).length?edits:null);rebuild();markDirty()}
 async function load(id,push){
   const m=MAN.find(x=>x.id==id)||MAN[0];if(!m)return;
+  if(m.page){location.replace(m.page);return;}
   if(!cache[m.id]){const r=await fetch('data/'+m.id+'.json',{cache:'no-cache'});cache[m.id]=await r.json()}
   M=cache[m.id];cur='all';arch=false;fN.clear();fS.clear();
   edits=ls('memo-edits:'+M.id)||{};PREV=ls('memo-prev:'+M.id)||{};rebuild();setTimeout(()=>{if(ls('memo-dirty:'+M.id))pushSrv();else pull()},0);
@@ -315,7 +316,7 @@ window.addEventListener('online',()=>{if(M&&ls('memo-dirty:'+M.id))pushSrv();els
   MAN=(await (await fetch('data/manifest.json',{cache:'no-cache'})).json()).sort((a,b)=>b.date.localeCompare(a.date)||a.title.localeCompare(b.title,'ru'));
   DATES=[...new Set(MAN.map(x=>x.date))];
   const q=new URLSearchParams(location.search);let id=decodeURIComponent(location.hash.slice(1))||q.get('m')||'';
-  if(!MAN.some(x=>x.id==id)){const d=q.get('d');id=(MAN.find(x=>x.date==d)||MAN[0]||{}).id}
+  if(!id||!MAN.some(x=>x.id==id)){const d=q.get('d');id=(MAN.find(x=>x.date==d&&!x.page)||MAN.find(x=>x.date==d)||MAN.find(x=>!x.page)||MAN[0]||{}).id}
   if(id)load(id,false);else $('lead').textContent='Мемо пока нет.';
 })();
 </script>
