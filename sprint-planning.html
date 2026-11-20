@@ -353,13 +353,14 @@ function compute(){
   const rm={};Q.forEach(t=>rm[t.id]=+t.rem);const put=(t,d,k)=>{const c=cap[p.id][d];c.items.push({t:t.id,h:k});c.free-=k;rm[t.id]-=k;R[t.id].fc[d]=(R[t.id].fc[d]||0)+k;};
   const A=Q.filter(t=>t.status==='Активна');
   for(const d of fut){let L=A.filter(t=>rm[t.id]>EPS);while(L.length&&cap[p.id][d].free>EPS){const sh=cap[p.id][d].free/L.length;L.forEach(t=>put(t,d,Math.min(sh,rm[t.id])));L=L.filter(t=>rm[t.id]>EPS);}}
-  Q.filter(t=>t.status!=='Активна').forEach(t=>{const s0=es[t.id]||'';const nf=!Object.keys(R[t.id].fact).length;let st=false;for(const d of fut){if(rm[t.id]<=EPS)break;if(d<s0)continue;if(nf&&!st&&SPE.has(d))continue;const k=Math.min(rm[t.id],cap[p.id][d].free);if(k>EPS){put(t,d,k);st=true;}}});
+  let cur=A.reduce((m,t)=>{const z=Object.keys(R[t.id].fc).sort();return z.length&&z[z.length-1]>m?z[z.length-1]:m;},'');// строго по порядку бэклога: следующая задача не начинается раньше дня окончания предыдущей, младшие не обгоняют
+  Q.filter(t=>t.status!=='Активна').forEach(t=>{const s0=es[t.id]||'';const nf=!Object.keys(R[t.id].fact).length;let st=false;for(const d of fut){if(rm[t.id]<=EPS)break;if(d<s0||d<cur)continue;if(nf&&!st&&SPE.has(d))continue;const k=Math.min(rm[t.id],cap[p.id][d].free);if(k>EPS){put(t,d,k);st=true;}}const fz=Object.keys(R[t.id].fc).sort();if(fz.length)cur=fz[fz.length-1];});
   Q.forEach(t=>R[t.id].overflow=Math.max(0,rm[t.id]));});
  const finish=()=>D.tasks.forEach(t=>{const x=R[t.id];const fdz=Object.keys(x.fc).sort(),fa=Object.keys(x.fact).sort();
   x.end=t.status==='Принята'?(fa.length?fa[fa.length-1]:x.readyReal):(fdz.length?fdz[fdz.length-1]:(x.readyReal||(+t.rem<=EPS&&fa.length?fa[fa.length-1]:null)));
   x.ready=x.readyReal||(!t.blocker&&t.status!=='Пауза/Блокер'&&t.status!=='Принята'&&x.overflow<=EPS?x.end:null);
   if(x.accepted)x.endA=x.accepted;else if(!x.ready||t.blocker||x.overflow>EPS)x.endA=null;else if(!t.needRev)x.endA=x.ready<today?today:x.ready;else{const due=addWD(x.ready,SLA);x.endA=due?(due<today?today:due):null;}});
- for(let k=0;k<6;k++){runFc();finish();const ne={};D.tasks.forEach(t=>{const pq=deps(t).map(task).filter(q=>q&&!R[q.id].accepted);if(!pq.length)return;let m='';pq.forEach(q=>{const a=R[q.id].endA,v=a?(addWD(a,1)||'9999'):'9999';if(v>m)m=v;});ne[t.id]=m;});const s=JSON.stringify(ne);if(s===key0)break;key0=s;es=ne;}
+ for(let k=0;k<12;k++){runFc();finish();const ne={};D.tasks.forEach(t=>{const pq=deps(t).map(task).filter(q=>q&&!R[q.id].accepted);if(!pq.length)return;let m='';pq.forEach(q=>{const a=R[q.id].endA,v=a?(addWD(a,1)||'9999'):'9999';if(v>m)m=v;});ne[t.id]=m;});const s=JSON.stringify(ne);if(s===key0)break;key0=s;es=ne;}
  D.tasks.forEach(t=>{const x=R[t.id];x.es=es[t.id]||null;x.revDue=t.needRev&&x.ready?addWD(x.ready,SLA):null;x.wait=null;x.waitFrom=x.waitTo=null;x.revLate=false;
   if(t.status==='На ревью'&&x.readyReal){x.wait=0;const due=addWD(x.readyReal,SLA);if(due&&today>due){x.revLate=true;x.waitFrom=addWD(due,1);x.waitTo=today;x.wait=Math.max(0,di(today)-di(due));}}
   x.depRisk=false;x.depOn=null;if(t.status!=='Принята')deps(t).map(task).filter(q=>q&&!R[q.id].accepted).forEach(pr=>{const a=R[pr.id].endA;if(!x.depRisk&&(!a||!!(x.baseStart&&a>=x.baseStart)||(['Активна','На ревью'].includes(t.status)))){x.depRisk=true;x.depOn=pr.id;}});
