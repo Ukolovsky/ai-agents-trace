@@ -102,7 +102,7 @@ h3.sec{font-size:16px;line-height:20px;font-weight:500;margin:16px 0 8px}
 #gsvg.dim .gn:not(.on){opacity:.12}
 #gsvg.dim .ge:not(.on){opacity:.05}
 #gsvg.dim .ge.on{stroke:#5D6198}
-#gsvg.dim .gdep.on{stroke:#FF5722}
+#gsvg.dim .gdep.on{stroke-width:2.2}
 #gsvg.dim .gn.on .glt{display:block;fill:#050819}
 #gsvg .gn.pulse circle:first-child{stroke:#FF5722;stroke-width:3}
 .gtool{position:absolute;right:10px;top:10px;display:flex;gap:6px}
@@ -457,7 +457,7 @@ function drawGantt(P){const svg=$('gantt');while(svg.firstChild)svg.removeChild(
  const RH=26,BAR=14,PH=34,HEAD=74;
  const trunc=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
  // группы
- const POS={};const groups=ps.map(p=>{const ts=D.tasks.filter(t=>t.person===p.id&&ids.has(t.id)).sort(cmpTasksInPerson);
+ const POS={},ROWS={};const groups=ps.map(p=>{const ts=D.tasks.filter(t=>t.person===p.id&&ids.has(t.id)).sort(cmpTasksInPerson);
   const rows=ts.map(t=>{const days=[];DAYS.forEach(d=>{if(!xs[d])return;P.cap[p.id][d].items.filter(a=>a.t===t.id&&!a.rv).forEach(a=>days.push({d,h:a.h,fact:!!a.fact}));});
    const runs=[];let cur=null;days.forEach(s=>{const prev=cur&&cur.days[cur.days.length-1];if(prev&&prev.d===s.d){prev.h+=s.h;prev.fact=prev.fact||s.fact;return;}const contig=prev&&DAYS.indexOf(s.d)===DAYS.indexOf(prev.d)+1;if(cur&&contig)cur.days.push(s);else{cur={days:[s]};runs.push(cur);}});
    if(t.blocker&&t.status!=='Принята'){const s=t.since||S.today;const bd=DAYS.filter(d=>d>=s&&d<S.today&&xs[d]);if(bd.length)runs.push({blk:true,days:bd.map(d=>({d,h:0}))});}
@@ -494,7 +494,7 @@ function drawGantt(P){const svg=$('gantt');while(svg.firstChild)svg.removeChild(
   const ovSum=rows.reduce((s,r)=>s+P.R[r.t.id].overflow,0);if(ovSum>EPS)el('text',{x:XR+8,y:y0+21,'font-size':12,'font-weight':600,fill:'#F32A16'},svg,h1(ovSum)+' ч');
   y+=PH;if(!open)return;
   rows.forEach(({t,runs})=>{const ry=y,by=ry+(RH-BAR)/2,sel=F.task===t.id,dim=F.task!=='all'&&!sel;const x=P.R[t.id];
-   const row=el('g',{style:'cursor:pointer',opacity:dim?.3:1},svg);
+   const row=el('g',{style:'cursor:pointer',opacity:dim?.3:1},svg);ROWS[t.id]=row;
    el('rect',{x:0,y:ry,width:XR+OV,height:RH,fill:sel?'rgba(0,0,0,.08)':'transparent'},row);
    el('line',{x1:0,x2:XR+OV,y1:ry+RH,y2:ry+RH,stroke:'#EBEBEB'},row);
    el('rect',{x:4,y:ry+8,width:4,height:10,rx:2,fill:TYPECOL[t.type]},row);
@@ -521,7 +521,8 @@ function drawGantt(P){const svg=$('gantt');while(svg.firstChild)svg.removeChild(
    row.style.cursor='pointer';row.addEventListener('click',ev=>{ev.stopPropagation();openPop(t.id,ev);});
    y+=RH;});});
  // зависимости
- D.tasks.forEach(t=>deps(t).forEach(dp=>{if(!POS[t.id]||!POS[dp])return;const a=POS[dp],b=POS[t.id],r=P.R[t.id].depRisk&&P.R[t.id].depOn===dp;el('path',{d:`M${a.x2} ${a.y} H${a.x2+6} V${b.y} H${b.x1-1}`,fill:'none',stroke:r?'#F32A16':'#5D6198','stroke-width':1.3,'stroke-dasharray':r?'4 2':'','marker-end':r?'url(#arrR)':'url(#arr)','pointer-events':'none'},svg);}));
+ {const LK={};D.tasks.forEach(t=>deps(t).forEach(dp=>{const q=task(dp);if(!POS[t.id]||!POS[dp]||!q||q.person===t.person)return;const a=POS[dp],b=POS[t.id];const pa=el('path',{d:`M${a.x2} ${a.y} H${a.x2+6} V${b.y} H${b.x1-1}`,fill:'none',stroke:'#5D6198','stroke-width':1.3,'marker-end':'url(#arr)','pointer-events':'none',style:'display:none'},svg);(LK[t.id]=LK[t.id]||[]).push(pa);(LK[dp]=LK[dp]||[]).push(pa);}));
+ Object.keys(LK).forEach(id=>{const r=ROWS[id];if(!r)return;r.addEventListener('mouseenter',()=>LK[id].forEach(e=>e.style.display=''));r.addEventListener('mouseleave',()=>LK[id].forEach(e=>e.style.display='none'));});}
  // вехи и сегодня
  const ms=C.sprints.map(s=>({d:s.end,l:'конец '+s.id})).concat([{d:C.release,l:'релиз'}]);
  ms.forEach(m=>{if(!xs[m.d])return;const x=xs[m.d].x+xs[m.d].w;el('line',{x1:x,y1:20,x2:x,y2:H,stroke:'#343A7E','stroke-dasharray':'3 4',opacity:.5,'pointer-events':'none'},svg);el('path',{d:`M${x} 22 l6 6 l-6 6 l-6 -6z`,fill:m.l==='релиз'?'#599C16':'#343A7E'},svg);});
@@ -982,7 +983,7 @@ function gBuild(P){const gr=gGroups(),ts=visTasks().filter(t=>gInPeriod(t,P)),id
    L.push({s:n.id,t:fn.id,kind:'pf',len:100+fn.r+Math.min(p.feats.length,14)*3,k:0.32});add(n.id,fn.id);
    f.tasks.forEach(t=>{const m={id:t.id,kind:'task',t,f,r:4+Math.sqrt(+t.est||1)*1.05,ch:-45};N.push(m);
     L.push({s:fn.id,t:t.id,kind:'ft',len:34+fn.r+m.r+Math.min(f.tasks.length,12)*1.5,k:0.6});add(fn.id,t.id);});});});
- ts.forEach(t=>deps(t).forEach(d=>{if(ids.has(d)&&d!==t.id){L.push({s:d,t:t.id,kind:'dep',len:160,k:0.02});add(d,t.id);}}));
+ ts.forEach(t=>deps(t).forEach(d=>{if(ids.has(d)&&d!==t.id&&task(d)&&task(d).person!==t.person){L.push({s:d,t:t.id,kind:'dep',len:160,k:0.02});add(d,t.id);}}));
  const M={};N.forEach(n=>M[n.id]=n);L.forEach(l=>{l.a=M[l.s];l.b=M[l.t];});
  return {N,L,A,M,feats,projs,gr,root};}
 /* лёгкий force-layout (как d3-force: many-body, link, collide, слабое притяжение к центру) */
