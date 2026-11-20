@@ -345,13 +345,15 @@ function compute(){
  D.people.forEach(p=>fut.forEach(d=>{cap[p.id][d].free0=cap[p.id][d].free;}));
  D.tasks.forEach(t=>{const x=R[t.id];const H=histOf(t.id).filter(e=>e.d<=today);const lr=H.find(e=>['На ревью','Принята'].includes(e.s));const acc=H.find(e=>e.s==='Принята');x.accepted=acc?acc.d:null;x.readyReal=lr?prevDay(lr.d):null;x.baseStart=Object.keys(x.base).sort()[0]||null;});
  let es={},key0=null;
+ // правило: задача не начинается в последний рабочий день спринта (кроме последнего), старт переносится на первый день следующего спринта
+ const SPE=new Set(C.sprints.slice(0,-1).map(s=>{const ds=DAYS.filter(d=>d>=s.start&&d<=s.end);return ds[ds.length-1];}).filter(Boolean));
  const runFc=()=>D.people.forEach(p=>{fut.forEach(d=>{const c=cap[p.id][d];c.items=c.items.filter(a=>a.fact);c.free=c.free0;});
   D.tasks.filter(t=>t.person===p.id).forEach(t=>{R[t.id].fc={};R[t.id].overflow=0;});
   const Q=D.tasks.filter(t=>t.person===p.id&&t.status!=='Принята'&&t.status!=='Пауза/Блокер'&&+t.rem>0&&!t.blocker).sort((a,b)=>a.prio-b.prio||a.id.localeCompare(b.id));
   const rm={};Q.forEach(t=>rm[t.id]=+t.rem);const put=(t,d,k)=>{const c=cap[p.id][d];c.items.push({t:t.id,h:k});c.free-=k;rm[t.id]-=k;R[t.id].fc[d]=(R[t.id].fc[d]||0)+k;};
   const A=Q.filter(t=>t.status==='Активна');
   for(const d of fut){let L=A.filter(t=>rm[t.id]>EPS);while(L.length&&cap[p.id][d].free>EPS){const sh=cap[p.id][d].free/L.length;L.forEach(t=>put(t,d,Math.min(sh,rm[t.id])));L=L.filter(t=>rm[t.id]>EPS);}}
-  Q.filter(t=>t.status!=='Активна').forEach(t=>{const s0=es[t.id]||'';for(const d of fut){if(rm[t.id]<=EPS)break;if(d<s0)continue;const k=Math.min(rm[t.id],cap[p.id][d].free);if(k>EPS)put(t,d,k);}});
+  Q.filter(t=>t.status!=='Активна').forEach(t=>{const s0=es[t.id]||'';const nf=!Object.keys(R[t.id].fact).length;let st=false;for(const d of fut){if(rm[t.id]<=EPS)break;if(d<s0)continue;if(nf&&!st&&SPE.has(d))continue;const k=Math.min(rm[t.id],cap[p.id][d].free);if(k>EPS){put(t,d,k);st=true;}}});
   Q.forEach(t=>R[t.id].overflow=Math.max(0,rm[t.id]));});
  const finish=()=>D.tasks.forEach(t=>{const x=R[t.id];const fdz=Object.keys(x.fc).sort(),fa=Object.keys(x.fact).sort();
   x.end=t.status==='Принята'?(fa.length?fa[fa.length-1]:x.readyReal):(fdz.length?fdz[fdz.length-1]:(x.readyReal||(+t.rem<=EPS&&fa.length?fa[fa.length-1]:null)));
